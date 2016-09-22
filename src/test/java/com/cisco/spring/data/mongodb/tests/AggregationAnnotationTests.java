@@ -27,9 +27,7 @@ import com.cisco.spring.data.mongodb.test.config.aggregate.AggregateTestConfigur
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.BootstrapWith;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.support.DefaultTestContextBootstrapper;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
@@ -48,7 +46,7 @@ import static org.testng.Assert.*;
  * 10/10/2015.
  */
 @ContextConfiguration(classes = {AggregateTestConfiguration.class})
-@BootstrapWith(DefaultTestContextBootstrapper.class)
+//@BootstrapWith(DefaultTestContextBootstrapper.class)
 public class AggregationAnnotationTests extends AbstractTestNGSpringContextTests {
 
   @Autowired

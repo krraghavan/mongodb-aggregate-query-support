@@ -47,7 +47,7 @@ public class AggregateOutTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private MongoTemplate mongoTemplate;
 
-  @Test(enabled = false)
+  @Test
   public void outMustPlaceRepositoryObjectsInDifferentRepository() {
     TestAggregateAnnotation2FieldsBean obj1 = new TestAggregateAnnotation2FieldsBean(randomAlphabetic(10));
     TestAggregateAnnotation2FieldsBean obj2 = new TestAggregateAnnotation2FieldsBean(randomAlphabetic(20),
@@ -71,7 +71,7 @@ public class AggregateOutTest extends AbstractTestNGSpringContextTests {
     }
   }
 
-  @Test(enabled = false)
+  @Test
   public void outMustPlaceRepositoryObjectsInDifferentRepositoryIfOtherQueryAnnotationsArePresent() {
     String randomStr = randomAlphabetic(10);
     TestAggregateAnnotation2FieldsBean obj1 = new TestAggregateAnnotation2FieldsBean(randomStr);

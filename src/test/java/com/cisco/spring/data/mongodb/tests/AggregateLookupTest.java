@@ -28,9 +28,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.BootstrapWith;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.support.DefaultTestContextBootstrapper;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
@@ -44,7 +42,6 @@ import static org.testng.Assert.*;
  * @author rkolliva.
  */
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
-@BootstrapWith(DefaultTestContextBootstrapper.class)
 public class AggregateLookupTest extends AbstractTestNGSpringContextTests {
 
   @Autowired
