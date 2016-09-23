@@ -27,7 +27,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by rkolliva on 10/19/2015.
+ * Created by rkolliva
+ * 10/19/2015.
  */
 public interface TestAggregateRepositoryForUnwind extends
                                                   TestMongoRepository<TestUnwindAggregateAnnotationBean, String> {
