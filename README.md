@@ -8,7 +8,6 @@ The @Query annotation provided by Spring Data MongoDb allows queries to be execu
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
 
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.fakemongo/fongo/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.fakemongo/fongo/) ![License Apache2](https://go-shields.herokuapp.com/license-apache2-blue.png) 
 
 ## Current Limitations
 Not all aggregate pipeline steps are supported.  As of 1.0.0 support is provided for
