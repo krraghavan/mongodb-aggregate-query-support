@@ -29,6 +29,7 @@ import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
 import java.util.List;
+import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomUtils.nextInt;
@@ -50,8 +51,11 @@ public class AggregateOutTest extends AbstractTestNGSpringContextTests {
   @Test
   public void outMustPlaceRepositoryObjectsInDifferentRepository() {
     TestAggregateAnnotation2FieldsBean obj1 = new TestAggregateAnnotation2FieldsBean(randomAlphabetic(10));
+    obj1.setOid(UUID.randomUUID().toString());
     TestAggregateAnnotation2FieldsBean obj2 = new TestAggregateAnnotation2FieldsBean(randomAlphabetic(20),
                                                                                      nextInt(1, 10000));
+    obj2.setOid(UUID.randomUUID().toString());
+
     testAggregateRepository2.save(obj1);
     testAggregateRepository2.save(obj2);
     String outputRepoName = "temp1";

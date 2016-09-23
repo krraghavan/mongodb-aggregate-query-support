@@ -50,6 +50,11 @@ public interface QueryProvider {
   boolean returnCollection();
 
   /**
+   * @return repository's aggregate function's return type
+   */
+  Class getMethodReturnType();
+
+  /**
    * @return result key
    */
   String getQueryResultKey();
