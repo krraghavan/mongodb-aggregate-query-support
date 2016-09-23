@@ -90,7 +90,7 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
     //ResultsIterator resultsIterator = aggregate.options(aggregationOptions).as(resultMap.getClass());
 
     ResultsIterator resultsIterator = aggregate.as(resultMap.getClass());
-    if (!resultsIterator.hasNext()) {
+    if (!resultsIterator.hasNext() || Void.TYPE.equals(queryProvider.getMethodReturnType())) {
       return null;
     }
     final String resultKey = queryProvider.getQueryResultKey();
