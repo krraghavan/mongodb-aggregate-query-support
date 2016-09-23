@@ -121,6 +121,11 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
   }
 
   @Override
+  public Class getMethodReturnType() {
+    return method.getReturnType();
+  }
+
+  @Override
   public boolean hasNext() {
     return queryIterator.hasNext();
   }
