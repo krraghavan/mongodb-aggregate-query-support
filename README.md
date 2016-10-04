@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support?branch=master)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support)
+[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
