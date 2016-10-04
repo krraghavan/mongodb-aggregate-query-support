@@ -23,7 +23,11 @@ Not all aggregate pipeline steps are supported.  As of 1.0.0 support is provided
 Minimum Java version supported is 1.8 
 
 ## Usage
-See the test classes and test repository definitions for examples of how to use the Aggregate query annotations.
+See the unit test classes and test repository definitions for examples of how to use the Aggregate query annotations.
+
+The @Aggregate annotation is used identically to the way the Spring data @Query annotation is used.  You can put the annotation
+on any interface method (with placeholders) to get Aggregate query support.  The easiest way to do this is to test the 
+pipeline on a MongoDB client (like RoboMongo or MongoChef) and then copy the pipeline steps into each annotation.
 
 # Contributors
 * Kollivakkam Raghavan (owner)
