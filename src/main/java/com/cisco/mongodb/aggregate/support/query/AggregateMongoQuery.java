@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.query.*;
+import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.util.Assert;
 
@@ -50,10 +51,12 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
    * Creates a new {@link AbstractMongoQuery} from the given {@link MongoQueryMethod} and {@link MongoOperations}.
    *
    * @param method must not be {@literal null}.
+   * @param projectionFactory
    */
   public AggregateMongoQuery(Method method, RepositoryMetadata metadata, MongoOperations mongoOperations,
-                             MongoQueryExecutor queryExecutor) {
-    super(new MongoQueryMethod(method, metadata, mongoOperations.getConverter().getMappingContext()), mongoOperations);
+                             ProjectionFactory projectionFactory, MongoQueryExecutor queryExecutor) {
+    super(new MongoQueryMethod(method, metadata, projectionFactory, mongoOperations.getConverter().getMappingContext()),
+          mongoOperations);
     this.mongoOperations = mongoOperations;
     this.method = method;
     this.queryExecutor = queryExecutor;

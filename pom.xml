@@ -26,7 +26,7 @@
 
   <groupId>com.github.krraghavan</groupId>
   <artifactId>mongodb-aggregate-query-support</artifactId>
-  <version>0.7.1-SNAPSHOT</version>
+  <version>0.7.1-RELEASE</version>
 
   <name>Annotation based Mongo DB Aggregation Query Support</name>
   <description>Spring Data @Query like support for Mongo Aggregation queries</description>
@@ -48,6 +48,11 @@
     </developer>
     <developer>
       <name>Sukhdev Singh</name>
+      <organization>Cisco</organization>
+      <organizationUrl>http://www.cisco.com</organizationUrl>
+    </developer>
+    <developer>
+      <name>Cameron Javier</name>
       <organization>Cisco</organization>
       <organizationUrl>http://www.cisco.com</organizationUrl>
     </developer>
@@ -81,7 +86,7 @@
     <dependency>
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-mongodb</artifactId>
-      <version>1.8.0.RELEASE</version>
+      <version>1.9.6.RELEASE</version>
     </dependency>
     <dependency>
       <groupId>org.jongo</groupId>

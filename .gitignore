@@ -97,6 +97,8 @@ local.properties
 
 # IntelliJ
 /out/
+*.iml
+logfile.txt
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/

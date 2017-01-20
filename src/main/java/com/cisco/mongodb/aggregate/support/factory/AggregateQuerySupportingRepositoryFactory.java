@@ -26,6 +26,7 @@ import com.cisco.mongodb.aggregate.support.query.MongoQueryExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.MongoRepositoryFactory;
+import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.NamedQueries;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.query.EvaluationContextProvider;
@@ -79,13 +80,13 @@ public class AggregateQuerySupportingRepositoryFactory extends MongoRepositoryFa
     }
 
     @Override
-    public RepositoryQuery resolveQuery(Method method, RepositoryMetadata metadata, NamedQueries namedQueries) {
+    public RepositoryQuery resolveQuery(Method method, RepositoryMetadata repositoryMetadata, ProjectionFactory projectionFactory, NamedQueries namedQueries) {
       Annotation aggregateAnnotation = method.getAnnotation(Aggregate.class);
       if (aggregateAnnotation == null) {
-        return parentQueryLookupStrategy.resolveQuery(method, metadata, namedQueries);
+        return parentQueryLookupStrategy.resolveQuery(method, repositoryMetadata, projectionFactory, namedQueries);
       }
       else {
-        return new AggregateMongoQuery(method, metadata, mongoOperations, queryExecutor);
+        return new AggregateMongoQuery(method, repositoryMetadata, mongoOperations, projectionFactory, queryExecutor);
       }
     }
   }
