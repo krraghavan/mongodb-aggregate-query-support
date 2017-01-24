@@ -73,4 +73,5 @@ public @interface Aggregate {
 
   Out out() default @Out(query = "");
 
+  Bucket[] bucket() default {};
 }

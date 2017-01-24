@@ -19,11 +19,6 @@
 
 package com.cisco.mongodb.aggregate.support.factory;
 
-/**
- * Created by rkolliva
- * 9/7/16.
- */
-
 
 import com.cisco.mongodb.aggregate.support.query.MongoQueryExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +30,19 @@ import org.springframework.util.Assert;
 
 import java.io.Serializable;
 
+/**
+ * Created by rkolliva
+ * 9/7/16.
+ */
 public class AggregateQuerySupportingRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extends Serializable>
     extends MongoRepositoryFactoryBean<T, S, ID> {
 
+  private final MongoQueryExecutor queryExecutor;
+
   @Autowired
-  private MongoQueryExecutor queryExecutor;
+  public AggregateQuerySupportingRepositoryFactoryBean(MongoQueryExecutor queryExecutor) {
+    this.queryExecutor = queryExecutor;
+  }
 
   @Override
   protected RepositoryFactorySupport getFactoryInstance(MongoOperations operations) {

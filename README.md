@@ -10,7 +10,7 @@ queries with practically no code being written.
 
 
 ## Current Limitations
-Not all aggregate pipeline steps are supported.  As of 1.0.0 support is provided for
+Not all aggregate pipeline steps are supported.  As of 0.7.2 support is provided for
 
 * Project
 * Unwind
@@ -19,6 +19,7 @@ Not all aggregate pipeline steps are supported.  As of 1.0.0 support is provided
 * Match
 * Out
 * Limit
+* Bucket (Mongo 3.4+)
 
 Minimum Java version supported is 1.8 
 

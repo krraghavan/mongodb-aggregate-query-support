@@ -23,7 +23,6 @@ package com.cisco.mongodb.aggregate.support.factory;
 import com.cisco.mongodb.aggregate.support.annotation.Aggregate;
 import com.cisco.mongodb.aggregate.support.query.AggregateMongoQuery;
 import com.cisco.mongodb.aggregate.support.query.MongoQueryExecutor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.MongoRepositoryFactory;
 import org.springframework.data.projection.ProjectionFactory;
@@ -44,14 +43,13 @@ public class AggregateQuerySupportingRepositoryFactory extends MongoRepositoryFa
 
   private final MongoOperations mongoOperations;
 
-  @Autowired
   private MongoQueryExecutor queryExecutor;
 
   /**
    * Creates a new {@link MongoRepositoryFactory} with the given {@link MongoOperations}.
    *
    * @param mongoOperations must not be {@literal null}
-   * @param queryExecutor
+   * @param queryExecutor - the query executor
    */
   public AggregateQuerySupportingRepositoryFactory(MongoOperations mongoOperations, MongoQueryExecutor queryExecutor) {
     super(mongoOperations);
@@ -67,15 +65,11 @@ public class AggregateQuerySupportingRepositoryFactory extends MongoRepositoryFa
     return new AggregateQueryLookupStrategy(parentQueryLookupStrategy);
   }
 
-  public void setQueryExecutor(MongoQueryExecutor queryExecutor) {
-    this.queryExecutor = queryExecutor;
-  }
-
   private class AggregateQueryLookupStrategy implements QueryLookupStrategy {
 
     private final QueryLookupStrategy parentQueryLookupStrategy;
 
-    public AggregateQueryLookupStrategy(QueryLookupStrategy parentQueryLookupStrategy) {
+    AggregateQueryLookupStrategy(QueryLookupStrategy parentQueryLookupStrategy) {
       this.parentQueryLookupStrategy = parentQueryLookupStrategy;
     }
 
