@@ -85,7 +85,15 @@ public @interface Aggregate {
    * Support for $addFields aggregation pipeline operator.
    * Since Mongo 3.4
    *
-   * @return - array of AddFields stages
+   * @return - array of $addFields stages
    */
   AddFields [] addFields() default {};
+
+  /**
+   * Support for $replaceRoot aggregation pipeline operator.
+   * Since Mongo 3.4
+   *
+   * @return - array of $replaceRoot stages
+   */
+  ReplaceRoot[] replaceRoot() default {};
 }

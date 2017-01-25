@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2016 the original author or authors.
+ *  Copyright (c) 2017 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,18 +17,20 @@
  *
  */
 
+package com.cisco.mongodb.aggregate.support.annotation;
 
-
-package com.cisco.mongodb.aggregate.support.test.config;
-
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import java.lang.annotation.*;
 
 /**
- * @author rkolliva.
+ * Created by rkolliva
+ * 1/25/17.
  */
-@Configuration
-@Import({MongoDBTestConfiguration.class, TestMongoRepositoryConfiguration.class})
-public class AggregateTestConfiguration {
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+public @interface ReplaceRoot {
 
+  String query();
+
+  int order();
 }

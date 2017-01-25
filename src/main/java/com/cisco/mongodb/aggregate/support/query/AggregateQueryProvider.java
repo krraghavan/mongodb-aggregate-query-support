@@ -223,6 +223,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     Bucket [] buckets = aggregateAnnotation.bucket();
     Out out = aggregateAnnotation.out();
     AddFields[] addFields = aggregateAnnotation.addFields();
+    ReplaceRoot[] replaceRoots = aggregateAnnotation.replaceRoot();
 
     pipelineCount += aggregateCounter.apply(projections);
     pipelineCount += aggregateCounter.apply(groups);
@@ -232,6 +233,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     pipelineCount += aggregateCounter.apply(limits);
     pipelineCount += aggregateCounter.apply(buckets);
     pipelineCount += aggregateCounter.apply(addFields);
+    pipelineCount += aggregateCounter.apply(replaceRoots);
 
     //If query is empty string then out was not declared in tests
     if (!"".equals(out.query())) {
@@ -275,10 +277,17 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
                                                      + pipelineCount);
         queries[bucket.order()] = getQueryString.apply(BUCKET, bucket.query());
       }
+
       for (AddFields fieldsToAdd : addFields) {
-        Assert.isTrue(fieldsToAdd.order() < pipelineCount, "addFields order " + fieldsToAdd.order()
+        Assert.isTrue(fieldsToAdd.order() < pipelineCount, "AddFields order " + fieldsToAdd.order()
                                                            + " must be less than " + pipelineCount);
         queries[fieldsToAdd.order()] = getQueryString.apply(ADDFIELDS, fieldsToAdd.query());
+      }
+
+      for (ReplaceRoot replaceRoot : replaceRoots) {
+        Assert.isTrue(replaceRoot.order() < pipelineCount, "ReplaceRoot order " + replaceRoot.order()
+                                                           + " must be less than " + pipelineCount);
+        queries[replaceRoot.order()] = getQueryString.apply(REPLACEROOT, replaceRoot.query());
       }
       //since only one out is allowed, place it at the end
       if (outAnnotationPresent) {
@@ -301,6 +310,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     LIMIT("$limit"),
     BUCKET("$bucket"),
     ADDFIELDS("$addFields"),
+    REPLACEROOT("$replaceRoot"),
     OUT("$out");
 
     private final String representation;
