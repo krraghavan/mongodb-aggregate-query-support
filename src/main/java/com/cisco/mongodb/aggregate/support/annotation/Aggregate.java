@@ -73,5 +73,19 @@ public @interface Aggregate {
 
   Out out() default @Out(query = "");
 
+  /**
+   * Support for $bucket aggregation pipeline operator.
+   * Since Mongo 3.4
+   *
+   * @return - array of Bucket stages
+   */
   Bucket[] bucket() default {};
+
+  /**
+   * Support for $addFields aggregation pipeline operator.
+   * Since Mongo 3.4
+   *
+   * @return - array of AddFields stages
+   */
+  AddFields [] addFields() default {};
 }

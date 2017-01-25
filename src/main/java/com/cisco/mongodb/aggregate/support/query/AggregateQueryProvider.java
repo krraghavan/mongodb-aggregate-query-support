@@ -222,6 +222,8 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     Limit[] limits = aggregateAnnotation.limit();
     Bucket [] buckets = aggregateAnnotation.bucket();
     Out out = aggregateAnnotation.out();
+    AddFields[] addFields = aggregateAnnotation.addFields();
+
     pipelineCount += aggregateCounter.apply(projections);
     pipelineCount += aggregateCounter.apply(groups);
     pipelineCount += aggregateCounter.apply(unwinds);
@@ -229,6 +231,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     pipelineCount += aggregateCounter.apply(lookups);
     pipelineCount += aggregateCounter.apply(limits);
     pipelineCount += aggregateCounter.apply(buckets);
+    pipelineCount += aggregateCounter.apply(addFields);
 
     //If query is empty string then out was not declared in tests
     if (!"".equals(out.query())) {
@@ -272,6 +275,11 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
                                                      + pipelineCount);
         queries[bucket.order()] = getQueryString.apply(BUCKET, bucket.query());
       }
+      for (AddFields fieldsToAdd : addFields) {
+        Assert.isTrue(fieldsToAdd.order() < pipelineCount, "addFields order " + fieldsToAdd.order()
+                                                           + " must be less than " + pipelineCount);
+        queries[fieldsToAdd.order()] = getQueryString.apply(ADDFIELDS, fieldsToAdd.query());
+      }
       //since only one out is allowed, place it at the end
       if (outAnnotationPresent) {
         queries[pipelineCount - 1] = getQueryString.apply(OUT, out.query());
@@ -292,6 +300,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     PROJECT("$project"),
     LIMIT("$limit"),
     BUCKET("$bucket"),
+    ADDFIELDS("$addFields"),
     OUT("$out");
 
     private final String representation;

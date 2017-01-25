@@ -31,21 +31,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Created by rkolliva on 10/21/2015.
  * A query executor for test cases
  */
+@SuppressWarnings("unchecked")
 public class JongoQueryExecutor implements MongoQueryExecutor {
 
-
   private static final Logger LOGGER = LoggerFactory.getLogger(JongoQueryExecutor.class);
-
-  //30 sec
-  //keeping this same as  socket timeout so that if socket timeout
-  // happens the processing is stopped in DB also.
-  private static final long MAX_DB_PROCESSING_TIMEOUT = 30 * 1000;
 
   private final Jongo jongo;
 
