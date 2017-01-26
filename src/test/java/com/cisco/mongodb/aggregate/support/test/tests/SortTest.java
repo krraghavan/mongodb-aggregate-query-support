@@ -43,7 +43,7 @@ public class SortTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private TestSortRepository testSortRepository;
 
-  @Test
+  @Test(enabled = false)
   public void mustSortResults() {
     Assert.assertNotNull(testSortRepository);
     List<TestSortResultsBean> sortResultsBeans = testSortRepository.sortByTags();

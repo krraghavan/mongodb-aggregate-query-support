@@ -45,7 +45,7 @@ public class AggregateAddFieldsTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private TestAddFieldsRepository testAddFieldsRepository;
 
-  @Test
+  @Test(enabled = false)
   public void mustAddFieldsToResults() {
     assertNotNull(testAddFieldsRepository);
 

@@ -45,7 +45,7 @@ public class ReplaceRootTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private TestReplaceRootRepository testReplaceRootRepository;
 
-  @Test
+  @Test(enabled = false)
   public void mustAddFieldsToResults() {
     assertNotNull(testReplaceRootRepository);
 
@@ -76,7 +76,7 @@ public class ReplaceRootTest extends AbstractTestNGSpringContextTests {
     assertEquals(yamsCount[0], 200);
   }
 
-  @Test
+  @Test(enabled = false)
   public void mustReplaceRootWithMatch() {
     assertNotNull(testReplaceRootRepository);
 
@@ -99,7 +99,7 @@ public class ReplaceRootTest extends AbstractTestNGSpringContextTests {
   }
 
   @SuppressWarnings("unchecked")
-  @Test
+  @Test(enabled = false)
   public void mustReplaceRootWithExpression() {
     assertNotNull(testReplaceRootRepository);
 
@@ -128,7 +128,7 @@ public class ReplaceRootTest extends AbstractTestNGSpringContextTests {
   }
 
   @SuppressWarnings("unchecked")
-  @Test
+  @Test(enabled = false)
   public void mustReplaceRootWithArrays() {
     assertNotNull(testReplaceRootRepository);
 
