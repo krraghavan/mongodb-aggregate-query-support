@@ -96,4 +96,12 @@ public @interface Aggregate {
    * @return - array of $replaceRoot stages
    */
   ReplaceRoot[] replaceRoot() default {};
+
+  /**
+   * Support for $sort aggregation pipeline operator.
+   *
+   * @return - array of $replaceRoot stages
+   */
+  Sort[] sort() default {};
+
 }

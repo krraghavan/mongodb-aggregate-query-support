@@ -224,6 +224,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     Out out = aggregateAnnotation.out();
     AddFields[] addFields = aggregateAnnotation.addFields();
     ReplaceRoot[] replaceRoots = aggregateAnnotation.replaceRoot();
+    Sort[] sorts = aggregateAnnotation.sort();
 
     pipelineCount += aggregateCounter.apply(projections);
     pipelineCount += aggregateCounter.apply(groups);
@@ -234,6 +235,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     pipelineCount += aggregateCounter.apply(buckets);
     pipelineCount += aggregateCounter.apply(addFields);
     pipelineCount += aggregateCounter.apply(replaceRoots);
+    pipelineCount += aggregateCounter.apply(sorts);
 
     //If query is empty string then out was not declared in tests
     if (!"".equals(out.query())) {
@@ -289,6 +291,12 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
                                                            + " must be less than " + pipelineCount);
         queries[replaceRoot.order()] = getQueryString.apply(REPLACEROOT, replaceRoot.query());
       }
+
+      for (Sort sort : sorts) {
+        Assert.isTrue(sort.order() < pipelineCount, "Sort order " + sort.order()
+                                                           + " must be less than " + pipelineCount);
+        queries[sort.order()] = getQueryString.apply(SORT, sort.query());
+      }
       //since only one out is allowed, place it at the end
       if (outAnnotationPresent) {
         queries[pipelineCount - 1] = getQueryString.apply(OUT, out.query());
@@ -311,6 +319,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     BUCKET("$bucket"),
     ADDFIELDS("$addFields"),
     REPLACEROOT("$replaceRoot"),
+    SORT("$sort"),
     OUT("$out");
 
     private final String representation;
