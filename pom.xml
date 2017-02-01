@@ -64,7 +64,7 @@
     <connection>scm:git:git://github.com/krraghavan/mongodb-aggregate-query-support.git</connection>
     <developerConnection>scm:git:ssh://github.com:krraghavan/mongodb-aggregate-query-support.git</developerConnection>
     <url>https://github.com/krraghavan/mongodb-aggregate-query-support/tree/master</url>
-    <tag>v0.7.2</tag>
+    <tag>v0.7.3-SNAPSHOT</tag>
   </scm>
 
   <distributionManagement>
