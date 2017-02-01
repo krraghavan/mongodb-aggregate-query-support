@@ -55,13 +55,14 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
   private final String collectioName;
   private final Iterator<String> queryIterator;
   private final Aggregate aggregateAnnotation;
+  @SuppressWarnings({"FieldCanBeLocal", "unused"})
   private final MongoParameterAccessor mongoParameterAccessor;
   private final ConvertingParameterAccessor convertingParameterAccessor;
   private final Method method;
   private List<String> aggregateQueryPipeline;
 
-  public AggregateQueryProvider(Method method, MongoParameterAccessor mongoParameterAccessor,
-                                ConvertingParameterAccessor convertingParameterAccessor) throws InvalidAggregationQueryException {
+  AggregateQueryProvider(Method method, MongoParameterAccessor mongoParameterAccessor,
+                         ConvertingParameterAccessor convertingParameterAccessor) throws InvalidAggregationQueryException {
     this.aggregateAnnotation = method.getAnnotation(Aggregate.class);
     this.outputClass = aggregateAnnotation.outputBeanType();
     this.mongoParameterAccessor = mongoParameterAccessor;
@@ -148,9 +149,9 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
   /**
    * Returns the serialized value to be used for the given {@link ParameterBinding}.
    *
-   * @param accessor
-   * @param binding
-   * @return
+   * @param accessor - the accessor
+   * @param binding - the binding
+   * @return - the value of the parameter
    */
   private String getParameterValueForBinding(ConvertingParameterAccessor accessor, ParameterBinding binding) {
 
@@ -163,13 +164,15 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     return JSON.serialize(value);
   }
 
-  /************* AGGREGATION SUPPORTS ***************************/
+  /*
+   * *********** AGGREGATION SUPPORTS ***************************
+   */
 
   /**
    * Replaced the parameter place-holders with the actual parameter values from the given {@link ParameterBinding}s.
    *
-   * @param query
-   * @return
+   * @param query - the query string with placeholders
+   * @return - the string with values replaced
    */
   private String replacePlaceholders(String query) {
     List<ParameterBinding> queryParameterBindings = PARSER.parseParameterBindingsFrom(query);
@@ -194,7 +197,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     return result.toString();
   }
 
-  protected void createAggregateQuery() throws InvalidAggregationQueryException {
+  private void createAggregateQuery() throws InvalidAggregationQueryException {
     // create the pipeline.
     LOGGER.debug("Getting aggregate operations");
     int pipelineCount = 0;
@@ -217,13 +220,23 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     Match[] matches = aggregateAnnotation.match();
     Lookup[] lookups = aggregateAnnotation.lookup();
     Limit[] limits = aggregateAnnotation.limit();
+    Bucket [] buckets = aggregateAnnotation.bucket();
     Out out = aggregateAnnotation.out();
+    AddFields[] addFields = aggregateAnnotation.addFields();
+    ReplaceRoot[] replaceRoots = aggregateAnnotation.replaceRoot();
+    Sort[] sorts = aggregateAnnotation.sort();
+
     pipelineCount += aggregateCounter.apply(projections);
     pipelineCount += aggregateCounter.apply(groups);
     pipelineCount += aggregateCounter.apply(unwinds);
     pipelineCount += aggregateCounter.apply(matches);
     pipelineCount += aggregateCounter.apply(lookups);
     pipelineCount += aggregateCounter.apply(limits);
+    pipelineCount += aggregateCounter.apply(buckets);
+    pipelineCount += aggregateCounter.apply(addFields);
+    pipelineCount += aggregateCounter.apply(replaceRoots);
+    pipelineCount += aggregateCounter.apply(sorts);
+
     //If query is empty string then out was not declared in tests
     if (!"".equals(out.query())) {
       outAnnotationPresent = true;
@@ -261,11 +274,35 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
                                                      + pipelineCount);
         queries[limit.order()] = getQueryString.apply(LIMIT, limit.query());
       }
+      for (Bucket bucket: buckets) {
+        Assert.isTrue(bucket.order() < pipelineCount, "Bucket Order " + bucket.order() + " must be less than "
+                                                     + pipelineCount);
+        queries[bucket.order()] = getQueryString.apply(BUCKET, bucket.query());
+      }
+
+      for (AddFields fieldsToAdd : addFields) {
+        Assert.isTrue(fieldsToAdd.order() < pipelineCount, "AddFields order " + fieldsToAdd.order()
+                                                           + " must be less than " + pipelineCount);
+        queries[fieldsToAdd.order()] = getQueryString.apply(ADDFIELDS, fieldsToAdd.query());
+      }
+
+      for (ReplaceRoot replaceRoot : replaceRoots) {
+        Assert.isTrue(replaceRoot.order() < pipelineCount, "ReplaceRoot order " + replaceRoot.order()
+                                                           + " must be less than " + pipelineCount);
+        queries[replaceRoot.order()] = getQueryString.apply(REPLACEROOT, replaceRoot.query());
+      }
+
+      for (Sort sort : sorts) {
+        Assert.isTrue(sort.order() < pipelineCount, "Sort order " + sort.order()
+                                                           + " must be less than " + pipelineCount);
+        queries[sort.order()] = getQueryString.apply(SORT, sort.query());
+      }
       //since only one out is allowed, place it at the end
       if (outAnnotationPresent) {
         queries[pipelineCount - 1] = getQueryString.apply(OUT, out.query());
       }
 
+      //noinspection ConfusingArgumentToVarargsMethod
       LOGGER.debug("Aggregate pipeline after forming queries - {}", queries);
 
       aggregateQueryPipeline = Arrays.asList(queries);
@@ -279,6 +316,10 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     LOOKUP("$lookup"),
     PROJECT("$project"),
     LIMIT("$limit"),
+    BUCKET("$bucket"),
+    ADDFIELDS("$addFields"),
+    REPLACEROOT("$replaceRoot"),
+    SORT("$sort"),
     OUT("$out");
 
     private final String representation;
@@ -310,8 +351,8 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
      * Returns a list of {@link ParameterBinding}s found in the given {@code input} or an
      * {@link Collections#emptyList()}.
      *
-     * @param input
-     * @return
+     * @param input - the string with parameter bindings
+     * @return - the list of parameters
      */
     public List<ParameterBinding> parseParameterBindingsFrom(String input) {
 
@@ -319,7 +360,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
         return Collections.emptyList();
       }
 
-      List<ParameterBinding> bindings = new ArrayList<ParameterBinding>();
+      List<ParameterBinding> bindings = new ArrayList<>();
 
       String parseableInput = makeParameterReferencesParseable(input);
 
@@ -404,24 +445,24 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     /**
      * Creates a new {@link ParameterBinding} with the given {@code parameterIndex} and {@code quoted} information.
      *
-     * @param parameterIndex
+     * @param parameterIndex - the index of the parameterIndex
      * @param quoted         whether or not the parameter is already quoted.
      */
-    public ParameterBinding(int parameterIndex, boolean quoted) {
+    ParameterBinding(int parameterIndex, boolean quoted) {
 
       this.parameterIndex = parameterIndex;
       this.quoted = quoted;
     }
 
-    public boolean isQuoted() {
+    boolean isQuoted() {
       return quoted;
     }
 
-    public int getParameterIndex() {
+    int getParameterIndex() {
       return parameterIndex;
     }
 
-    public String getParameter() {
+    String getParameter() {
       return "?" + parameterIndex;
     }
   }

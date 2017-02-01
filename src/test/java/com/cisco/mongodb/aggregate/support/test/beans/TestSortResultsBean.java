@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2016 the original author or authors.
+ *  Copyright (c) 2017 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,11 +16,41 @@
  *
  *
  */
+
 package com.cisco.mongodb.aggregate.support.test.beans;
+
+import org.jongo.marshall.jackson.oid.MongoId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.Id;
 
 /**
  * Created by rkolliva
- * 10/20/2015.
+ * 1/26/17.
  */
-public class AbstractTestAggregateBean {
+
+
+public class TestSortResultsBean extends AbstractTestAggregateBean {
+
+  @Id
+  @MongoId
+  private String id;
+
+  private String tags;
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public String getTags() {
+    return tags;
+  }
+
+  public void setTags(String tags) {
+    this.tags = tags;
+  }
 }

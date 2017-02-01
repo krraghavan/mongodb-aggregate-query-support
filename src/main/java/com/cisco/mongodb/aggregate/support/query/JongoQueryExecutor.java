@@ -31,25 +31,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.Assert;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * Created by rkolliva on 10/21/2015.
  * A query executor for test cases
  */
+@SuppressWarnings("unchecked")
 public class JongoQueryExecutor implements MongoQueryExecutor {
-
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JongoQueryExecutor.class);
 
-  //30 sec
-  //keeping this same as  socket timeout so that if socket timeout
-  // happens the processing is stopped in DB also.
-  private static final long MAX_DB_PROCESSING_TIMEOUT = 30 * 1000;
-
-  @Autowired
   private final Jongo jongo;
 
+  @Autowired
   public JongoQueryExecutor(Jongo jongo) {
     this.jongo = jongo;
   }
@@ -95,37 +89,34 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
     }
     final String resultKey = queryProvider.getQueryResultKey();
     final List retval = new ArrayList();
-    resultsIterator.forEachRemaining(new Consumer() {
-      @Override
-      public void accept(Object o) {
-        LOGGER.debug("Got object {}", o.toString());
-        Assert.isTrue(o instanceof Map);
-        Map<String, Object> instanceMap = (Map) o;
-        Object resultObject = null;
-        Object valueObject = null;
-        //If there is no result key, we should consider the whole return values map
-        //If not consider only the value in result key
-        if (resultKey.isEmpty()) {
-          valueObject = instanceMap;
-        }
-        else {
-          valueObject = instanceMap.get(resultKey);
-        }
-        //If the result is a map(by default map will be returned) we need to
-        // deserialize. If not, then it is a generic type(Eg. String, Integer)
-        // which does not need deserialization
-        if (valueObject instanceof Map) {
-          Map value = (Map) valueObject;
-          DBObject dbObject = new BasicDBObject(value);
-          BsonDocument bsonDocument = Bson.createDocument(dbObject);
-          resultObject = jongo.getMapper().getUnmarshaller().unmarshall(bsonDocument,
-                                                                        queryProvider.getOutputClass());
-        }
-        else {
-          resultObject = valueObject;
-        }
-        retval.add(resultObject);
+    resultsIterator.forEachRemaining(o -> {
+      LOGGER.debug("Got object {}", o.toString());
+      Assert.isTrue(o instanceof Map);
+      Map<String, Object> instanceMap = (Map) o;
+      Object resultObject = null;
+      Object valueObject = null;
+      //If there is no result key, we should consider the whole return values map
+      //If not consider only the value in result key
+      if (resultKey.isEmpty()) {
+        valueObject = instanceMap;
       }
+      else {
+        valueObject = instanceMap.get(resultKey);
+      }
+      //If the result is a map(by default map will be returned) we need to
+      // deserialize. If not, then it is a generic type(Eg. String, Integer)
+      // which does not need deserialization
+      if (valueObject instanceof Map) {
+        Map value = (Map) valueObject;
+        DBObject dbObject = new BasicDBObject(value);
+        BsonDocument bsonDocument = Bson.createDocument(dbObject);
+        resultObject = jongo.getMapper().getUnmarshaller().unmarshall(bsonDocument,
+                                                                      queryProvider.getOutputClass());
+      }
+      else {
+        resultObject = valueObject;
+      }
+      retval.add(resultObject);
     });
     if (queryProvider.returnCollection()) {
       return retval;

@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2016 the original author or authors.
+ *  Copyright (c) 2017 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -17,18 +17,33 @@
  *
  */
 
-
-
 package com.cisco.mongodb.aggregate.support.test.config;
 
+import com.github.fakemongo.Fongo;
+import com.mongodb.MongoClient;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+
+import java.net.UnknownHostException;
 
 /**
- * @author rkolliva.
+ * Created by rkolliva
+ * 1/21/17.
  */
+
 @Configuration
-@Import({MongoDBTestConfiguration.class, TestMongoRepositoryConfiguration.class})
-public class AggregateTestConfiguration {
+public class FongoConfiguration {
+
+  @Bean
+  public MongoClient mongo() throws UnknownHostException {
+    Fongo fongo = new Fongo(RandomStringUtils.randomAlphabetic(10));
+    return fongo.getMongo();
+  }
+
+  @Bean
+  public String dbName() {
+    return RandomStringUtils.randomAlphabetic(10);
+  }
 
 }

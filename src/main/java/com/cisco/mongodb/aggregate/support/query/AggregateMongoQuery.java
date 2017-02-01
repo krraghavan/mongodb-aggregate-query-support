@@ -44,15 +44,15 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
 
   private final Method method;
 
-  @Autowired
-  private MongoQueryExecutor queryExecutor;
+  private final MongoQueryExecutor queryExecutor;
 
   /**
    * Creates a new {@link AbstractMongoQuery} from the given {@link MongoQueryMethod} and {@link MongoOperations}.
    *
    * @param method must not be {@literal null}.
-   * @param projectionFactory
+   * @param projectionFactory - the projection factory
    */
+  @Autowired
   public AggregateMongoQuery(Method method, RepositoryMetadata metadata, MongoOperations mongoOperations,
                              ProjectionFactory projectionFactory, MongoQueryExecutor queryExecutor) {
     super(new MongoQueryMethod(method, metadata, projectionFactory, mongoOperations.getConverter().getMappingContext()),

@@ -20,18 +20,20 @@ package com.cisco.mongodb.aggregate.support.test.config;
 
 import com.cisco.mongodb.aggregate.support.query.JongoQueryExecutor;
 import com.cisco.mongodb.aggregate.support.query.MongoQueryExecutor;
-import com.github.fakemongo.Fongo;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
 import org.jongo.Jongo;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.core.convert.DbRefResolver;
 import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
+import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 
 import java.net.UnknownHostException;
@@ -41,95 +43,50 @@ import java.net.UnknownHostException;
  * 10/21/2015.
  */
 @Configuration
+@Import({FongoConfiguration.class, MongoClientConfiguration.class})
 public class MongoDBTestConfiguration {
 
-  private MongoDbFactory mongoDbFactory;
-
-  private MappingMongoConverter mongoConverter;
-
-  private MongoTemplate mongoTemplate;
-
-  private MongoDbFactory mongoDbFactoryForJongo;
-  private Jongo jongo;
-  private MongoQueryExecutor queryExecutor;
-
-  public MongoDBTestConfiguration() {
-  }
-
-  public synchronized MongoDbFactory mongoDBFactory() throws UnknownHostException {
-    if (mongoDbFactory == null) {
-      mongoDbFactory = new SimpleMongoDbFactory(mongo(), "test");
-    }
-    return mongoDbFactory;
-  }
-
-  public synchronized MongoDbFactory mongoDBFactoryForJongo() throws UnknownHostException {
-    if (mongoDbFactoryForJongo == null) {
-      mongoDbFactoryForJongo = new SimpleMongoDbFactory(mongoForJongo(), "test");
-    }
-    return mongoDbFactoryForJongo;
+  @Bean
+  public MongoDbFactory mongoDbFactory(MongoClient mongoClient, String dbName) throws UnknownHostException {
+    return new SimpleMongoDbFactory(mongoClient, dbName);
   }
 
   @Bean
-  public MongoTemplate mongoTemplate() throws Exception {
-    if (mongoTemplate == null) {
-      mongoTemplate = new MongoTemplate(mongoDBFactory(), mongoConverter());
-      mongoTemplate.setWriteConcern(WriteConcern.JOURNALED);
-    }
+  public MongoDbFactory mongoDbFactoryForJongo(MongoClient mongoClient, String dbName) throws UnknownHostException {
+    return new SimpleMongoDbFactory(mongoClient, dbName);
+  }
+
+  @Bean
+  public MongoMappingContext mongoMappingContext() {
+    return new MongoMappingContext();
+  }
+
+  @Bean
+  public DbRefResolver dbRefResolver(@Qualifier("mongoDbFactory") MongoDbFactory mongoDbFactory) {
+    return new DefaultDbRefResolver(mongoDbFactory);
+  }
+
+  @Bean
+  public MongoTemplate mongoTemplate(@Qualifier("mongoDbFactory") MongoDbFactory mongoDbFactory,
+                                     MongoConverter mongoConverter) throws Exception {
+    MongoTemplate mongoTemplate = new MongoTemplate(mongoDbFactory, mongoConverter);
+    mongoTemplate.setWriteConcern(WriteConcern.JOURNALED);
     return mongoTemplate;
   }
 
   @Bean
-  public MongoClient mongo() throws UnknownHostException {
-    Fongo fongo = new Fongo("TestMongoInstance");
-    return fongo.getMongo();
+  public MappingMongoConverter mongoConverter(MongoMappingContext mappingContext,
+                                              DbRefResolver dbRefResolver) throws Exception {
+    return new MappingMongoConverter(dbRefResolver, mappingContext);
   }
 
   @Bean
-  public MongoClient mongoForJongo() throws UnknownHostException {
-    return mongo();
+  public Jongo jongo(@Qualifier("mongoDbFactoryForJongo") MongoDbFactory mongoDbFactoryForJongo) throws UnknownHostException {
+    return new Jongo(mongoDbFactoryForJongo.getDb());
   }
 
   @Bean
-  public MappingMongoConverter mongoConverter() throws Exception {
-    if (mongoConverter == null) {
-      MongoMappingContext mappingContext = new MongoMappingContext();
-      DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoDBFactory());
-      mongoConverter = new MappingMongoConverter(dbRefResolver, mappingContext);
-    }
-    return mongoConverter;
+  public MongoQueryExecutor queryExecutor(Jongo jongo) throws UnknownHostException {
+    return new JongoQueryExecutor(jongo);
   }
-
-//  public MongoDbFactory getMongoDbFactory() {
-//    return mongoDbFactory;
-//  }
-//
-//  public void setMongoDbFactory(MongoDbFactory mongoDbFactory) {
-//    this.mongoDbFactory = mongoDbFactory;
-//  }
-//
-//  public MongoDbFactory getMongoDbFactoryForJongo() {
-//    return mongoDbFactoryForJongo;
-//  }
-//
-//  public void setMongoDbFactoryForJongo(MongoDbFactory mongoDbFactoryForJongo) {
-//    this.mongoDbFactoryForJongo = mongoDbFactoryForJongo;
-//  }
-//
-  @Bean
-  public Jongo jongo() throws UnknownHostException {
-    if (jongo == null) {
-      jongo = new Jongo(mongoDBFactoryForJongo().getDb());
-    }
-    return jongo;
-  }
-
-  @Bean
-  public MongoQueryExecutor queryExecutor() throws UnknownHostException {
-    if (queryExecutor == null) {
-      queryExecutor = new JongoQueryExecutor(jongo());
-    }
-    return queryExecutor;
-  }
-
 }

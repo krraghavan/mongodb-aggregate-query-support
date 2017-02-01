@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2016 the original author or authors.
+ *  Copyright (c) 2017 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,11 +16,21 @@
  *
  *
  */
-package com.cisco.mongodb.aggregate.support.test.beans;
+
+package com.cisco.mongodb.aggregate.support.annotation;
+
+import java.lang.annotation.*;
 
 /**
  * Created by rkolliva
- * 10/20/2015.
+ * 1/26/17.
  */
-public class AbstractTestAggregateBean {
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+@Inherited
+public @interface Sort {
+
+  String query();
+
+  int order();
 }
