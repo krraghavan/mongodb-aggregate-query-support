@@ -225,6 +225,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     AddFields[] addFields = aggregateAnnotation.addFields();
     ReplaceRoot[] replaceRoots = aggregateAnnotation.replaceRoot();
     Sort[] sorts = aggregateAnnotation.sort();
+    Facet[] facets = aggregateAnnotation.facet();
 
     pipelineCount += aggregateCounter.apply(projections);
     pipelineCount += aggregateCounter.apply(groups);
@@ -236,6 +237,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     pipelineCount += aggregateCounter.apply(addFields);
     pipelineCount += aggregateCounter.apply(replaceRoots);
     pipelineCount += aggregateCounter.apply(sorts);
+    pipelineCount += aggregateCounter.apply(facets);
 
     //If query is empty string then out was not declared in tests
     if (!"".equals(out.query())) {
@@ -297,6 +299,13 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
                                                            + " must be less than " + pipelineCount);
         queries[sort.order()] = getQueryString.apply(SORT, sort.query());
       }
+
+      for (Facet facet : facets) {
+        Assert.isTrue(facet.order() < pipelineCount, "Facet order " + facet.order()
+                                                           + " must be less than " + pipelineCount);
+        queries[facet.order()] = getQueryString.apply(FACET, facet.query());
+      }
+
       //since only one out is allowed, place it at the end
       if (outAnnotationPresent) {
         queries[pipelineCount - 1] = getQueryString.apply(OUT, out.query());
@@ -320,6 +329,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     ADDFIELDS("$addFields"),
     REPLACEROOT("$replaceRoot"),
     SORT("$sort"),
+    FACET("$facet"),
     OUT("$out");
 
     private final String representation;

@@ -104,4 +104,13 @@ public @interface Aggregate {
    */
   Sort[] sort() default {};
 
+
+  /**
+   * Support for $sort aggregation pipeline operator.
+   * Since Mongo 3.4
+   *
+   * @return - array of $facet stages
+   *
+   */
+  Facet[] facet() default {};
 }

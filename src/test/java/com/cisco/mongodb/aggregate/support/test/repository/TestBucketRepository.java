@@ -40,9 +40,10 @@ public interface TestBucketRepository extends TestMongoRepository<TestBucketBean
                       " \"boundaries\" : [0, 60, 75],\n" +
                       " \"default\" : \"moreThan75\",\n" +
                       " \"output\" : {\n" +
-                      " \"count\" : {$sum : 1},\n" +
-                      " \"model\" : {$push : \"$model\"}\n" +
-                      "}}", order = 0)
+                      "   \"count\" : {$sum : 1},\n" +
+                      "   \"model\" : {$push : \"$model\"}\n" +
+                      "  }" +
+                      "}", order = 0)
              })
   List<Histogram> fixedBucket();
 

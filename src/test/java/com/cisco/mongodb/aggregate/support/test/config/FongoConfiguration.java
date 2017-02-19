@@ -19,10 +19,12 @@
 
 package com.cisco.mongodb.aggregate.support.test.config;
 
+import com.cisco.mongodb.aggregate.support.test.config.conditions.NotUseRealMongoCondition;
 import com.github.fakemongo.Fongo;
 import com.mongodb.MongoClient;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
 
 import java.net.UnknownHostException;
@@ -33,6 +35,7 @@ import java.net.UnknownHostException;
  */
 
 @Configuration
+@Conditional(NotUseRealMongoCondition.class)
 public class FongoConfiguration {
 
   @Bean
