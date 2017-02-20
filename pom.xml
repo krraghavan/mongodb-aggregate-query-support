@@ -24,7 +24,7 @@
 
   <groupId>com.github.krraghavan</groupId>
   <artifactId>mongodb-aggregate-query-support</artifactId>
-  <version>0.7.4-SNAPSHOT</version>
+  <version>0.7.4</version>
 
   <name>Annotation based Mongo DB Aggregation Query Support</name>
   <description>Spring Data @Query like support for Mongo Aggregation queries</description>
@@ -122,13 +122,12 @@
       <artifactId>spring-core</artifactId>
       <version>4.3.2.RELEASE</version>
     </dependency>
-    <!-- TEST DEPENDENCIES -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
       <version>3.3.2</version>
-      <scope>test</scope>
     </dependency>
+    <!-- TEST DEPENDENCIES -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>

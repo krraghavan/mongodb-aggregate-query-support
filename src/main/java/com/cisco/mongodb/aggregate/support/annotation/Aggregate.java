@@ -113,4 +113,11 @@ public @interface Aggregate {
    *
    */
   Facet[] facet() default {};
+
+  /**
+   * Implements the $count pipeline operator.
+   *
+   * @return - the count pipeline operator.  Only makes sense to have one of these.
+   */
+  Count [] count() default {};
 }

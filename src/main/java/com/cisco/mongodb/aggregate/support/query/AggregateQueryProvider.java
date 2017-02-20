@@ -22,6 +22,7 @@ import com.cisco.mongodb.aggregate.support.annotation.*;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.util.JSON;
+import com.mongodb.util.JSONParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -211,9 +212,14 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     LOGGER.debug("Getting aggregate operations");
     int pipelineCount = 0;
     boolean outAnnotationPresent = false;
-    final Function<Object[], Integer> aggregateCounter = objects -> {
+    final Function<Object, Integer> aggregateCounter = objects -> {
       if (objects != null) {
-        return objects.length;
+        if(objects instanceof Object []) {
+          return ((Object[])objects).length;
+        }
+        else {
+          return 1;
+        }
       }
       else {
         return 0;
@@ -235,6 +241,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     ReplaceRoot[] replaceRoots = aggregateAnnotation.replaceRoot();
     Sort[] sorts = aggregateAnnotation.sort();
     Facet[] facets = aggregateAnnotation.facet();
+    Count [] counts = aggregateAnnotation.count();
 
     pipelineCount += aggregateCounter.apply(projections);
     pipelineCount += aggregateCounter.apply(groups);
@@ -247,6 +254,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     pipelineCount += aggregateCounter.apply(replaceRoots);
     pipelineCount += aggregateCounter.apply(sorts);
     pipelineCount += aggregateCounter.apply(facets);
+    pipelineCount += aggregateCounter.apply(counts);
 
     //If query is empty string then out was not declared in tests
     if (!"".equals(out.query())) {
@@ -315,6 +323,12 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
         queries[facet.order()] = getQueryString.apply(FACET, facet.query());
       }
 
+      for (Count count : counts) {
+        Assert.isTrue(count.order() < pipelineCount, "Count order " + count.order()
+                                                           + " must be less than " + pipelineCount);
+        queries[count.order()] = getQueryString.apply(COUNT, count.query());
+      }
+
       //since only one out is allowed, place it at the end
       if (outAnnotationPresent) {
         queries[pipelineCount - 1] = getQueryString.apply(OUT, out.query());
@@ -339,6 +353,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     REPLACEROOT("$replaceRoot"),
     SORT("$sort"),
     FACET("$facet"),
+    COUNT("$count"),
     OUT("$out");
 
     private final String representation;
@@ -382,9 +397,13 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
       List<ParameterBinding> bindings = new ArrayList<>();
 
       String parseableInput = makeParameterReferencesParseable(input);
-
-      collectParameterReferencesIntoBindings(bindings, JSON.parse(parseableInput));
-
+      try {
+        collectParameterReferencesIntoBindings(bindings, JSON.parse(parseableInput));
+      }
+      catch(JSONParseException e) {
+        // the parseable input is not JSON - some stages like $unwind and $count only have strings.
+        // nothing to do here.
+      }
       return bindings;
     }
 

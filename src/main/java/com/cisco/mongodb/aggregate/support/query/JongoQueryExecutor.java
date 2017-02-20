@@ -75,14 +75,6 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
 
     Map<String, Object> resultMap = new HashMap<>();
 
-    //for now commenting out -- we should set the same timeout as socket timeout becuase
-    // MongoExcecutionException will be thrown and we are not handling for now.
-    //setting the max DB processing timeout.
-       /* AggregationOptions aggregationOptions=AggregationOptions.builder()
-                .maxTime(MAX_DB_PROCESSING_TIMEOUT, TimeUnit.MILLISECONDS)
-                .build();*/
-    //ResultsIterator resultsIterator = aggregate.options(aggregationOptions).as(resultMap.getClass());
-
     ResultsIterator resultsIterator = aggregate.as(resultMap.getClass());
     if (!resultsIterator.hasNext() || Void.TYPE.equals(queryProvider.getMethodReturnType())) {
       return null;
