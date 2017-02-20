@@ -22,6 +22,7 @@ Not all aggregate pipeline steps are supported.  As of 0.7.2 support is provided
 * Bucket (Mongo 3.4+) - added in v0.7.2
 * AddFields (Mongo 3.4+) - added in v0.7.2
 * ReplaceRoot (Mongo 3.4+) - added in v0.7.2
+* Facet (Mongo 3.4+) - added in v0.7.3
 
 
 Minimum Java version supported is 1.8 

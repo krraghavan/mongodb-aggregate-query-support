@@ -81,13 +81,22 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     String collectionName;
     if (documentAnnotation != null) {
       collectionName = documentAnnotation.collection();
+      if(StringUtils.isEmpty(collectionName)) {
+        collectionName = getSimpleCollectionName(className);
+      }
     }
     else {
-      String simpleName = className.getSimpleName();
-      collectionName = Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
+      collectionName = getSimpleCollectionName(className);
     }
 
     Assert.notNull(collectionName);
+    return collectionName;
+  }
+
+  private String getSimpleCollectionName(Class className) {
+    String collectionName;
+    String simpleName = className.getSimpleName();
+    collectionName = Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
     return collectionName;
   }
 
