@@ -379,6 +379,11 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     private static final Pattern PARAMETER_BINDING_PATTERN = Pattern.compile("\\?(\\d+)");
     private static final Pattern PARSEABLE_BINDING_PATTERN = Pattern.compile("\"?" + PARAMETER_PREFIX + "(\\d+)\"?");
 
+    private static final String LHS_PARAMETER_PREFIX = "@lhs@";
+    private static final String LHS_PARSEABLE_PARAMETER = LHS_PARAMETER_PREFIX + "$1";
+    private static final Pattern LHS_PARAMETER_BINDING_PATTERN = Pattern.compile("@(\\d+)");
+    private static final Pattern LHS_PARSEABLE_BINDING_PATTERN = Pattern.compile(LHS_PARAMETER_PREFIX + "(\\d+)?");
+
     private static final int PARAMETER_INDEX_GROUP = 1;
 
     /**
@@ -409,7 +414,11 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
 
     private String makeParameterReferencesParseable(String input) {
       Matcher matcher = PARAMETER_BINDING_PATTERN.matcher(input);
-      return matcher.replaceAll(PARSEABLE_PARAMETER);
+      String retval = matcher.replaceAll(PARSEABLE_PARAMETER);
+
+      // now parse any LHS placeholders
+      Matcher lhsMatcher = LHS_PARAMETER_BINDING_PATTERN.matcher(retval);
+      return lhsMatcher.replaceAll(LHS_PARSEABLE_PARAMETER);
     }
 
     private void collectParameterReferencesIntoBindings(List<ParameterBinding> bindings, Object value) {
@@ -461,13 +470,20 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
 
       Matcher valueMatcher = PARSEABLE_BINDING_PATTERN.matcher(source);
 
+      boolean quoted = (source.startsWith("'") && source.endsWith("'"))
+                       || (source.startsWith("\"") && source.endsWith("\""));
+      replaceParameterBindings(bindings, valueMatcher, "?", quoted);
+      Matcher lhsMatcher = LHS_PARSEABLE_BINDING_PATTERN.matcher(source);
+      replaceParameterBindings(bindings, lhsMatcher, "@", true);
+    }
+
+    private void replaceParameterBindings(List<ParameterBinding> bindings, Matcher valueMatcher, String prefix,
+                                          boolean quoted) {
       while (valueMatcher.find()) {
 
         int paramIndex = Integer.parseInt(valueMatcher.group(PARAMETER_INDEX_GROUP));
-        boolean quoted = (source.startsWith("'") && source.endsWith("'"))
-                         || (source.startsWith("\"") && source.endsWith("\""));
 
-        bindings.add(new ParameterBinding(paramIndex, quoted));
+        bindings.add(new ParameterBinding(paramIndex, quoted, prefix));
       }
     }
   }
@@ -480,6 +496,8 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     private final int parameterIndex;
     private final boolean quoted;
 
+    private final String prefix;
+
     /**
      * Creates a new {@link ParameterBinding} with the given {@code parameterIndex} and {@code quoted} information.
      *
@@ -487,9 +505,14 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
      * @param quoted         whether or not the parameter is already quoted.
      */
     ParameterBinding(int parameterIndex, boolean quoted) {
+      this(parameterIndex, quoted, "?");
+    }
+
+    ParameterBinding(int parameterIndex, boolean quoted, String prefix) {
 
       this.parameterIndex = parameterIndex;
       this.quoted = quoted;
+      this.prefix = prefix;
     }
 
     boolean isQuoted() {
@@ -501,7 +524,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     }
 
     String getParameter() {
-      return "?" + parameterIndex;
+      return this.prefix + parameterIndex;
     }
   }
 }
