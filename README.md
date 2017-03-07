@@ -71,7 +71,8 @@ it is desired to have the sort pipeline stage be passed in as a method argument.
 will require a different interface method to be defined.  To specify sort strings (see the unit test) call the string as 
 follows:
 
-```String sortString = "{sortTestNumber:-1}";
+```
+String sortString = "{sortTestNumber:-1}";
        List<Possessions> possessions = possessionsRepository.getPossesionsSortedByTag(tag, sortString);
 ```
 and the repository method 
