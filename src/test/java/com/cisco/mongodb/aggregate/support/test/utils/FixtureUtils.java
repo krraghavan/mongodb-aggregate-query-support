@@ -22,7 +22,9 @@ package com.cisco.mongodb.aggregate.support.test.utils;
 import com.cisco.mongodb.aggregate.support.test.beans.Asset;
 import com.cisco.mongodb.aggregate.support.test.beans.Possessions;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -42,8 +44,14 @@ public class FixtureUtils {
   }
 
   public static Possessions createPossessions(boolean cars, boolean homes) {
+    return createPossessions(cars, homes, RandomStringUtils.randomAlphabetic(10));
+  }
+
+  public static Possessions createPossessions(boolean cars, boolean homes, String tag) {
     // add one document with only cars, another with only homes.
     Possessions possessions = new Possessions();
+    possessions.setSortTestNumber(RandomUtils.nextLong(100, 400));
+    possessions.setTag(tag);
     Asset carAssets = null;
     if(cars) {
       String id = RandomStringUtils.randomAlphabetic(10);
@@ -72,4 +80,13 @@ public class FixtureUtils {
     return possessions;
   }
 
+
+  public static List<Possessions> createPossessionsWithSortField(String tag) {
+    int count = RandomUtils.nextInt(5, 10);
+    List<Possessions> retval = new ArrayList<>();
+    for(int i = 0; i < count; i++) {
+      retval.add(createPossessions(true, true, tag));
+    }
+    return retval;
+  }
 }

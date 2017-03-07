@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.6-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
+[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.7-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -65,6 +65,30 @@ To achieve this the ```outputClass``` attribute of the Aggregate annotation can 
 package also provides an implementation of the ResultsExtractor interface that uses the Jongo unmarshaller to return the
 desired class.  However, callers are free to implement this interface and unmarshall results as they see fit.
  
+## New in 0.7.7 version
+Support for parameterized JSON objects passed in as method arguments in the form of a String.  Useful for instance when
+it is desired to have the sort pipeline stage be passed in as a method argument.  Without this feature, each sort combination
+will require a different interface method to be defined.  To specify sort strings (see the unit test) call the string as 
+follows:
+
+```String sortString = "{sortTestNumber:-1}";
+       List<Possessions> possessions = possessionsRepository.getPossesionsSortedByTag(tag, sortString);
+```
+and the repository method 
+```
+@Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class,
+             match = {
+                 @Match(query = "{" +
+                                "   \"tag\": ?0" +
+                                "}", order = 0)
+             },
+             sort = {
+                 @Sort(query = "\"@@1\"", order = 1)
+             })
+  List<Possessions> getPossesionsSortedByTag(String tag, String sort);
+``` 
+Note the use of the extra escaped quotes and the use of the double @@ (both required).
+
 Minimum Java version supported is 1.8 
 
 ## Usage

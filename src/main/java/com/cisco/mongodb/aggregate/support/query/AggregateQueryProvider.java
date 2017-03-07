@@ -190,11 +190,14 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     if (queryParameterBindings.isEmpty()) {
       return query;
     }
-
-    StringBuilder result = new StringBuilder(query);
+    String lquery = query;
+    if(query.contains("@@")) {
+      // strip quotes from the query
+      lquery = query.replace("\"", "").replace("@@", "@");
+    }
+    StringBuilder result = new StringBuilder(lquery);
 
     for (ParameterBinding binding : queryParameterBindings) {
-
       String parameter = binding.getParameter();
       int idx = result.indexOf(parameter);
 

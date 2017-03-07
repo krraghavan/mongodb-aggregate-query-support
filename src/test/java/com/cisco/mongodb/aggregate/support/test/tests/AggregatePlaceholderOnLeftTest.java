@@ -39,6 +39,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.cisco.mongodb.aggregate.support.test.utils.FixtureUtils.createPossessions;
+import static com.cisco.mongodb.aggregate.support.test.utils.FixtureUtils.createPossessionsWithSortField;
 import static com.cisco.mongodb.aggregate.support.test.utils.StringUtils.getRandomStrings;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
@@ -56,37 +57,50 @@ public class AggregatePlaceholderOnLeftTest extends AbstractTestNGSpringContextT
   @Autowired
   private PossessionsRepository possessionsRepository;
 
-  private Possessions possessionsWithCars;
-
-  private Possessions possessionsWithHomes;
-
-  @BeforeClass
-  public void setup() {
-    possessionsWithCars = createPossessions(true, false);
-    possessionsWithHomes = createPossessions(false, true);
-    possessionsRepository.save(Arrays.asList(possessionsWithCars, possessionsWithHomes));
-  }
-
   @Test
   public void mustReplacePlaceholderOnLeftForAggregateQuery() {
-    boolean hasCars = possessionsRepository.hasCars();
+    String tag = "mustReplacePlaceholderOnLeftForAggregateQuery";
+    Possessions expectedPossessions = createPossessions(true, false, tag);
+    possessionsRepository.save(expectedPossessions);
+    boolean hasCars = possessionsRepository.hasCars(tag);
     assertTrue(hasCars);
   }
 
   @Test(dataProvider = "possessionsProvider")
-  public void mustReturnCarsFromAggregateQuery(String type, Possessions expectedPossessions) {
-    List<Possessions> possessions = possessionsRepository.getPossessions(type);
+  public void mustReturnCarsFromAggregateQuery(String tag, boolean cars, boolean homes) {
+    Possessions expectedPossessions = createPossessions(cars, homes, tag);
+    possessionsRepository.save(expectedPossessions);
+
+    List<Possessions> possessions = possessionsRepository.getPossessions(tag);
     assertNotNull(possessions);
     assertTrue(possessions.size() == 1);
     Possessions possession = possessions.get(0);
     assertTrue(possession.getId().equals(expectedPossessions.getId()));
   }
 
+  @Test
+  public void mustReplaceSortParameterWithPlaceholder() {
+    String tag = "mustReplaceSortParameterWithPlaceholder";
+    List<Possessions> possessionss = createPossessionsWithSortField(tag);
+    possessionsRepository.save(possessionss);
+    String sortString = "{sortTestNumber:-1}";
+    List<Possessions> possessions = possessionsRepository.getPossesionsSortedByTag(tag, sortString);
+    assertNotNull(possessions);
+    assertTrue(possessions.size() == possessionss.size());
+    // verify that Possessions are in descending order.
+    final long[] lastNumber = {999999};
+    possessions.forEach(i -> {
+      Long sortTestNumber = i.getSortTestNumber();
+      assertTrue(sortTestNumber <= lastNumber[0]);
+      lastNumber[0] = sortTestNumber;
+    });
+  }
+
   @DataProvider
   public Object[][] possessionsProvider() {
     return new Object[][] {
-        new Object[] {"cars", possessionsWithCars},
-        new Object[] {"homes", possessionsWithHomes}
+        new Object[] {"possessionsProviderCars", true, false},
+        new Object[] {"possessionsProviderHomes", false, true}
     };
   }
 

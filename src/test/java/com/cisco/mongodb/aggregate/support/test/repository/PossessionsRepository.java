@@ -21,6 +21,7 @@ package com.cisco.mongodb.aggregate.support.test.repository;
 
 import com.cisco.mongodb.aggregate.support.annotation.Aggregate;
 import com.cisco.mongodb.aggregate.support.annotation.Match;
+import com.cisco.mongodb.aggregate.support.annotation.Sort;
 import com.cisco.mongodb.aggregate.support.test.beans.Possessions;
 import com.mongodb.DBObject;
 import org.apache.commons.collections.CollectionUtils;
@@ -37,14 +38,14 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Stri
   @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class,
              match = {
                  @Match(query = "{" +
-                                "   \"assets.@0\": { $exists: true, $ne : []}" +
+                                "   \"tag\": ?0}" +
                                 "   }" +
                                 "}", order = 0)
              })
-  List<Possessions> getPossessions(String type);
+  List<Possessions> getPossessions(String tag);
 
-  default boolean hasCars() {
-    return CollectionUtils.isNotEmpty(getPossessions( "cars"));
+  default boolean hasCars(String tag) {
+    return CollectionUtils.isNotEmpty(getPossessions( tag));
   }
 
   default boolean hasHomes(String id) {
@@ -59,4 +60,14 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Stri
              })
   List<DBObject> getPossessionsDbObject(String id);
 
+  @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class,
+             match = {
+                 @Match(query = "{" +
+                                "   \"tag\": ?0" +
+                                "}", order = 0)
+             },
+             sort = {
+                 @Sort(query = "\"@@1\"", order = 1)
+             })
+  List<Possessions> getPossesionsSortedByTag(String tag, String sort);
 }

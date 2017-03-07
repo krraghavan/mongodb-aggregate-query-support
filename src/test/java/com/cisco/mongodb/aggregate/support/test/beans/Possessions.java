@@ -40,6 +40,10 @@ public class Possessions {
 
   private List<Asset> assets;
 
+  private Long sortTestNumber;
+
+  private String tag;
+
   public String getId() {
     return id;
   }
@@ -54,5 +58,21 @@ public class Possessions {
 
   public void setAssets(List<Asset> assets) {
     this.assets = assets;
+  }
+
+  public Long getSortTestNumber() {
+    return sortTestNumber;
+  }
+
+  public void setSortTestNumber(Long sortTestNumber) {
+    this.sortTestNumber = sortTestNumber;
+  }
+
+  public String getTag() {
+    return tag;
+  }
+
+  public void setTag(String tag) {
+    this.tag = tag;
   }
 }
