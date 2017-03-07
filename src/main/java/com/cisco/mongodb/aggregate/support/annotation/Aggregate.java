@@ -18,6 +18,8 @@
  */
 package com.cisco.mongodb.aggregate.support.annotation;
 
+import org.bson.BsonDocument;
+
 import java.lang.annotation.*;
 
 @Target(ElementType.METHOD)
@@ -39,7 +41,7 @@ public @interface Aggregate {
    * @return - the class name of the return type.  If the return type is a list then this class
    * is the type of each list element
    */
-  Class outputBeanType();
+  Class outputBeanType() default BsonDocument.class;
 
   /**
    * @return - the name of the attribute that should be extracted from the result if we need anything specific

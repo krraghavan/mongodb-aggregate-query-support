@@ -21,6 +21,10 @@
 
 package com.cisco.mongodb.aggregate.support.test.config;
 
+import com.cisco.mongodb.aggregate.support.api.ResultsExtractor;
+import com.cisco.mongodb.aggregate.support.query.JongoBasedAggregateResultExtractor;
+import org.jongo.Jongo;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
@@ -31,4 +35,8 @@ import org.springframework.context.annotation.Import;
 @Import({MongoDBTestConfiguration.class, TestMongoRepositoryConfiguration.class})
 public class AggregateTestConfiguration {
 
+  @Bean
+  public ResultsExtractor resultsUnmarshaller(Jongo jongo) {
+    return new JongoBasedAggregateResultExtractor(jongo);
+  }
 }

@@ -59,7 +59,12 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Inte
 
 }
 ```
-
+## New in 0.7.6 version
+In some use cases it is desirable to give control of the unmarshalling process to the clients of the Aggregate query.
+To achieve this the ```outputClass``` attribute of the Aggregate annotation can be set to return the DBObject type.  This
+package also provides an implementation of the ResultsExtractor interface that uses the Jongo unmarshaller to return the
+desired class.  However, callers are free to implement this interface and unmarshall results as they see fit.
+ 
 Minimum Java version supported is 1.8 
 
 ## Usage

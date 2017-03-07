@@ -22,6 +22,7 @@ package com.cisco.mongodb.aggregate.support.test.repository;
 import com.cisco.mongodb.aggregate.support.annotation.Aggregate;
 import com.cisco.mongodb.aggregate.support.annotation.Match;
 import com.cisco.mongodb.aggregate.support.test.beans.Possessions;
+import com.mongodb.DBObject;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -49,5 +50,13 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Stri
   default boolean hasHomes(String id) {
     return CollectionUtils.isNotEmpty(getPossessions( "homes"));
   }
+
+  @Aggregate(inputType = Possessions.class, outputBeanType = DBObject.class,
+             match = {
+                 @Match(query = "{" +
+                                "   \"_id\": ?0" +
+                                "}", order = 0)
+             })
+  List<DBObject> getPossessionsDbObject(String id);
 
 }

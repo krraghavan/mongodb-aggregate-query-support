@@ -101,9 +101,14 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
       if (valueObject instanceof Map) {
         Map value = (Map) valueObject;
         DBObject dbObject = new BasicDBObject(value);
-        BsonDocument bsonDocument = Bson.createDocument(dbObject);
-        resultObject = jongo.getMapper().getUnmarshaller().unmarshall(bsonDocument,
-                                                                      queryProvider.getOutputClass());
+        Class outputClass = queryProvider.getOutputClass();
+        if(outputClass == DBObject.class) {
+          resultObject = dbObject;
+        }
+        else {
+          BsonDocument bsonDocument = Bson.createDocument(dbObject);
+          resultObject = jongo.getMapper().getUnmarshaller().unmarshall(bsonDocument, outputClass);
+        }
       }
       else {
         resultObject = valueObject;
