@@ -17,25 +17,30 @@
  *
  */
 
-package com.cisco.mongodb.aggregate.support.annotation;
+package com.cisco.mongodb.aggregate.support.utils;
 
-import java.lang.annotation.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Created by rkolliva
- * 2/19/17.
- *
- * @since 0.7.3
+ * 3/8/17.
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-@Inherited
-public @interface Facet {
+public class ArrayUtils {
 
-  String query();
+  public static final String NULL_STRING = "@_NULL_STRING_@";
 
-  int order();
-
-  Conditional [] condition() default {};
-
+  public <T>  List<T> packToList(T [] inputs) {
+    if(inputs != null) {
+      List<T> returnedList = new ArrayList<>();
+      for(T input : inputs) {
+        if(input != null && !NULL_STRING.equals(input)) {
+          returnedList.add(input);
+        }
+      }
+      return returnedList;
+    }
+    return Collections.emptyList();
+  }
 }

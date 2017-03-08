@@ -29,4 +29,7 @@ import java.lang.annotation.*;
 @Inherited
 public @interface Out {
   String query();
+
+  Conditional [] condition() default {};
+
 }

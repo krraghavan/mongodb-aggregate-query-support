@@ -33,4 +33,7 @@ public @interface Lookup {
   String query();
 
   int order();
+
+  Conditional [] condition() default {};
+
 }

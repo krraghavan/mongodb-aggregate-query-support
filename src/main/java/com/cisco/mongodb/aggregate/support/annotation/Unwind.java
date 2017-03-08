@@ -31,4 +31,7 @@ public @interface Unwind {
   String query();
 
   int order();
+
+  Conditional [] condition() default {};
+
 }

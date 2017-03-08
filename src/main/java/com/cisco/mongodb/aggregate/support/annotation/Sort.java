@@ -33,4 +33,7 @@ public @interface Sort {
   String query();
 
   int order();
+
+  Conditional [] condition() default {};
+
 }

@@ -36,4 +36,7 @@ public @interface Count {
   String query();
 
   int order();
+
+  Conditional [] condition() default {};
+
 }

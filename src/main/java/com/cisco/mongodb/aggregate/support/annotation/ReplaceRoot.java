@@ -33,4 +33,7 @@ public @interface ReplaceRoot {
   String query();
 
   int order();
+
+  Conditional [] condition() default {};
+
 }

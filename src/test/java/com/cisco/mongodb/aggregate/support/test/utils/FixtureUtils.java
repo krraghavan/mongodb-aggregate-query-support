@@ -82,10 +82,14 @@ public class FixtureUtils {
 
 
   public static List<Possessions> createPossessionsWithSortField(String tag) {
+    return createPossessionsWithSortField(tag, true, true);
+  }
+
+  public static List<Possessions> createPossessionsWithSortField(String tag, boolean homes, boolean cars) {
     int count = RandomUtils.nextInt(5, 10);
     List<Possessions> retval = new ArrayList<>();
     for(int i = 0; i < count; i++) {
-      retval.add(createPossessions(true, true, tag));
+      retval.add(createPossessions(cars, homes, tag));
     }
     return retval;
   }

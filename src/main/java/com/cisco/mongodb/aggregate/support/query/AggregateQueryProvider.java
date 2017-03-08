@@ -19,12 +19,16 @@
 package com.cisco.mongodb.aggregate.support.query;
 
 import com.cisco.mongodb.aggregate.support.annotation.*;
+import com.cisco.mongodb.aggregate.support.condition.AggregateQueryMethodConditionContext;
+import com.cisco.mongodb.aggregate.support.condition.ConditionalAnnotationMetadata;
+import com.cisco.mongodb.aggregate.support.utils.ArrayUtils;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.util.JSON;
 import com.mongodb.util.JSONParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Condition;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.repository.query.ConvertingParameterAccessor;
@@ -41,6 +45,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.cisco.mongodb.aggregate.support.query.AggregateQueryProvider.AggregationType.*;
+import static com.cisco.mongodb.aggregate.support.utils.ArrayUtils.NULL_STRING;
 
 /**
  * Created by rkolliva on 10/21/2015.
@@ -61,6 +66,19 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
   private final ConvertingParameterAccessor convertingParameterAccessor;
   private final Method method;
   private List<String> aggregateQueryPipeline;
+  private ArrayUtils arrayUtils = new ArrayUtils();
+
+  private final BiFunction<AggregationStage, String, String> getQueryString = (aggregationStage, query) -> {
+    if (aggregationStage.allowStage()) {
+      String queryStringForStage = replacePlaceholders(query);
+      if (!StringUtils.isEmpty(queryStringForStage)) {
+        return String.format("{%s:%s}", aggregationStage.getAggregationType().getRepresentation(),
+                             queryStringForStage);
+      }
+    }
+    return NULL_STRING;
+  };
+
 
   AggregateQueryProvider(Method method, MongoParameterAccessor mongoParameterAccessor,
                          ConvertingParameterAccessor convertingParameterAccessor) throws InvalidAggregationQueryException {
@@ -200,10 +218,9 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     for (ParameterBinding binding : queryParameterBindings) {
       String parameter = binding.getParameter();
       int idx = result.indexOf(parameter);
-
+      String parameterValueForBinding = getParameterValueForBinding(convertingParameterAccessor, binding);
       if (idx != -1) {
-        result.replace(idx, idx + parameter.length(), getParameterValueForBinding(convertingParameterAccessor,
-                                                                                  binding));
+        result.replace(idx, idx + parameter.length(), parameterValueForBinding);
       }
     }
     LOGGER.debug("Query after replacing place holders - {}", result);
@@ -229,8 +246,6 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
       }
     };
 
-    final BiFunction<AggregationType, String, String> getQueryString = (aggregationType, query) ->
-        String.format("{%s:%s}", aggregationType.getRepresentation(), replacePlaceholders(query));
     LOGGER.debug("Extracting aggregate tests values");
     Project[] projections = aggregateAnnotation.project();
     Group[] groups = aggregateAnnotation.group();
@@ -270,106 +285,139 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     }
     else {
       String[] queries = new String[pipelineCount];
-      for (Project projection : projections) {
-        Assert.isTrue(projection.order() < pipelineCount, "Projection Order must be less than size");
-        queries[projection.order()] = getQueryString.apply(PROJECT, projection.query());
-      }
-      for (Unwind unwind : unwinds) {
-        Assert.isTrue(unwind.order() < pipelineCount, "Unwind Order must be less than size");
-        queries[unwind.order()] = getQueryString.apply(UNWIND, unwind.query());
-      }
-      for (Group group : groups) {
-        Assert.isTrue(group.order() < pipelineCount, "Group Order must be less than size");
-        queries[group.order()] = getQueryString.apply(GROUP, group.query());
-      }
-      for (Match match : matches) {
-        Assert.isTrue(match.order() < pipelineCount, "Match Order must be less than size");
-        queries[match.order()] = getQueryString.apply(MATCH, match.query());
-      }
-      for (Lookup lookup : lookups) {
-        Assert.isTrue(lookup.order() < pipelineCount, "Lookup Order " + lookup.order() + "must be less than "
-                                                      + pipelineCount);
-        queries[lookup.order()] = getQueryString.apply(LOOKUP, lookup.query());
-      }
-      for (Limit limit : limits) {
-        Assert.isTrue(limit.order() < pipelineCount, "Limit Order " + limit.order() + "must be less than "
-                                                     + pipelineCount);
-        queries[limit.order()] = getQueryString.apply(LIMIT, limit.query());
-      }
-      for (Bucket bucket: buckets) {
-        Assert.isTrue(bucket.order() < pipelineCount, "Bucket Order " + bucket.order() + " must be less than "
-                                                     + pipelineCount);
-        queries[bucket.order()] = getQueryString.apply(BUCKET, bucket.query());
-      }
-
-      for (AddFields fieldsToAdd : addFields) {
-        Assert.isTrue(fieldsToAdd.order() < pipelineCount, "AddFields order " + fieldsToAdd.order()
-                                                           + " must be less than " + pipelineCount);
-        queries[fieldsToAdd.order()] = getQueryString.apply(ADDFIELDS, fieldsToAdd.query());
-      }
-
-      for (ReplaceRoot replaceRoot : replaceRoots) {
-        Assert.isTrue(replaceRoot.order() < pipelineCount, "ReplaceRoot order " + replaceRoot.order()
-                                                           + " must be less than " + pipelineCount);
-        queries[replaceRoot.order()] = getQueryString.apply(REPLACEROOT, replaceRoot.query());
-      }
-
-      for (Sort sort : sorts) {
-        Assert.isTrue(sort.order() < pipelineCount, "Sort order " + sort.order()
-                                                           + " must be less than " + pipelineCount);
-        queries[sort.order()] = getQueryString.apply(SORT, sort.query());
-      }
-
-      for (Facet facet : facets) {
-        Assert.isTrue(facet.order() < pipelineCount, "Facet order " + facet.order()
-                                                           + " must be less than " + pipelineCount);
-        queries[facet.order()] = getQueryString.apply(FACET, facet.query());
-      }
-
-      for (Count count : counts) {
-        Assert.isTrue(count.order() < pipelineCount, "Count order " + count.order()
-                                                           + " must be less than " + pipelineCount);
-        queries[count.order()] = getQueryString.apply(COUNT, count.query());
-      }
+      addPipelineStages(queries, projections);
+      addPipelineStages(queries, unwinds);
+      addPipelineStages(queries, groups);
+      addPipelineStages(queries, matches);
+      addPipelineStages(queries, lookups);
+      addPipelineStages(queries, limits);
+      addPipelineStages(queries, buckets);
+      addPipelineStages(queries, addFields);
+      addPipelineStages(queries, replaceRoots);
+      addPipelineStages(queries, sorts);
+      addPipelineStages(queries, facets);
+      addPipelineStages(queries, counts);
 
       //since only one out is allowed, place it at the end
       if (outAnnotationPresent) {
-        queries[pipelineCount - 1] = getQueryString.apply(OUT, out.query());
+        setupQuery(queries, OUT, out.condition(), pipelineCount-1, out.query());
       }
 
       //noinspection ConfusingArgumentToVarargsMethod
-      LOGGER.debug("Aggregate pipeline after forming queries - {}", queries);
-
-      aggregateQueryPipeline = Arrays.asList(queries);
+      LOGGER.debug("Aggregate pipeline after forming queries - {}", (String[])queries);
+      aggregateQueryPipeline = arrayUtils.packToList(queries);
     }
   }
 
-  public enum AggregationType {
-    MATCH("$match"),
-    GROUP("$group"),
-    UNWIND("$unwind"),
-    LOOKUP("$lookup"),
-    PROJECT("$project"),
-    LIMIT("$limit"),
-    BUCKET("$bucket"),
-    ADDFIELDS("$addFields"),
-    REPLACEROOT("$replaceRoot"),
-    SORT("$sort"),
-    FACET("$facet"),
-    COUNT("$count"),
-    OUT("$out");
-
-    private final String representation;
-
-    AggregationType(String representation) {
-      this.representation = representation;
-    }
-
-    String getRepresentation() {
-      return representation;
+  private void addPipelineStages(String[] queries, Group [] groups) {
+    int length = queries.length;
+    for (Group group : groups) {
+      Assert.isTrue(group.order() < length, "Group Order must be less than " + length);
+      setupQuery(queries, GROUP, group.condition(), group.order(), group.query());
     }
   }
 
+  private void addPipelineStages(String[] queries, Match [] matches) {
+    int length = queries.length;
+    for (Match match : matches) {
+      Assert.isTrue(match.order() < length, "Match Order must be less than " + length);
+      setupQuery(queries, MATCH, match.condition(), match.order(), match.query());
+    }
+  }
+
+  private void addPipelineStages(String[] queries, Lookup [] lookups) {
+    int length = queries.length;
+    for (Lookup lookup : lookups) {
+      Assert.isTrue(lookup.order() < length, "Lookup Order must be less than " + length);
+      setupQuery(queries, LOOKUP, lookup.condition(), lookup.order(), lookup.query());
+    }
+  }
+
+  private void addPipelineStages(String[] queries, Limit [] limits) {
+    int length = queries.length;
+    for (Limit limit : limits) {
+      Assert.isTrue(limit.order() < length, "Limit Order must be less than " + length);
+      setupQuery(queries, LIMIT, limit.condition(), limit.order(), limit.query());
+    }
+  }
+
+  private void addPipelineStages(String[] queries, Bucket [] buckets) {
+    int length = queries.length;
+    for (Bucket bucket : buckets) {
+      Assert.isTrue(bucket.order() < length, "Bucket Order must be less than " + length);
+      setupQuery(queries, BUCKET, bucket.condition(), bucket.order(), bucket.query());
+    }
+  }
+
+  private void addPipelineStages(String[] queries, AddFields [] addFieldss) {
+    int length = queries.length;
+    for (AddFields addFields : addFieldss) {
+      Assert.isTrue(addFields.order() < length, "AddFields Order must be less than " + length);
+      setupQuery(queries, ADDFIELDS, addFields.condition(), addFields.order(), addFields.query());
+    }
+  }
+
+  private void addPipelineStages(String[] queries, ReplaceRoot [] replaceRoots) {
+    int length = queries.length;
+    for (ReplaceRoot replaceRoot : replaceRoots) {
+      Assert.isTrue(replaceRoot.order() < length, "ReplaceRoot Order must be less than " + length);
+      setupQuery(queries, REPLACEROOT, replaceRoot.condition(), replaceRoot.order(), replaceRoot.query());
+    }
+  }
+
+  private void addPipelineStages(String[] queries, Sort [] sorts) {
+    int length = queries.length;
+    for (Sort sort : sorts) {
+      Assert.isTrue(sort.order() < length, "Sort Order must be less than " + length);
+      setupQuery(queries, SORT, sort.condition(), sort.order(), sort.query());
+    }
+  }
+
+  private void addPipelineStages(String[] queries, Facet [] facets) {
+    int length = queries.length;
+    for (Facet facet : facets) {
+      Assert.isTrue(facet.order() < length, "Facet Order must be less than " + length);
+      setupQuery(queries, FACET, facet.condition(), facet.order(), facet.query());
+    }
+  }
+
+  private void addPipelineStages(String[] queries, Count [] counts) {
+    int length = queries.length;
+    for (Count count : counts) {
+      Assert.isTrue(count.order() < length, "Count Order must be less than " + length);
+      setupQuery(queries, COUNT, count.condition(), count.order(), count.query());
+    }
+  }
+
+  private void addPipelineStages(String[] queries, Project[] projections) {
+    int length = queries.length;
+    for (Project projection : projections) {
+      Assert.isTrue(projection.order() < length, "Projection Order must be less than " + length);
+      setupQuery(queries, PROJECT, projection.condition(), projection.order(), projection.query());
+    }
+  }
+
+  private void addPipelineStages(String[] queries, Unwind[] unwinds) {
+    int length = queries.length;
+    for (Unwind projection : unwinds) {
+      Assert.isTrue(projection.order() < length, "Unwind Order must be less than " + length);
+      setupQuery(queries, UNWIND, projection.condition(), projection.order(), projection.query());
+    }
+  }
+
+  private void setupQuery(String[] queries, AggregationType aggType, Conditional[] conditional, int order, String query) {
+    AggregationStage stage = new AggregationStage(aggType, conditional);
+    String queryString = getQueryString.apply(stage, query);
+    if(!StringUtils.isEmpty(queries[order]) && !NULL_STRING.equals(queryString)) {
+      // this stage is not empty - replace contents only if the query string is not null
+      LOGGER.warn("Two stages have the same order and the second one did not evaluate to a false condition");
+      queries[order] = queryString;
+    }
+    else if(StringUtils.isEmpty(queries[order])) {
+      // replace this stage only if the query string is not the null string.
+      queries[order] = queryString;
+    }
+  }
   /**
    * A parser that extracts the parameter bindings from a given query string.
    */
@@ -411,6 +459,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
       catch(JSONParseException e) {
         // the parseable input is not JSON - some stages like $unwind and $count only have strings.
         // nothing to do here.
+        LOGGER.debug("JSONParseException:", e);
       }
       return bindings;
     }
@@ -488,6 +537,88 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
 
         bindings.add(new ParameterBinding(paramIndex, quoted, prefix));
       }
+    }
+  }
+
+  public enum AggregationType {
+    MATCH("$match"),
+    GROUP("$group"),
+    UNWIND("$unwind"),
+    LOOKUP("$lookup"),
+    PROJECT("$project"),
+    LIMIT("$limit"),
+    BUCKET("$bucket"),
+    ADDFIELDS("$addFields"),
+    REPLACEROOT("$replaceRoot"),
+    SORT("$sort"),
+    FACET("$facet"),
+    COUNT("$count"),
+    OUT("$out");
+
+    private final String representation;
+
+    AggregationType(String representation) {
+      this.representation = representation;
+    }
+
+    String getRepresentation() {
+      return representation;
+    }
+  }
+
+  private class AggregationStage {
+
+    private final AggregationType aggregationType;
+
+    private final Conditional[] conditionalClasses;
+
+    AggregationStage(AggregationType aggregationType, Conditional[] conditionClass) {
+      this.aggregationType = aggregationType;
+      this.conditionalClasses = conditionClass;
+    }
+
+    AggregationStage(AggregationType aggregationType) {
+      this(aggregationType, null);
+    }
+
+    AggregationType getAggregationType() {
+      return aggregationType;
+    }
+
+    boolean allowStage() {
+      if (conditionalClasses.length == 0) {
+        return true;
+      }
+      try {
+        for (Conditional conditional : conditionalClasses) {
+          List<Object> parameterValues = getParameterValues();
+          ConditionalAnnotationMetadata metadata = new ConditionalAnnotationMetadata(conditional);
+          AggregateQueryMethodConditionContext context = new AggregateQueryMethodConditionContext(method,
+                                                                                                  parameterValues);
+          Condition condition = conditional.condition().newInstance();
+          boolean isTrue = condition.matches(context, metadata);
+          if (isTrue) {
+            return true;
+          }
+        }
+      }
+      catch (InstantiationException | IllegalAccessException e) {
+        throw new IllegalStateException("Could not create an instance of the condition class", e);
+      }
+      return false;
+    }
+
+    private List<Object> getParameterValues() {
+      List<Object> retval = new ArrayList<>();
+      int numArgs = method.getParameterCount();
+      for (int i = 0; i < numArgs; i++) {
+        retval.add(convertingParameterAccessor.getBindableValue(i));
+      }
+      return retval;
+    }
+
+    public Conditional[] getConditionalClasses() {
+      return conditionalClasses;
     }
   }
 

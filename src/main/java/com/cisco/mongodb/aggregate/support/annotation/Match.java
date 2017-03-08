@@ -31,4 +31,6 @@ public @interface Match {
   String query();
 
   int order();
+
+  Conditional [] condition() default {};
 }

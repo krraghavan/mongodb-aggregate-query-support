@@ -32,4 +32,7 @@ public @interface Group {
   String query();
 
   int order();
+
+  Conditional [] condition() default {};
+
 }

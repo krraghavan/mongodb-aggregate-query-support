@@ -20,8 +20,10 @@
 package com.cisco.mongodb.aggregate.support.test.repository;
 
 import com.cisco.mongodb.aggregate.support.annotation.Aggregate;
+import com.cisco.mongodb.aggregate.support.annotation.Conditional;
 import com.cisco.mongodb.aggregate.support.annotation.Match;
 import com.cisco.mongodb.aggregate.support.annotation.Sort;
+import com.cisco.mongodb.aggregate.support.condition.ParameterValueNotNullCondition;
 import com.cisco.mongodb.aggregate.support.test.beans.Possessions;
 import com.mongodb.DBObject;
 import org.apache.commons.collections.CollectionUtils;
@@ -70,4 +72,41 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Stri
                  @Sort(query = "\"@@1\"", order = 1)
              })
   List<Possessions> getPossesionsSortedByTag(String tag, String sort);
+
+  @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class,
+             match = {
+                 @Match(query = "{" +
+                                "   \"tag\"  : ?0," +
+                                "   \"assets.cars\" : { $exists: true, $ne : []}" +
+                                "}", order = 0, condition = {
+                     @Conditional(condition = ParameterValueNotNullCondition.class, parameterIndex = 1)
+                 }),
+                 @Match(query = "{" +
+                                "   \"tag\": ?0," +
+                                "   \"assets.homes\" : { $exists: true, $ne : []}" +
+                                "}", order = 0, condition = {
+                     @Conditional(condition = ParameterValueNotNullCondition.class, parameterIndex = 2)
+                 })
+             })
+  List<Possessions> mutuallyExclusiveStages(String tag, Boolean getCars, Boolean getHomes);
+
+  @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class,
+             match = {
+                 @Match(query = "{" +
+                                "   \"tag\"  : ?0," +
+                                "   \"assets.cars\" : { $exists: true, $ne : []}" +
+                                "}", order = 0, condition = {
+                     @Conditional(condition = ParameterValueNotNullCondition.class, parameterIndex = 1)
+                 }),
+                 @Match(query = "{" +
+                                "   \"tag\": ?0," +
+                                "   \"assets.homes\" : { $exists: true, $ne : []}" +
+                                "}", order = 1, condition = {
+                     @Conditional(condition = ParameterValueNotNullCondition.class, parameterIndex = 2)
+                 })
+             },
+             sort = {
+                 @Sort(query = "{\"sortTestNumber\" : -1}", order = 2)
+             })
+  List<Possessions> getWithMixOfConditionalAndUnconditionalStages(String tag, Boolean getCars, Boolean getHomes);
 }

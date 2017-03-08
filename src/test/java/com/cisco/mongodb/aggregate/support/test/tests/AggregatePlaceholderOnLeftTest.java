@@ -49,7 +49,6 @@ import static org.testng.Assert.assertTrue;
  * 3/1/17.
  */
 
-
 @SuppressWarnings("SpringJavaAutowiredMembersInspection")
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
 public class AggregatePlaceholderOnLeftTest extends AbstractTestNGSpringContextTests {

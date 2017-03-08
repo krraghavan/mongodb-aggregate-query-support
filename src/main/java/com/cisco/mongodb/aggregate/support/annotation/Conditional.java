@@ -19,23 +19,20 @@
 
 package com.cisco.mongodb.aggregate.support.annotation;
 
+import org.springframework.context.annotation.Condition;
+
 import java.lang.annotation.*;
 
 /**
  * Created by rkolliva
- * 2/19/17.
- *
- * @since 0.7.3
+ * 3/7/17.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-public @interface Facet {
+public @interface Conditional {
 
-  String query();
+  Class<? extends Condition> condition();
 
-  int order();
-
-  Conditional [] condition() default {};
-
+  int parameterIndex() default -1;
 }

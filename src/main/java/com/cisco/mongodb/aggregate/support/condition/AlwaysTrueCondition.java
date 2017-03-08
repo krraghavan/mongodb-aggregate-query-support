@@ -17,25 +17,23 @@
  *
  */
 
-package com.cisco.mongodb.aggregate.support.annotation;
+package com.cisco.mongodb.aggregate.support.condition;
 
-import java.lang.annotation.*;
+import org.springframework.context.annotation.Condition;
+import org.springframework.context.annotation.ConditionContext;
+import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
  * Created by rkolliva
- * 2/19/17.
+ * 3/7/17.
  *
- * @since 0.7.3
+ * This is the default condition associated with a pipeline stage.
+ * It always returns true which means the stage is always included.
  */
-@Target(ElementType.METHOD)
-@Retention(RetentionPolicy.RUNTIME)
-@Inherited
-public @interface Facet {
+public class AlwaysTrueCondition implements Condition {
 
-  String query();
-
-  int order();
-
-  Conditional [] condition() default {};
-
+  @Override
+  public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
+    return true;
+  }
 }

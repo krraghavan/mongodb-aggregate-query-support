@@ -76,7 +76,7 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
     }
     catch (MongoQueryException e) {
       LOGGER.error("Error executing aggregate query", e);
-      throw new RuntimeException(e);
+      throw new IllegalStateException(e);
     }
     catch (InvalidAggregationQueryException e) {
       LOGGER.error("Invalid aggregation query", e);

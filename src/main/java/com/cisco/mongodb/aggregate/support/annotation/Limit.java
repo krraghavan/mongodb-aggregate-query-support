@@ -29,4 +29,7 @@ public @interface Limit {
   String query();
 
   int order();
+
+  Conditional [] condition() default {};
+
 }

@@ -34,4 +34,6 @@ public @interface AddFields {
   String query();
 
   int order();
+
+  Conditional [] condition() default {};
 }

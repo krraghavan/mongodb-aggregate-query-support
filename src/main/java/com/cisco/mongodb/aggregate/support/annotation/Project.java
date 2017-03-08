@@ -32,4 +32,6 @@ public @interface Project {
 
   int order();
 
+  Conditional [] condition() default {};
+
 }

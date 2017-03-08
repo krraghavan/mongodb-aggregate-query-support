@@ -36,4 +36,7 @@ public @interface Bucket {
   String query();
 
   int order();
+
+  Conditional [] condition() default {};
+
 }

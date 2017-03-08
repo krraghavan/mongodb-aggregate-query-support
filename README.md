@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.7-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
+[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.8-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -90,6 +90,14 @@ and the repository method
 ``` 
 Note the use of the extra escaped quotes and the use of the double @@ (both required).
 
+## New in 0.7.8 version
+This supports the use case where the query structure is largely the same with minor variations (say in a match stage) based
+on different conditions.  In order to avoid needing to have multiple copies of queries that vary only in the definition of
+one or more stages.  A new annotation and attribute ```@Conditional``` is defined that can be associated with each pipeline 
+ stage (see the unit test for more details).  One or more conditional annotations can be specified and if any one of the 
+ conditions match, the pipeline stage is used.  With this capability, the order attribute of each pipeline stage becomes relative.
+   Stages that don't match and should not be included in the pipeline are filtered out when the pipeline is fully built.
+
 Minimum Java version supported is 1.8 
 
 ## Usage
@@ -98,6 +106,35 @@ See the unit test classes and test repository definitions for examples of how to
 The @Aggregate annotation is used identically to the way the Spring data @Query annotation is used.  You can put the annotation
 on any interface method (with placeholders) to get Aggregate query support.  The easiest way to do this is to test the 
 pipeline on a MongoDB client (like RoboMongo or MongoChef) and then copy the pipeline steps into each annotation.
+
+
+```
+
+  @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class,
+             match = {
+                 @Match(query = "{" +
+                                "   \"tag\"  : ?0," +
+                                "   \"assets.cars\" : { $exists: true, $ne : []}" +
+                                "}", order = 0, condition = {
+                     @Conditional(condition = ParameterValueNotNullCondition.class, parameterIndex = 1)
+                 }),
+                 @Match(query = "{" +
+                                "   \"tag\": ?0," +
+                                "   \"assets.homes\" : { $exists: true, $ne : []}" +
+                                "}", order = 0, condition = {
+                     @Conditional(condition = ParameterValueNotNullCondition.class, parameterIndex = 2)
+                 })
+             })
+  List<Possessions> mutuallyExclusiveStages(String tag, Boolean getCars, Boolean getHomes);
+
+```
+In this case, when only one of the condition matches, only the matching @Match annotation is used in the pipeline.  If
+both boolean flags are true, the second match criteria will overwrite the first match (a warning is emitted to the log).
+The ```ParameterValueNotNullCondition``` class returns true if the parameter identified by the index is not null.
+
+_It is the responsibility of the user to ensure that all the pipeline stages are correct after evaluating the conditions.  Using
+distinct order values so that the relative order of the stages are all correct is necessary for this functionality to work correctly.
+This functionality needs more work and should be used with care._
 
 # Contributors
 * Kollivakkam Raghavan (owner)
