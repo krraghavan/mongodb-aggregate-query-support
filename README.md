@@ -98,16 +98,6 @@ one or more stages.  A new annotation and attribute ```@Conditional``` is define
  conditions match, the pipeline stage is used.  With this capability, the order attribute of each pipeline stage becomes relative.
    Stages that don't match and should not be included in the pipeline are filtered out when the pipeline is fully built.
 
-Minimum Java version supported is 1.8 
-
-## Usage
-See the unit test classes and test repository definitions for examples of how to use the Aggregate query annotations.
-
-The @Aggregate annotation is used identically to the way the Spring data @Query annotation is used.  You can put the annotation
-on any interface method (with placeholders) to get Aggregate query support.  The easiest way to do this is to test the 
-pipeline on a MongoDB client (like RoboMongo or MongoChef) and then copy the pipeline steps into each annotation.
-
-
 ```
 
   @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class,
@@ -135,6 +125,18 @@ The ```ParameterValueNotNullCondition``` class returns true if the parameter ide
 _It is the responsibility of the user to ensure that all the pipeline stages are correct after evaluating the conditions.  Using
 distinct order values so that the relative order of the stages are all correct is necessary for this functionality to work correctly.
 This functionality needs more work and should be used with care._
+
+
+## Java version
+Minimum Java version supported is 1.8 
+
+## Usage
+See the unit test classes and test repository definitions for examples of how to use the Aggregate query annotations.
+
+The @Aggregate annotation is used identically to the way the Spring data @Query annotation is used.  You can put the annotation
+on any interface method (with placeholders) to get Aggregate query support.  The easiest way to do this is to test the 
+pipeline on a MongoDB client (like RoboMongo or MongoChef) and then copy the pipeline steps into each annotation.
+
 
 # Contributors
 * Kollivakkam Raghavan (owner)
