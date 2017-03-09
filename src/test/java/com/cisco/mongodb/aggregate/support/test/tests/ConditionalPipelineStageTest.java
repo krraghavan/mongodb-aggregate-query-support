@@ -29,7 +29,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -94,6 +96,34 @@ public class ConditionalPipelineStageTest extends AbstractTestNGSpringContextTes
                                                                                                                  true);
 
     verifyPossessions(expectedHomePossessions, homesOnlyPossessions);
+  }
+
+  @Test
+  public void mustReturnResultWithPotentiallyNullList() {
+    String carTag = "mustReturnResultWithPotentiallyNullListCarPossessions";
+    List<Possessions> expectedCarPossessions = createPossessionsWithSortField(carTag, false, true);
+    String homeTag = "mustReturnResultWithPotentiallyNullListHomePossessions";
+    List<Possessions> expectedHomePossessions = createPossessionsWithSortField(homeTag, true, false);
+    possessionsRepository.save(expectedCarPossessions);
+    possessionsRepository.save(expectedHomePossessions);
+
+    List<Possessions> expectedAllPossessions = new ArrayList<>();
+    expectedAllPossessions.addAll(expectedCarPossessions);
+    expectedAllPossessions.addAll(expectedHomePossessions);
+
+    List<Possessions> allPossessions = possessionsRepository
+            .getPossessionsWithPotentiallyNullTagList(null);
+    assertTrue(allPossessions != null);
+    LOGGER.info("allPossessions:{}", allPossessions);
+
+    verifyPossessions(expectedAllPossessions, allPossessions);
+
+    List<Possessions> carPossessions = possessionsRepository
+            .getPossessionsWithPotentiallyNullTagList(Collections.singletonList(carTag));
+    assertTrue(carPossessions != null);
+    LOGGER.info("carPossessions:{}", carPossessions);
+
+    verifyPossessions(expectedCarPossessions, carPossessions);
   }
 
   private void verifyPossessions(List<Possessions> expectedPossessions, List<Possessions> actualPossessions) {
