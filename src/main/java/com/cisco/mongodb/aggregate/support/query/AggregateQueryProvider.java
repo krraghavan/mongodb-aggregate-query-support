@@ -260,6 +260,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     Sort[] sorts = aggregateAnnotation.sort();
     Facet[] facets = aggregateAnnotation.facet();
     Count [] counts = aggregateAnnotation.count();
+    Skip [] skips = aggregateAnnotation.skip();
 
     pipelineCount += aggregateCounter.apply(projections);
     pipelineCount += aggregateCounter.apply(groups);
@@ -273,6 +274,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     pipelineCount += aggregateCounter.apply(sorts);
     pipelineCount += aggregateCounter.apply(facets);
     pipelineCount += aggregateCounter.apply(counts);
+    pipelineCount += aggregateCounter.apply(skips);
 
     //If query is empty string then out was not declared in tests
     if (!"".equals(out.query())) {
@@ -297,6 +299,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
       addPipelineStages(queries, sorts);
       addPipelineStages(queries, facets);
       addPipelineStages(queries, counts);
+      addPipelineStages(queries, skips);
 
       //since only one out is allowed, place it at the end
       if (outAnnotationPresent) {
@@ -399,9 +402,17 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
 
   private void addPipelineStages(String[] queries, Unwind[] unwinds) {
     int length = queries.length;
-    for (Unwind projection : unwinds) {
-      Assert.isTrue(projection.order() < length, "Unwind Order must be less than " + length);
-      setupQuery(queries, UNWIND, projection.condition(), projection.order(), projection.query());
+    for (Unwind unwind : unwinds) {
+      Assert.isTrue(unwind.order() < length, "Unwind Order must be less than " + length);
+      setupQuery(queries, UNWIND, unwind.condition(), unwind.order(), unwind.query());
+    }
+  }
+
+  private void addPipelineStages(String[] queries, Skip[] skips) {
+    int length = queries.length;
+    for (Skip skip : skips) {
+      Assert.isTrue(skip.order() < length, "Skip Order must be less than " + length);
+      setupQuery(queries, SKIP, skip.condition(), skip.order(), skip.query());
     }
   }
 
@@ -553,6 +564,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     SORT("$sort"),
     FACET("$facet"),
     COUNT("$count"),
+    SKIP("$skip"),
     OUT("$out");
 
     private final String representation;

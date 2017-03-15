@@ -24,6 +24,7 @@ Not all aggregate pipeline steps are supported.  As of 0.7.2 support is provided
 * ReplaceRoot (Mongo 3.4+) - added in v0.7.2
 * Facet (Mongo 3.4+) - added in v0.7.3
 * Count - added in v0.7.4
+* Skip - added in v0.7.9
 
 ## New in 0.7.5 version
 Ability to parameterize keys in aggregate queries.  When the structure of the query is the same but the only difference 
