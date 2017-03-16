@@ -122,4 +122,12 @@ public @interface Aggregate {
    * @return - the count pipeline operator.  Only makes sense to have one of these.
    */
   Count [] count() default {};
+
+  /**
+   * Support for $skip aggregation pipeline operator.
+   *
+   * @return - array of $skip stages
+   *
+   */
+  Skip [] skip() default {};
 }

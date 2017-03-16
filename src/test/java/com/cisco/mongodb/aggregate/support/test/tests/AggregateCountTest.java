@@ -59,6 +59,7 @@ public class AggregateCountTest extends AbstractTestNGSpringContextTests {
 
 
   @BeforeClass
+  @SuppressWarnings("Duplicates")
   public void setup() throws Exception {
     countRepository.deleteAll();
     ObjectMapper mapper = new ObjectMapper();
