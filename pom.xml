@@ -24,7 +24,7 @@
 
   <groupId>com.github.krraghavan</groupId>
   <artifactId>mongodb-aggregate-query-support</artifactId>
-  <version>0.7.9</version>
+  <version>0.7.8</version>
 
   <name>Annotation based Mongo DB Aggregation Query Support</name>
   <description>Spring Data @Query like support for Mongo Aggregation queries</description>
@@ -64,7 +64,7 @@
     <connection>scm:git:git://github.com/krraghavan/mongodb-aggregate-query-support.git</connection>
     <developerConnection>scm:git:ssh://github.com:krraghavan/mongodb-aggregate-query-support.git</developerConnection>
     <url>https://github.com/krraghavan/mongodb-aggregate-query-support/tree/master</url>
-    <tag>v0.7.10-SNAPSHOT</tag>
+    <tag>v0.7.9-SNAPSHOT</tag>
   </scm>
 
   <distributionManagement>

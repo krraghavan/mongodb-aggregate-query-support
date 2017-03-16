@@ -319,13 +319,16 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     int lastStage = pipelineCount - 1;
     int skipStageForPageable = lastStage - 1;
     int limitStageForPageable = lastStage;
+    LOGGER.debug("Last stage is {}", lastStage);
     //shift skipStageForPageable back one if client is performing an out
     if (outAnnotationPresent) {
+      LOGGER.debug("Decrementing potential pageable stage since out annotation is present");
       skipStageForPageable--;
       limitStageForPageable--;
     }
 
     if (isPageable) {
+      LOGGER.debug("isPageable is true, adding skip and limit stages");
       setupQuery(queries, SKIP, new Conditional[]{}, skipStageForPageable,
                  String.valueOf(pageable.getPageNumber() * pageable.getPageSize()));
       setupQuery(queries, LIMIT, new Conditional[]{}, limitStageForPageable, String.valueOf(pageable.getPageSize()));
@@ -333,6 +336,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
 
     //since only one out is allowed, place it at the end
     if (outAnnotationPresent) {
+      LOGGER.debug("outAnnotation is present, adding to last stage");
       setupQuery(queries, OUT, out.condition(), lastStage, out.query());
     }
   }
