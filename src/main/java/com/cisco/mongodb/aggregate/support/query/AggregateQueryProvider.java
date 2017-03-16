@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.repository.query.ConvertingParameterAccessor;
 import org.springframework.data.mongodb.repository.query.MongoParameterAccessor;
@@ -232,6 +233,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     LOGGER.debug("Getting aggregate operations");
     int pipelineCount = 0;
     boolean outAnnotationPresent = false;
+    boolean isPageable = this.mongoParameterAccessor.getPageable() != null;
     final Function<Object, Integer> aggregateCounter = objects -> {
       if (objects != null) {
         if(objects instanceof Object []) {
@@ -275,6 +277,9 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
     pipelineCount += aggregateCounter.apply(facets);
     pipelineCount += aggregateCounter.apply(counts);
     pipelineCount += aggregateCounter.apply(skips);
+    if (isPageable) {
+      pipelineCount += 2;
+    }
 
     //If query is empty string then out was not declared in tests
     if (!"".equals(out.query())) {
@@ -301,14 +306,34 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
       addPipelineStages(queries, counts);
       addPipelineStages(queries, skips);
 
-      //since only one out is allowed, place it at the end
-      if (outAnnotationPresent) {
-        setupQuery(queries, OUT, out.condition(), pipelineCount-1, out.query());
-      }
+      addToEndOfQuery(pipelineCount, outAnnotationPresent, isPageable, out, queries, mongoParameterAccessor.getPageable());
 
       //noinspection ConfusingArgumentToVarargsMethod
       LOGGER.debug("Aggregate pipeline after forming queries - {}", (String[])queries);
       aggregateQueryPipeline = arrayUtils.packToList(queries);
+    }
+  }
+
+  private void addToEndOfQuery(int pipelineCount, boolean outAnnotationPresent, boolean isPageable, Out out,
+                               String[] queries, Pageable pageable) {
+    int lastStage = pipelineCount - 1;
+    int skipStageForPageable = lastStage - 1;
+    int limitStageForPageable = lastStage;
+    //shift skipStageForPageable back one if client is performing an out
+    if (outAnnotationPresent) {
+      skipStageForPageable--;
+      limitStageForPageable--;
+    }
+
+    if (isPageable) {
+      setupQuery(queries, SKIP, new Conditional[]{}, skipStageForPageable,
+                 String.valueOf(pageable.getPageNumber() * pageable.getPageSize()));
+      setupQuery(queries, LIMIT, new Conditional[]{}, limitStageForPageable, String.valueOf(pageable.getPageSize()));
+    }
+
+    //since only one out is allowed, place it at the end
+    if (outAnnotationPresent) {
+      setupQuery(queries, OUT, out.condition(), lastStage, out.query());
     }
   }
 
