@@ -127,6 +127,22 @@ _It is the responsibility of the user to ensure that all the pipeline stages are
 distinct order values so that the relative order of the stages are all correct is necessary for this functionality to work correctly.
 This functionality needs more work and should be used with care._
 
+## New in 0.7.9 version
+In this version, support for the $skip pipeline stage is added along with support for Pageable in aggregate query methods.
+ Using pageable will automatically add $skip and $limit pipeline stages and allows aggregate query results to be paged. 
+
+Example (see unit test as well)
+
+```
+
+  @Aggregate(inputType = Score.class, outputBeanType = Score.class,
+             sort = {
+                 @Sort(query = "{ score : 1 }", order = 0)
+             })
+  List<Score> getPageableScores(Pageable pageable);
+
+```
+The ```getPageableScores``` method returns only a pageful of records from the repository.
 
 ## Java version
 Minimum Java version supported is 1.8 
