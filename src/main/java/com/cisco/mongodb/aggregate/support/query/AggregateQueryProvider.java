@@ -19,6 +19,7 @@
 package com.cisco.mongodb.aggregate.support.query;
 
 import com.cisco.mongodb.aggregate.support.annotation.*;
+import com.cisco.mongodb.aggregate.support.bean.UnbindableObject;
 import com.cisco.mongodb.aggregate.support.condition.AggregateQueryMethodConditionContext;
 import com.cisco.mongodb.aggregate.support.condition.ConditionalAnnotationMetadata;
 import com.cisco.mongodb.aggregate.support.utils.ArrayUtils;
@@ -34,6 +35,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.repository.query.ConvertingParameterAccessor;
 import org.springframework.data.mongodb.repository.query.MongoParameterAccessor;
+import org.springframework.data.mongodb.repository.query.MongoParametersParameterAccessor;
+import org.springframework.data.repository.query.Parameter;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -653,7 +656,14 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
       List<Object> retval = new ArrayList<>();
       int numArgs = method.getParameterCount();
       for (int i = 0; i < numArgs; i++) {
-        retval.add(convertingParameterAccessor.getBindableValue(i));
+        Parameter param = ((MongoParametersParameterAccessor) mongoParameterAccessor).getParameters().getParameter(i);
+        if (param.isBindable()) {
+          retval.add(convertingParameterAccessor.getBindableValue(i));
+        }
+        else {
+          LOGGER.debug("{} was unbindable, adding it as an unbindable object", param.getName());
+          retval.add(new UnbindableObject(param.getName()));
+        }
       }
       return retval;
     }
