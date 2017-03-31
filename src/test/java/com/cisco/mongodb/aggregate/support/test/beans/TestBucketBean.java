@@ -26,7 +26,7 @@ import org.springframework.data.annotation.Id;
  * 1/21/17.
  */
 
-public class TestBucketBean extends AbstractTestAggregateBean{
+public class TestBucketBean extends AbstractTestAggregateBean {
 
   @Id
   private String oid;

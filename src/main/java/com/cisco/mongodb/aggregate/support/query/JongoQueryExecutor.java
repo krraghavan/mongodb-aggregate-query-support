@@ -28,6 +28,9 @@ import org.jongo.bson.BsonDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.util.*;
@@ -36,10 +39,13 @@ import java.util.*;
  * Created by rkolliva on 10/21/2015.
  * A query executor for test cases
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "squid:S2259"})
+@Component
 public class JongoQueryExecutor implements MongoQueryExecutor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JongoQueryExecutor.class);
+  public static final String UNEXPECTED_NULL_AGGREGATE_QUERY = "Unexpected null aggregate query";
+  public static final String QUERY_RETURN_ERROR_STR = "Query is expecting a single object to be returned but the result set had multiple rows";
 
   private final Jongo jongo;
 
@@ -50,15 +56,6 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
 
   @Override
   public Object executeQuery(QueryProvider queryProvider) throws MongoQueryException {
-    if (queryProvider.isIterable()) {
-      return doMultiQuery(queryProvider);
-    }
-    else {
-      return doSingleQuery(queryProvider);
-    }
-  }
-
-  private Object doMultiQuery(final QueryProvider queryProvider) throws MongoQueryException {
     Iterator<String> iterator = (Iterator) queryProvider;
     int i = 0;
     Aggregate aggregate = null;
@@ -69,24 +66,58 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
         aggregate = jongo.getCollection(queryProvider.getCollectionName()).aggregate(query);
       }
       else {
+        Assert.notNull(aggregate, UNEXPECTED_NULL_AGGREGATE_QUERY);
         aggregate.and(query);
       }
     }
-
-    Map<String, Object> resultMap = new HashMap<>();
-
-    ResultsIterator resultsIterator = aggregate.as(resultMap.getClass());
-    if (!resultsIterator.hasNext() || Void.TYPE.equals(queryProvider.getMethodReturnType())) {
+    Assert.notNull(aggregate, UNEXPECTED_NULL_AGGREGATE_QUERY);
+    ResultsIterator resultsIterator = aggregate.as(HashMap.class);
+    if (resultsIterator == null || !resultsIterator.hasNext() || Void.TYPE.equals(queryProvider.getMethodReturnType())) {
       return null;
     }
     final String resultKey = queryProvider.getQueryResultKey();
+    if(isPageReturnType(queryProvider) && !queryProvider.isAggregate2()) {
+      throw new IllegalArgumentException("Page can be used as a return type only with @Aggregate2 annotation");
+    }
+    if (!queryProvider.isPageable() || (queryProvider.isPageable() &&
+                                        List.class.isAssignableFrom(queryProvider.getMethodReturnType()))) {
+      return getNonPageResults(queryProvider, resultsIterator, resultKey);
+    }
+    else if (queryProvider.isPageable() && isPageReturnType(queryProvider)) {
+      return getPageableResults(queryProvider, resultsIterator);
+    }
+    throw new MongoQueryException(QUERY_RETURN_ERROR_STR);
+  }
+
+  private boolean isPageReturnType(QueryProvider queryProvider) {
+    return Page.class.isAssignableFrom(queryProvider.getMethodReturnType());
+  }
+
+  private Object getPageableResults(QueryProvider queryProvider, ResultsIterator resultsIterator) {
+    // for pageable we get one entry always - which is a DBObject
+    Map<String, Object> valueMap = (Map) resultsIterator.next();
+
+    final List results = (List) valueMap.get("results");
+    // we need to deserialize each of these.
+
+    final List retval = new ArrayList();
+    for (Object result : results) {
+      unmarshallResult(queryProvider, retval, result);
+    }
+    final int count = (int)valueMap.get("totalResultSetCount");
+    // return type is pageable
+
+    return new PageImpl(retval, queryProvider.getPageable(), count);
+  }
+
+  private Object getNonPageResults(QueryProvider queryProvider, Iterator resultsIterator,
+                                   String resultKey) throws MongoQueryException {
     final List retval = new ArrayList();
     resultsIterator.forEachRemaining(o -> {
       LOGGER.debug("Got object {}", o.toString());
       Assert.isTrue(o instanceof Map);
       Map<String, Object> instanceMap = (Map) o;
-      Object resultObject = null;
-      Object valueObject = null;
+      Object valueObject;
       //If there is no result key, we should consider the whole return values map
       //If not consider only the value in result key
       if (resultKey.isEmpty()) {
@@ -98,22 +129,7 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
       //If the result is a map(by default map will be returned) we need to
       // deserialize. If not, then it is a generic type(Eg. String, Integer)
       // which does not need deserialization
-      if (valueObject instanceof Map) {
-        Map value = (Map) valueObject;
-        DBObject dbObject = new BasicDBObject(value);
-        Class outputClass = queryProvider.getOutputClass();
-        if(outputClass == DBObject.class) {
-          resultObject = dbObject;
-        }
-        else {
-          BsonDocument bsonDocument = Bson.createDocument(dbObject);
-          resultObject = jongo.getMapper().getUnmarshaller().unmarshall(bsonDocument, outputClass);
-        }
-      }
-      else {
-        resultObject = valueObject;
-      }
-      retval.add(resultObject);
+      unmarshallResult(queryProvider, retval, valueObject);
     });
     if (queryProvider.returnCollection()) {
       return retval;
@@ -124,7 +140,23 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
     throw new MongoQueryException("Query is expecting a single object to be returned but the result set had multiple rows");
   }
 
-  private Object doSingleQuery(QueryProvider queryProvider) {
-    return null;
+  private void unmarshallResult(QueryProvider queryProvider, List retval, Object valueObject) {
+    Object resultObject;
+    if (valueObject instanceof Map) {
+      Map value = (Map) valueObject;
+      DBObject dbObject = new BasicDBObject(value);
+      Class outputClass = queryProvider.getOutputClass();
+      if (outputClass == DBObject.class) {
+        resultObject = dbObject;
+      }
+      else {
+        BsonDocument bsonDocument = Bson.createDocument(dbObject);
+        resultObject = jongo.getMapper().getUnmarshaller().unmarshall(bsonDocument, outputClass);
+      }
+    }
+    else {
+      resultObject = valueObject;
+    }
+    retval.add(resultObject);
   }
 }

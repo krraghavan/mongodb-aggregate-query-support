@@ -43,16 +43,20 @@ import java.net.UnknownHostException;
  * 10/21/2015.
  */
 @Configuration
-@Import({FongoConfiguration.class, MongoClientConfiguration.class})
+@Import({
+    MongoClientTestConfiguration.class
+})
 public class MongoDBTestConfiguration {
 
   @Bean
-  public MongoDbFactory mongoDbFactory(MongoClient mongoClient, String dbName) throws UnknownHostException {
+  public MongoDbFactory mongoDbFactory(@Qualifier("mongo") MongoClient mongoClient,
+                                       String dbName) throws UnknownHostException {
     return new SimpleMongoDbFactory(mongoClient, dbName);
   }
 
   @Bean
-  public MongoDbFactory mongoDbFactoryForJongo(MongoClient mongoClient, String dbName) throws UnknownHostException {
+  public MongoDbFactory mongoDbFactoryForJongo(@Qualifier("mongoForJongo") MongoClient mongoClient,
+                                               String dbName) throws UnknownHostException {
     return new SimpleMongoDbFactory(mongoClient, dbName);
   }
 
@@ -70,7 +74,7 @@ public class MongoDBTestConfiguration {
   public MongoTemplate mongoTemplate(@Qualifier("mongoDbFactory") MongoDbFactory mongoDbFactory,
                                      MongoConverter mongoConverter) throws Exception {
     MongoTemplate mongoTemplate = new MongoTemplate(mongoDbFactory, mongoConverter);
-    mongoTemplate.setWriteConcern(WriteConcern.JOURNALED);
+    mongoTemplate.setWriteConcern(WriteConcern.ACKNOWLEDGED);
     return mongoTemplate;
   }
 

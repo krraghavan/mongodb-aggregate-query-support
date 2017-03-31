@@ -30,10 +30,10 @@ import java.util.List;
  */
 
 
-public class Artwork {
+public class Artwork extends AbstractTestAggregateBean {
 
   @Id @MongoId
-  private Integer id;
+  private Integer _id;
 
   private String title;
 
@@ -45,12 +45,12 @@ public class Artwork {
 
   private List<String> tags;
 
-  public int getId() {
-    return id;
+  public int get_id() {
+    return _id;
   }
 
-  public void setId(int id) {
-    this.id = id;
+  public void set_id(int id) {
+    this._id = id;
   }
 
   public String getTitle() {

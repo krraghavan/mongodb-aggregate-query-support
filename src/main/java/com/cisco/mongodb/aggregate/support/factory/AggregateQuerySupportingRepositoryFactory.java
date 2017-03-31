@@ -21,6 +21,7 @@ package com.cisco.mongodb.aggregate.support.factory;
 
 
 import com.cisco.mongodb.aggregate.support.annotation.Aggregate;
+import com.cisco.mongodb.aggregate.support.annotation.v2.Aggregate2;
 import com.cisco.mongodb.aggregate.support.query.AggregateMongoQuery;
 import com.cisco.mongodb.aggregate.support.query.MongoQueryExecutor;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -32,7 +33,6 @@ import org.springframework.data.repository.query.EvaluationContextProvider;
 import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.data.repository.query.RepositoryQuery;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 /**
@@ -58,11 +58,15 @@ public class AggregateQuerySupportingRepositoryFactory extends MongoRepositoryFa
   }
 
   @Override
-  protected QueryLookupStrategy getQueryLookupStrategy(QueryLookupStrategy.Key key,
-                                                       EvaluationContextProvider evaluationContextProvider) {
+  public QueryLookupStrategy getQueryLookupStrategy(QueryLookupStrategy.Key key,
+                                                    EvaluationContextProvider evaluationContextProvider) {
 
     QueryLookupStrategy parentQueryLookupStrategy = super.getQueryLookupStrategy(key, evaluationContextProvider);
     return new AggregateQueryLookupStrategy(parentQueryLookupStrategy);
+  }
+
+  private boolean isAggregateQueryAnnotated(Method method) {
+    return (method.getAnnotation(Aggregate.class) != null) || (method.getAnnotation(Aggregate2.class) != null);
   }
 
   private class AggregateQueryLookupStrategy implements QueryLookupStrategy {
@@ -74,9 +78,9 @@ public class AggregateQuerySupportingRepositoryFactory extends MongoRepositoryFa
     }
 
     @Override
-    public RepositoryQuery resolveQuery(Method method, RepositoryMetadata repositoryMetadata, ProjectionFactory projectionFactory, NamedQueries namedQueries) {
-      Annotation aggregateAnnotation = method.getAnnotation(Aggregate.class);
-      if (aggregateAnnotation == null) {
+    public RepositoryQuery resolveQuery(Method method, RepositoryMetadata repositoryMetadata,
+                                        ProjectionFactory projectionFactory, NamedQueries namedQueries) {
+      if (!isAggregateQueryAnnotated(method)) {
         return parentQueryLookupStrategy.resolveQuery(method, repositoryMetadata, projectionFactory, namedQueries);
       }
       else {

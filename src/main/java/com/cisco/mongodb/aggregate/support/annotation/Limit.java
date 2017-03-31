@@ -25,6 +25,7 @@ package com.cisco.mongodb.aggregate.support.annotation;
  *
  * Created by sukhdevs on 4/8/16.
  */
+@Deprecated
 public @interface Limit {
   String query();
 

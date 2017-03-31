@@ -35,7 +35,7 @@ public class TestScoreBean extends AbstractTestAggregateBean {
 
   @Id
   @MongoId
-  private int id;
+  private int _id;
 
   private String student;
 
@@ -45,12 +45,12 @@ public class TestScoreBean extends AbstractTestAggregateBean {
 
   private List<Integer> homework;
 
-  public int getId() {
-    return id;
+  public int get_id() {
+    return _id;
   }
 
-  public void setId(int id) {
-    this.id = id;
+  public void set_id(int _id) {
+    this._id = _id;
   }
 
   public String getStudent() {
@@ -94,7 +94,7 @@ public class TestScoreBean extends AbstractTestAggregateBean {
       return false;
     }
     TestScoreBean scoreBean = (TestScoreBean) o;
-    return id == scoreBean.id &&
+    return _id == scoreBean._id &&
            extraCredit == scoreBean.extraCredit &&
            Objects.equals(student, scoreBean.student) &&
            Objects.equals(quiz, scoreBean.quiz) &&
@@ -103,6 +103,6 @@ public class TestScoreBean extends AbstractTestAggregateBean {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, student, quiz, extraCredit, homework);
+    return Objects.hash(_id, student, quiz, extraCredit, homework);
   }
 }

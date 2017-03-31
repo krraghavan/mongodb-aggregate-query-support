@@ -19,13 +19,17 @@
 
 package com.cisco.mongodb.aggregate.support.test.tests;
 
+import com.cisco.mongodb.aggregate.support.test.beans.TestReplaceRootBean;
 import com.cisco.mongodb.aggregate.support.test.config.AggregateTestConfiguration;
+import com.cisco.mongodb.aggregate.support.test.fixtures.AggregateQueryFixtures;
 import com.cisco.mongodb.aggregate.support.test.repository.TestReplaceRootRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +49,13 @@ public class ReplaceRootTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private TestReplaceRootRepository testReplaceRootRepository;
 
-  @Test(enabled = false)
+  @BeforeClass
+  private void setupRepository() throws IOException {
+    List<TestReplaceRootBean> replaceRootBeans = AggregateQueryFixtures.newReplaceRootFixture();
+    testReplaceRootRepository.save(replaceRootBeans);
+  }
+
+  @Test
   public void mustAddFieldsToResults() {
     assertNotNull(testReplaceRootRepository);
 
@@ -76,7 +86,7 @@ public class ReplaceRootTest extends AbstractTestNGSpringContextTests {
     assertEquals(yamsCount[0], 200);
   }
 
-  @Test(enabled = false)
+  @Test
   public void mustReplaceRootWithMatch() {
     assertNotNull(testReplaceRootRepository);
 
@@ -99,7 +109,7 @@ public class ReplaceRootTest extends AbstractTestNGSpringContextTests {
   }
 
   @SuppressWarnings("unchecked")
-  @Test(enabled = false)
+  @Test
   public void mustReplaceRootWithExpression() {
     assertNotNull(testReplaceRootRepository);
 
@@ -128,7 +138,7 @@ public class ReplaceRootTest extends AbstractTestNGSpringContextTests {
   }
 
   @SuppressWarnings("unchecked")
-  @Test(enabled = false)
+  @Test
   public void mustReplaceRootWithArrays() {
     assertNotNull(testReplaceRootRepository);
 

@@ -22,8 +22,10 @@
 package com.cisco.mongodb.aggregate.support.test.repository;
 
 import com.cisco.mongodb.aggregate.support.annotation.Aggregate;
-import com.cisco.mongodb.aggregate.support.test.beans.TestPrimaryKeyBean;
 import com.cisco.mongodb.aggregate.support.annotation.Lookup;
+import com.cisco.mongodb.aggregate.support.annotation.v2.Aggregate2;
+import com.cisco.mongodb.aggregate.support.annotation.v2.Lookup2;
+import com.cisco.mongodb.aggregate.support.test.beans.TestPrimaryKeyBean;
 
 import java.util.List;
 
@@ -43,4 +45,13 @@ public interface TestPrimaryKeyRepository extends TestMongoRepository<TestPrimar
       genericType = true
   )
   List<TestPrimaryKeyBean> findAllPrimaryKeyBeans();
+
+  @Aggregate2(inputType = TestPrimaryKeyBean.class, outputBeanType = TestPrimaryKeyBean.class)
+  @Lookup2(query = "{" +
+                   "                \"from\": 'testForeignKeyBean'," +
+                   "                \"localField\" : \"_id\"," +
+                   "                \"foreignField\": \"foreignKey\"," +
+                   "                \"as\": \"foreignKeyBeanList\"" +
+                   "            }", order = 0)
+  List<TestPrimaryKeyBean> findAllPrimaryKeyBeans2();
 }

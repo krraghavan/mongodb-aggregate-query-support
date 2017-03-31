@@ -30,6 +30,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -50,8 +51,12 @@ public class AggregateLookupTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private TestForeignKeyRepository testForeignKeyRepository;
 
-  @Test
-  public void mustReturnForeignKeyItemsInPrimaryList() {
+  private int foreignKeyItemsCount;
+
+  private List<String> foreignKeys = new ArrayList<>();
+
+  @BeforeClass
+  private void setup() {
     String primaryKey = RandomStringUtils.randomAlphabetic(10);
 
     // create a single primarykey record
@@ -60,8 +65,7 @@ public class AggregateLookupTest extends AbstractTestNGSpringContextTests {
     testPrimaryKeyRepository.save(primaryKeyBean);
 
     // generate a random number of foreign key items
-    int foreignKeyItemsCount = RandomUtils.nextInt(10, 40);
-    List<String> foreignKeys = new ArrayList<>();
+    foreignKeyItemsCount = RandomUtils.nextInt(10, 40);
     List<TestForeignKeyBean> foreignKeyBeans = new ArrayList<>(foreignKeyItemsCount);
     for (int i = 0; i < foreignKeyItemsCount; i++) {
       TestForeignKeyBean testForeignKeyBean = new TestForeignKeyBean();
@@ -73,8 +77,16 @@ public class AggregateLookupTest extends AbstractTestNGSpringContextTests {
     }
     testForeignKeyRepository.save(foreignKeyBeans);
 
+  }
+
+  @Test
+  public void mustReturnForeignKeyItemsInPrimaryList() {
     // now read the primary key
     List<TestPrimaryKeyBean> actualPrimaryKeyBean = testPrimaryKeyRepository.findAllPrimaryKeyBeans();
+    validateResults(actualPrimaryKeyBean);
+  }
+
+  private void validateResults(List<TestPrimaryKeyBean> actualPrimaryKeyBean) {
     assertNotNull(actualPrimaryKeyBean);
     assertTrue(actualPrimaryKeyBean.size() == 1);
     List<TestForeignKeyBean> actualFKeyBeanList = actualPrimaryKeyBean.get(0).getForeignKeyBeanList();
@@ -86,5 +98,12 @@ public class AggregateLookupTest extends AbstractTestNGSpringContextTests {
     actualFKeyBeanList.forEach(fkey -> {
       assertTrue(foreignKeys.contains(fkey.getRandomAttribute()));
     });
+  }
+
+  @Test
+  public void mustReturnForeignKeyItemsInPrimaryList2() {
+    // now read the primary key
+    List<TestPrimaryKeyBean> actualPrimaryKeyBeans = testPrimaryKeyRepository.findAllPrimaryKeyBeans2();
+    validateResults(actualPrimaryKeyBeans);
   }
 }

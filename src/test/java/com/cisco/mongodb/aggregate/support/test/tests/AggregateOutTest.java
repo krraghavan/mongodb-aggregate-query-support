@@ -38,6 +38,7 @@ import static org.testng.Assert.assertTrue;
 
 /**
  * Created by camejavi on 6/9/2016.
+ *
  */
 @ContextConfiguration(classes = {AggregateTestConfiguration.class})
 public class AggregateOutTest extends AbstractTestNGSpringContextTests {

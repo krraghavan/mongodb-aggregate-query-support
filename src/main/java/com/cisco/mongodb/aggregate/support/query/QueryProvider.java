@@ -18,8 +18,11 @@
  */
 package com.cisco.mongodb.aggregate.support.query;
 
+import org.springframework.data.domain.Pageable;
+
 /**
  * Created by rkolliva on 10/21/2015.
+ *
  */
 public interface QueryProvider {
 
@@ -58,4 +61,22 @@ public interface QueryProvider {
    * @return result key
    */
   String getQueryResultKey();
+
+  /**
+   * Returns true if the aggregate query returns a Pageable
+   * @return true if aggregate query returns a pageable, false otherwise.
+   */
+  boolean isPageable();
+
+  /**
+   * Returns the pageable object associated with the aggregate query
+   * @return - The Pageable object if the query is pageable null otherwise.
+   *
+   */
+  Pageable getPageable();
+
+  /**
+   * @return true if the query was being served using the @Aggregate2 annotation, false otherwise
+   */
+  boolean isAggregate2();
 }

@@ -18,13 +18,16 @@
  */
 package com.cisco.mongodb.aggregate.support.annotation;
 
+import com.cisco.mongodb.aggregate.support.api.ResultsExtractor;
 import org.bson.BsonDocument;
 
+import javax.xml.transform.Result;
 import java.lang.annotation.*;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
+@Deprecated
 public @interface Aggregate {
 
   /**

@@ -54,7 +54,7 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Inte
     return CollectionUtils.isNotEmpty(getPossessions( "cars"));
   }
   
-  default boolean hasHomes(String id) {
+  default boolean hasHomes(String _id) {
     return CollectionUtils.isNotEmpty(getPossessions( "homes"));
   }
 
@@ -143,6 +143,104 @@ Example (see unit test as well)
 
 ```
 The ```getPageableScores``` method returns only a pageful of records from the repository.
+
+
+## New in 0.7.11 version
+A new set of Aggregate annotations have been created that allow the pipelines to be specified in their natural order by
+leveraging Java 8 repeatable annotations.  Note that the order attribute is still required since the Java compiler 
+puts all repeated annotations into their container without regard to their order in the method.  The primary purpose of
+this enhancement is to improve readability of the query.  In addition to this, the specification of the Facet pipeline stage
+has been changed to use nested annotations to specify the different pipeline stages.  The ```@FacetPipeline``` and 
+```FacetPipelineStage``` can be used to specify multiple pipelines each with multiple stages (see unit tests for more details).
+Finally, the Pageable support has been enhanced to support returning ```Page``` objects.  Users of this capability will now
+ be able to get the total number of results that matched the query in addition to limiting the size of the results.
+
+Notes
+1. All annotations have the suffix 2 to distinguish them from the non-repeatable annotations - Example ```@Match2```
+2. Pageable with Page return type is only supported with the new repeatable annotation
+3. The non-repeatable annotations are being deprecated
+4. Additional pipeline stages ```$sortByCount```, ```$graphLookup```, and ```$bucketAuto``` are supported (only in repeatable form)
+Since these annotations were not supported in the previous releases, they do not have a suffix 2.
+ 
+### Example - Pageable stage with Facet2
+
+```
+  @Aggregate2(inputType = Score.class, outputBeanType = Score.class)
+  @Facet2(pipelines = {
+    @FacetPipeline(name="documents", stages = {
+        @FacetPipelineStage(stageType = Match2.class, query = "{'score' : {'$lt' : 100}}")
+    })
+  }, order = 0)
+  @Unwind2(query = "'$documents'", order = 1)
+  @ReplaceRoot2(query = "{" +
+                        "   \"newRoot\" : \"$documents\"" +
+                        "}", order = 2)
+  @Sort2(query = "{ score : 1 }", order = 3)
+  Page<Score> getPageableWithFacet(Pageable pageable);
+
+```
+
+ ### Example - Facet2 with no pageable (example in unit test is from the MongoDb 3.4 documentation)
+ ```
+   @Aggregate2(inputType = Artwork.class, genericType = true, outputBeanType = HashMap.class)
+   @Facet2(pipelines = {
+       @FacetPipeline(name = "categorizedByTags",
+                      stages = {
+                          @FacetPipelineStage(stageType = Unwind2.class, query = "'$tags'"),
+                          @FacetPipelineStage(stageType = SortByCount.class, query = "'$tags'")
+                      }),
+       @FacetPipeline(name = "categorizedByPrice",
+                      stages = {
+                          @FacetPipelineStage(stageType = Match2.class, query = "{ price: { $exists: 1 } }"),
+                          @FacetPipelineStage(stageType = Bucket2.class, query = "{" +
+                                                                                 "  groupBy: \"$price\",\n" +
+                                                                                 "  boundaries: [  0, 150, 200, 300, 400 ],\n" +
+                                                                                 "  default: \"Other\",\n" +
+                                                                                 "  output: {\n" +
+                                                                                 "  \"count\": { $sum: 1 },\n" +
+                                                                                 "  \"titles\": { $push: \"$title\" }\n" +
+                                                                                 "  }\n" +
+                                                                                 "}")
+                      })}
+       , order = 0)
+   Map<String, Object> getFacetResults2();
+ 
+ ```
+ 
+ ### Example usage of different pipeline stages with repeatable annotations (the query arguments don't matter)
+ ```
+   @Aggregate2(inputType = TestAggregateAnnotation2FieldsBean.class, outputBeanType = Void.class)
+   @Match2(query = "dont care", order = 0)
+   void aggregateQueryWithMatchOnly();
+ ```
+ 
+ ```
+ 
+   @Aggregate2(inputType = TestAggregateAnnotation2FieldsBean.class, outputBeanType = Void.class)
+   @Match2(query = "dont care", order = 0)
+   @Match2(query = "dont care1", order = 1)
+   void aggregateQueryWithMultipleMatchQueries();
+ ```
+  ```
+
+   @Aggregate2(inputType = TestAggregateAnnotation2FieldsBean.class, outputBeanType = Void.class)
+   @Match2(query = "dont care", order = 0)
+   @Group2(query = "dont care", order = 1)
+   @Match2(query = "dont care1", order = 2)
+   void aggregateQueryWithMultipleMatchQueriesInNonContiguousOrder();
+ ```
+ 
+ ```
+ 
+   @Aggregate2(inputType = TestAggregateAnnotation2FieldsBean.class, outputBeanType = Void.class)
+   @Match2(query = "dont care", order = 0)
+   @Group2(query = "dont care", order = 1)
+   @DummyAnnotation
+   @Match2(query = "dont care1", order = 2)
+   void aggregateQueryWithMultipleMatchQueriesInNonContiguousOrderWithNonAggAnnotations();
+
+ ```
+Note the actual position of the annotations don't matter but putting the annotations in their natural order improves readability.
 
 ## Java version
 Minimum Java version supported is 1.8 
