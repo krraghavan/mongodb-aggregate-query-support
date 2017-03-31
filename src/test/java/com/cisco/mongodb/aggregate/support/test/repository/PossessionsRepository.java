@@ -27,6 +27,7 @@ import com.cisco.mongodb.aggregate.support.condition.ParameterValueNotNullCondit
 import com.cisco.mongodb.aggregate.support.test.beans.Possessions;
 import com.mongodb.DBObject;
 import org.apache.commons.collections.CollectionUtils;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
@@ -109,4 +110,21 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Stri
                  @Sort(query = "{\"sortTestNumber\" : -1}", order = 2)
              })
   List<Possessions> getWithMixOfConditionalAndUnconditionalStages(String tag, Boolean getCars, Boolean getHomes);
+
+  @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class,
+             match = {
+                 @Match(query = "{" +
+                                "   \"tag\"  : ?0," +
+                                "   \"assets.cars\" : { $exists: true, $ne : []}" +
+                                "}", order = 0, condition = {
+                     @Conditional(condition = ParameterValueNotNullCondition.class, parameterIndex = 1)
+                 }),
+                 @Match(query = "{" +
+                                "   \"tag\": ?0," +
+                                "   \"assets.homes\" : { $exists: true, $ne : []}" +
+                                "}", order = 0, condition = {
+                     @Conditional(condition = ParameterValueNotNullCondition.class, parameterIndex = 2)
+                 })
+             })
+  List<Possessions> mutuallyExclusiveStagesPageable(String tag, Boolean getCars, Boolean getHomes, Pageable pageable);
 }
