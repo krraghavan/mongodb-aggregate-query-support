@@ -24,6 +24,7 @@ import com.cisco.mongodb.aggregate.support.annotation.Conditional;
 import com.cisco.mongodb.aggregate.support.annotation.Match;
 import com.cisco.mongodb.aggregate.support.annotation.Sort;
 import com.cisco.mongodb.aggregate.support.condition.ParameterValueNotNullCondition;
+import com.cisco.mongodb.aggregate.support.condition.ParameterValueNullCondition;
 import com.cisco.mongodb.aggregate.support.test.beans.Possessions;
 import com.mongodb.DBObject;
 import org.apache.commons.collections.CollectionUtils;
@@ -127,4 +128,23 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Stri
                  })
              })
   List<Possessions> mutuallyExclusiveStagesPageable(String tag, Boolean getCars, Boolean getHomes, Pageable pageable);
+
+  @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class,
+          match = {
+                  @Match(query = "{" +
+                          "   'tag': ?0," +
+                          "   '_id': { $in : ?1 }" +
+                          "}", order = 0, condition = {
+                      @Conditional(condition = ParameterValueNotNullCondition.class, parameterIndex = 1)
+                  }),
+                  @Match(query = "{" +
+                          "   'tag': ?0" +
+                          "}", order = 0, condition = {
+                      @Conditional(condition = ParameterValueNullCondition.class, parameterIndex = 1)
+                  })
+          },
+          sort = {
+                  @Sort(query = "{\"sortTestNumber\" : -1}", order = 1)
+          })
+  List<Possessions> getPossessionsWithPotentiallyNullIdList(String tag, List<String> ids);
 }

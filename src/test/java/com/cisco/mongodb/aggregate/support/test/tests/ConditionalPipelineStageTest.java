@@ -29,7 +29,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -94,6 +96,36 @@ public class ConditionalPipelineStageTest extends AbstractTestNGSpringContextTes
                                                                                                                  true);
 
     verifyPossessions(expectedHomePossessions, homesOnlyPossessions);
+  }
+
+  @Test
+  public void mustReturnResultWithPotentiallyNullIdList() {
+    String tag = "mustReturnResultWithPotentiallyNullIdList";
+    List<Possessions> expectedCarPossessions = createPossessionsWithSortField(tag, false, true);
+    List<Possessions> expectedHomePossessions = createPossessionsWithSortField(tag, true, false);
+    possessionsRepository.save(expectedCarPossessions);
+    possessionsRepository.save(expectedHomePossessions);
+
+    List<String> carIds = new ArrayList<>();
+    expectedCarPossessions.forEach(expectedCarPossession -> carIds.add(expectedCarPossession.getId()));
+
+    List<Possessions> expectedAllPossessions = new ArrayList<>();
+    expectedAllPossessions.addAll(expectedCarPossessions);
+    expectedAllPossessions.addAll(expectedHomePossessions);
+
+    List<Possessions> allPossessions = possessionsRepository
+            .getPossessionsWithPotentiallyNullIdList(tag,null);
+    assertTrue(allPossessions != null);
+    LOGGER.info("allPossessions:{}", allPossessions);
+
+    verifyPossessions(expectedAllPossessions, allPossessions);
+
+    List<Possessions> carPossessions = possessionsRepository
+            .getPossessionsWithPotentiallyNullIdList(tag, carIds);
+    assertTrue(carPossessions != null);
+    LOGGER.info("carPossessions:{}", carPossessions);
+
+    verifyPossessions(expectedCarPossessions, carPossessions);
   }
 
   private void verifyPossessions(List<Possessions> expectedPossessions, List<Possessions> actualPossessions) {
