@@ -75,17 +75,24 @@ public class AggregateCountTest extends AbstractTestNGSpringContextTests {
     countRepository.insert(scores);
   }
 
-  /**
-   * This test is disabled because it needs to be run on a real mongo instance
-   * Fongo does not yet support the $facet operator.
-   */
-  @Test(enabled = false)
+  @Test
   public void mustReturnBucketsFromRepository() {
     assertNotNull(countRepository, "Must have a repository");
     List<Score> scores = countRepository.findAll();
     assertNotNull(scores);
     assertEquals(scores.size(), COUNT_TEST_DOCS.length);
     Integer passingScores = countRepository.getPassingScores();
+    assertNotNull(passingScores);
+    assertEquals((int)passingScores, 4);
+  }
+
+  @Test
+  public void mustReturnBucketsFromRepository2() {
+    assertNotNull(countRepository, "Must have a repository");
+    List<Score> scores = countRepository.findAll();
+    assertNotNull(scores);
+    assertEquals(scores.size(), COUNT_TEST_DOCS.length);
+    Integer passingScores = countRepository.getPassingScores2();
     assertNotNull(passingScores);
     assertEquals((int)passingScores, 4);
   }

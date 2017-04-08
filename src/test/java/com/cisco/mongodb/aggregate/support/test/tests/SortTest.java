@@ -19,13 +19,17 @@
 
 package com.cisco.mongodb.aggregate.support.test.tests;
 
+import com.cisco.mongodb.aggregate.support.test.beans.Artwork;
+import com.cisco.mongodb.aggregate.support.test.beans.ArtworkSortTestBean;
 import com.cisco.mongodb.aggregate.support.test.beans.TestSortResultsBean;
 import com.cisco.mongodb.aggregate.support.test.config.AggregateTestConfiguration;
+import com.cisco.mongodb.aggregate.support.test.fixtures.AggregateQueryFixtures;
 import com.cisco.mongodb.aggregate.support.test.repository.TestSortRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.Assert;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -43,7 +47,14 @@ public class SortTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private TestSortRepository testSortRepository;
 
-  @Test(enabled = false)
+  @BeforeClass
+  public void setup() throws Exception {
+    List<ArtworkSortTestBean> artworks = AggregateQueryFixtures.newArtworkBeansWithTags();
+    testSortRepository.insert(artworks);
+  }
+
+
+  @Test
   public void mustSortResults() {
     Assert.assertNotNull(testSortRepository);
     List<TestSortResultsBean> sortResultsBeans = testSortRepository.sortByTags();

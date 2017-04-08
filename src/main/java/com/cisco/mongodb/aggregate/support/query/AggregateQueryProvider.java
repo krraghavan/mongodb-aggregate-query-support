@@ -19,113 +19,46 @@
 package com.cisco.mongodb.aggregate.support.query;
 
 import com.cisco.mongodb.aggregate.support.annotation.*;
-import com.cisco.mongodb.aggregate.support.bean.UnbindableObject;
-import com.cisco.mongodb.aggregate.support.condition.AggregateQueryMethodConditionContext;
-import com.cisco.mongodb.aggregate.support.condition.ConditionalAnnotationMetadata;
-import com.cisco.mongodb.aggregate.support.utils.ArrayUtils;
-import com.mongodb.DBObject;
-import com.mongodb.DBRef;
-import com.mongodb.util.JSON;
-import com.mongodb.util.JSONParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Condition;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.repository.query.ConvertingParameterAccessor;
 import org.springframework.data.mongodb.repository.query.MongoParameterAccessor;
-import org.springframework.data.mongodb.repository.query.MongoParametersParameterAccessor;
-import org.springframework.data.repository.query.Parameter;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
+import java.util.Collection;
 import java.util.function.Function;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import static com.cisco.mongodb.aggregate.support.query.AggregateQueryProvider.AggregationType.*;
+import static com.cisco.mongodb.aggregate.support.query.AbstractAggregateQueryProvider.AggregationType.*;
 import static com.cisco.mongodb.aggregate.support.utils.ArrayUtils.NULL_STRING;
 
 /**
  * Created by rkolliva on 10/21/2015.
  * A query provider allowing aggregate queries
  */
-public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
+@SuppressWarnings("WeakerAccess")
+public class AggregateQueryProvider extends AbstractAggregateQueryProvider {
 
   private static final String EMPTY_PIPELINE_FOR_AGGREGATION = "Empty pipeline for aggregation";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AggregateQueryProvider.class);
-  private static final ParameterBindingParser PARSER = ParameterBindingParser.INSTANCE;
-  private final Class outputClass;
-  private final String collectioName;
-  private final Iterator<String> queryIterator;
-  private final Aggregate aggregateAnnotation;
-  @SuppressWarnings({"FieldCanBeLocal", "unused"})
-  private final MongoParameterAccessor mongoParameterAccessor;
-  private final ConvertingParameterAccessor convertingParameterAccessor;
-  private final Method method;
-  private List<String> aggregateQueryPipeline;
-  private ArrayUtils arrayUtils = new ArrayUtils();
-
-  private final BiFunction<AggregationStage, String, String> getQueryString = (aggregationStage, query) -> {
-    if (aggregationStage.allowStage()) {
-      String queryStringForStage = replacePlaceholders(query);
-      if (!StringUtils.isEmpty(queryStringForStage)) {
-        return String.format("{%s:%s}", aggregationStage.getAggregationType().getRepresentation(),
-                             queryStringForStage);
-      }
-    }
-    return NULL_STRING;
-  };
-
+  private Class outputClass;
+  private String collectioName;
+  private Aggregate aggregateAnnotation;
 
   AggregateQueryProvider(Method method, MongoParameterAccessor mongoParameterAccessor,
                          ConvertingParameterAccessor convertingParameterAccessor) throws InvalidAggregationQueryException {
-    this.aggregateAnnotation = method.getAnnotation(Aggregate.class);
-    this.outputClass = aggregateAnnotation.outputBeanType();
-    this.mongoParameterAccessor = mongoParameterAccessor;
-    this.convertingParameterAccessor = convertingParameterAccessor;
-    this.collectioName = deriveCollectionName(aggregateAnnotation.inputType());
-    this.method = method;
-    // set up the query pipeline
-    createAggregateQuery();
-    // create the iterator - this class decorates the iterator
-    this.queryIterator = aggregateQueryPipeline.iterator();
-  }
-
-  private String deriveCollectionName(Class className) {
-
-    Document documentAnnotation = AnnotationUtils.findAnnotation(className, Document.class);
-    String collectionName;
-    if (documentAnnotation != null) {
-      collectionName = documentAnnotation.collection();
-      if(StringUtils.isEmpty(collectionName)) {
-        collectionName = getSimpleCollectionName(className);
-      }
-    }
-    else {
-      collectionName = getSimpleCollectionName(className);
-    }
-
-    Assert.notNull(collectionName);
-    return collectionName;
-  }
-
-  private String getSimpleCollectionName(Class className) {
-    String collectionName;
-    String simpleName = className.getSimpleName();
-    collectionName = Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
-    return collectionName;
+    super(method, mongoParameterAccessor, convertingParameterAccessor);
   }
 
   @Override
-  public String getQuery() {
-    throw new UnsupportedOperationException("Must use iterator methods to get the query for each stage of the aggregation pipeline");
+  protected void initializeAnnotation(Method method) {
+    this.aggregateAnnotation = method.getAnnotation(Aggregate.class);
+    this.outputClass = aggregateAnnotation.outputBeanType();
+    this.collectioName = deriveCollectionName(aggregateAnnotation.inputType());
   }
 
   @Override
@@ -154,84 +87,17 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
   }
 
   @Override
+  public boolean isAggregate2() {
+    return false;
+  }
+
+  @Override
   public Class getMethodReturnType() {
     return method.getReturnType();
   }
 
   @Override
-  public boolean hasNext() {
-    return queryIterator.hasNext();
-  }
-
-  @Override
-  public String next() {
-    return queryIterator.next();
-  }
-
-  @Override
-  public void remove() {
-    queryIterator.remove();
-  }
-
-  @Override
-  public void forEachRemaining(Consumer<? super String> action) {
-    queryIterator.forEachRemaining(action);
-  }
-
-  /**
-   * Returns the serialized value to be used for the given {@link ParameterBinding}.
-   *
-   * @param accessor - the accessor
-   * @param binding - the binding
-   * @return - the value of the parameter
-   */
-  private String getParameterValueForBinding(ConvertingParameterAccessor accessor, ParameterBinding binding) {
-
-    Object value = accessor.getBindableValue(binding.getParameterIndex());
-
-    if (value instanceof String && binding.isQuoted()) {
-      return (String) value;
-    }
-
-    return JSON.serialize(value);
-  }
-
-  /*
-   * *********** AGGREGATION SUPPORTS ***************************
-   */
-
-  /**
-   * Replaced the parameter place-holders with the actual parameter values from the given {@link ParameterBinding}s.
-   *
-   * @param query - the query string with placeholders
-   * @return - the string with values replaced
-   */
-  private String replacePlaceholders(String query) {
-    List<ParameterBinding> queryParameterBindings = PARSER.parseParameterBindingsFrom(query);
-
-    if (queryParameterBindings.isEmpty()) {
-      return query;
-    }
-    String lquery = query;
-    if(query.contains("@@")) {
-      // strip quotes from the query
-      lquery = query.replace("\"", "").replace("@@", "@");
-    }
-    StringBuilder result = new StringBuilder(lquery);
-
-    for (ParameterBinding binding : queryParameterBindings) {
-      String parameter = binding.getParameter();
-      int idx = result.indexOf(parameter);
-      String parameterValueForBinding = getParameterValueForBinding(convertingParameterAccessor, binding);
-      if (idx != -1) {
-        result.replace(idx, idx + parameter.length(), parameterValueForBinding);
-      }
-    }
-    LOGGER.debug("Query after replacing place holders - {}", result);
-    return result.toString();
-  }
-
-  private void createAggregateQuery() throws InvalidAggregationQueryException {
+  void createAggregateQuery() throws InvalidAggregationQueryException {
     // create the pipeline.
     LOGGER.debug("Getting aggregate operations");
     int pipelineCount = 0;
@@ -332,7 +198,7 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
 
     if (isPageable) {
       LOGGER.debug("isPageable is true, adding skip and limit stages");
-      setupQuery(queries, SKIP, new Conditional[]{}, skipStageForPageable,
+      setupQuery(queries, AggregationType.SKIP, new Conditional[]{}, skipStageForPageable,
                  String.valueOf(pageable.getPageNumber() * pageable.getPageSize()));
       setupQuery(queries, LIMIT, new Conditional[]{}, limitStageForPageable, String.valueOf(pageable.getPageSize()));
     }
@@ -461,255 +327,9 @@ public class AggregateQueryProvider implements QueryProvider, Iterator<String> {
       queries[order] = queryString;
     }
   }
-  /**
-   * A parser that extracts the parameter bindings from a given query string.
-   */
-  private enum ParameterBindingParser {
 
-    INSTANCE;
-
-    private static final String PARAMETER_PREFIX = "_param_";
-    private static final String PARSEABLE_PARAMETER = "\"" + PARAMETER_PREFIX + "$1\"";
-    private static final Pattern PARAMETER_BINDING_PATTERN = Pattern.compile("\\?(\\d+)");
-    private static final Pattern PARSEABLE_BINDING_PATTERN = Pattern.compile("\"?" + PARAMETER_PREFIX + "(\\d+)\"?");
-
-    private static final String LHS_PARAMETER_PREFIX = "@lhs@";
-    private static final String LHS_PARSEABLE_PARAMETER = LHS_PARAMETER_PREFIX + "$1";
-    private static final Pattern LHS_PARAMETER_BINDING_PATTERN = Pattern.compile("@(\\d+)");
-    private static final Pattern LHS_PARSEABLE_BINDING_PATTERN = Pattern.compile(LHS_PARAMETER_PREFIX + "(\\d+)?");
-
-    private static final int PARAMETER_INDEX_GROUP = 1;
-
-    /**
-     * Returns a list of {@link ParameterBinding}s found in the given {@code input} or an
-     * {@link Collections#emptyList()}.
-     *
-     * @param input - the string with parameter bindings
-     * @return - the list of parameters
-     */
-    public List<ParameterBinding> parseParameterBindingsFrom(String input) {
-
-      if (!StringUtils.hasText(input)) {
-        return Collections.emptyList();
-      }
-
-      List<ParameterBinding> bindings = new ArrayList<>();
-
-      String parseableInput = makeParameterReferencesParseable(input);
-      try {
-        collectParameterReferencesIntoBindings(bindings, JSON.parse(parseableInput));
-      }
-      catch(JSONParseException e) {
-        // the parseable input is not JSON - some stages like $unwind and $count only have strings.
-        // nothing to do here.
-        LOGGER.debug("JSONParseException:", e);
-      }
-      return bindings;
-    }
-
-    private String makeParameterReferencesParseable(String input) {
-      Matcher matcher = PARAMETER_BINDING_PATTERN.matcher(input);
-      String retval = matcher.replaceAll(PARSEABLE_PARAMETER);
-
-      // now parse any LHS placeholders
-      Matcher lhsMatcher = LHS_PARAMETER_BINDING_PATTERN.matcher(retval);
-      return lhsMatcher.replaceAll(LHS_PARSEABLE_PARAMETER);
-    }
-
-    private void collectParameterReferencesIntoBindings(List<ParameterBinding> bindings, Object value) {
-
-      if (value instanceof String) {
-
-        String string = ((String) value).trim();
-        potentiallyAddBinding(string, bindings);
-
-      }
-      else if (value instanceof Pattern) {
-
-        String string = value.toString().trim();
-
-        Matcher valueMatcher = PARSEABLE_BINDING_PATTERN.matcher(string);
-        while (valueMatcher.find()) {
-          int paramIndex = Integer.parseInt(valueMatcher.group(PARAMETER_INDEX_GROUP));
-
-                    /*
-                     * The pattern is used as a direct parameter replacement, e.g. 'field': ?1,
-                     * therefore we treat it as not quoted to remain backwards compatible.
-                     */
-          boolean quoted = !string.equals(PARAMETER_PREFIX + paramIndex);
-
-          bindings.add(new ParameterBinding(paramIndex, quoted));
-        }
-
-      }
-      else if (value instanceof DBRef) {
-
-        DBRef dbref = (DBRef) value;
-
-        potentiallyAddBinding(dbref.getCollectionName(), bindings);
-        potentiallyAddBinding(dbref.getId().toString(), bindings);
-
-      }
-      else if (value instanceof DBObject) {
-
-        DBObject dbo = (DBObject) value;
-
-        for (String field : dbo.keySet()) {
-          collectParameterReferencesIntoBindings(bindings, field);
-          collectParameterReferencesIntoBindings(bindings, dbo.get(field));
-        }
-      }
-    }
-
-    private void potentiallyAddBinding(String source, List<ParameterBinding> bindings) {
-
-      Matcher valueMatcher = PARSEABLE_BINDING_PATTERN.matcher(source);
-
-      boolean quoted = (source.startsWith("'") && source.endsWith("'"))
-                       || (source.startsWith("\"") && source.endsWith("\""));
-      replaceParameterBindings(bindings, valueMatcher, "?", quoted);
-      Matcher lhsMatcher = LHS_PARSEABLE_BINDING_PATTERN.matcher(source);
-      replaceParameterBindings(bindings, lhsMatcher, "@", true);
-    }
-
-    private void replaceParameterBindings(List<ParameterBinding> bindings, Matcher valueMatcher, String prefix,
-                                          boolean quoted) {
-      while (valueMatcher.find()) {
-
-        int paramIndex = Integer.parseInt(valueMatcher.group(PARAMETER_INDEX_GROUP));
-
-        bindings.add(new ParameterBinding(paramIndex, quoted, prefix));
-      }
-    }
-  }
-
-  public enum AggregationType {
-    MATCH("$match"),
-    GROUP("$group"),
-    UNWIND("$unwind"),
-    LOOKUP("$lookup"),
-    PROJECT("$project"),
-    LIMIT("$limit"),
-    BUCKET("$bucket"),
-    ADDFIELDS("$addFields"),
-    REPLACEROOT("$replaceRoot"),
-    SORT("$sort"),
-    FACET("$facet"),
-    COUNT("$count"),
-    SKIP("$skip"),
-    OUT("$out");
-
-    private final String representation;
-
-    AggregationType(String representation) {
-      this.representation = representation;
-    }
-
-    String getRepresentation() {
-      return representation;
-    }
-  }
-
-  private class AggregationStage {
-
-    private final AggregationType aggregationType;
-
-    private final Conditional[] conditionalClasses;
-
-    AggregationStage(AggregationType aggregationType, Conditional[] conditionClass) {
-      this.aggregationType = aggregationType;
-      this.conditionalClasses = conditionClass;
-    }
-
-    AggregationStage(AggregationType aggregationType) {
-      this(aggregationType, null);
-    }
-
-    AggregationType getAggregationType() {
-      return aggregationType;
-    }
-
-    boolean allowStage() {
-      if (conditionalClasses.length == 0) {
-        return true;
-      }
-      try {
-        for (Conditional conditional : conditionalClasses) {
-          List<Object> parameterValues = getParameterValues();
-          ConditionalAnnotationMetadata metadata = new ConditionalAnnotationMetadata(conditional);
-          AggregateQueryMethodConditionContext context = new AggregateQueryMethodConditionContext(method,
-                                                                                                  parameterValues);
-          Condition condition = conditional.condition().newInstance();
-          boolean isTrue = condition.matches(context, metadata);
-          if (isTrue) {
-            return true;
-          }
-        }
-      }
-      catch (InstantiationException | IllegalAccessException e) {
-        throw new IllegalStateException("Could not create an instance of the condition class", e);
-      }
-      return false;
-    }
-
-    private List<Object> getParameterValues() {
-      List<Object> retval = new ArrayList<>();
-      int numArgs = method.getParameterCount();
-      for (int i = 0; i < numArgs; i++) {
-        Parameter param = ((MongoParametersParameterAccessor) mongoParameterAccessor).getParameters().getParameter(i);
-        if (param.isBindable()) {
-          retval.add(convertingParameterAccessor.getBindableValue(i));
-        }
-        else {
-          LOGGER.debug("{} was unbindable, adding it as an unbindable object", param.getName());
-          retval.add(new UnbindableObject(param.getName()));
-        }
-      }
-      return retval;
-    }
-
-    public Conditional[] getConditionalClasses() {
-      return conditionalClasses;
-    }
-  }
-
-  /**
-   * A generic parameter binding with name or position information.
-   */
-  static class ParameterBinding {
-
-    private final int parameterIndex;
-    private final boolean quoted;
-
-    private final String prefix;
-
-    /**
-     * Creates a new {@link ParameterBinding} with the given {@code parameterIndex} and {@code quoted} information.
-     *
-     * @param parameterIndex - the index of the parameterIndex
-     * @param quoted         whether or not the parameter is already quoted.
-     */
-    ParameterBinding(int parameterIndex, boolean quoted) {
-      this(parameterIndex, quoted, "?");
-    }
-
-    ParameterBinding(int parameterIndex, boolean quoted, String prefix) {
-
-      this.parameterIndex = parameterIndex;
-      this.quoted = quoted;
-      this.prefix = prefix;
-    }
-
-    boolean isQuoted() {
-      return quoted;
-    }
-
-    int getParameterIndex() {
-      return parameterIndex;
-    }
-
-    String getParameter() {
-      return this.prefix + parameterIndex;
-    }
+  @Override
+  public String getQueryForStage(Annotation annotation) {
+    throw new UnsupportedOperationException("Not supported yet");
   }
 }

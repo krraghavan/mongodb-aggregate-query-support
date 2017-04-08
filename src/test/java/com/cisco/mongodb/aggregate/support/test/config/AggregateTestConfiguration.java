@@ -27,6 +27,8 @@ import org.jongo.Jongo;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.repository.query.EvaluationContextProvider;
+import org.springframework.data.repository.query.ExtensionAwareEvaluationContextProvider;
 
 /**
  * @author rkolliva.
@@ -34,6 +36,11 @@ import org.springframework.context.annotation.Import;
 @Configuration
 @Import({MongoDBTestConfiguration.class, TestMongoRepositoryConfiguration.class})
 public class AggregateTestConfiguration {
+
+  @Bean
+  public EvaluationContextProvider evaluationContextProvider() {
+    return new ExtensionAwareEvaluationContextProvider();
+  }
 
   @Bean
   public ResultsExtractor resultsUnmarshaller(Jongo jongo) {

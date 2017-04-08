@@ -98,7 +98,7 @@ local.properties
 # IntelliJ
 /out/
 *.iml
-logfile.txt
+logfile.*
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -123,3 +123,4 @@ buildNumber.properties
 .mvn/timing.properties
 
 .idea
+*.gz

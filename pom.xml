@@ -24,7 +24,7 @@
 
   <groupId>com.github.krraghavan</groupId>
   <artifactId>mongodb-aggregate-query-support</artifactId>
-  <version>0.7.11-SNAPSHOT</version>
+  <version>0.7.11</version>
 
   <name>Annotation based Mongo DB Aggregation Query Support</name>
   <description>Spring Data @Query like support for Mongo Aggregation queries</description>
@@ -80,7 +80,9 @@
     </repository>
   </distributionManagement>
 
-
+  <properties>
+    <embedded-mongo-version>2.0.0</embedded-mongo-version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.springframework.data</groupId>
@@ -135,22 +137,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.github.fakemongo</groupId>
-      <artifactId>fongo</artifactId>
-      <version>2.0.12</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
       <version>6.9.10</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- NEEDED BY FONGO -->
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -160,6 +149,12 @@
       <scope>test</scope>
     </dependency>
     <!-- TEST DEPENDENCIES -->
+    <dependency>
+      <groupId>de.flapdoodle.embed</groupId>
+      <artifactId>de.flapdoodle.embed.mongo</artifactId>
+      <version>${embedded-mongo-version}</version>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
   <build>
@@ -183,6 +178,21 @@
           <nexusUrl>https://oss.sonatype.org/</nexusUrl>
           <autoReleaseAfterClose>false</autoReleaseAfterClose>
         </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.19.1</version>
+        <executions>
+          <execution>
+            <id>unitTests</id>
+            <phase>test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -221,7 +231,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.1</version>
+            <version>1.5</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>

@@ -21,6 +21,8 @@ package com.cisco.mongodb.aggregate.support.test.repository;
 
 import com.cisco.mongodb.aggregate.support.annotation.AddFields;
 import com.cisco.mongodb.aggregate.support.annotation.Aggregate;
+import com.cisco.mongodb.aggregate.support.annotation.v2.AddFields2;
+import com.cisco.mongodb.aggregate.support.annotation.v2.Aggregate2;
 import com.cisco.mongodb.aggregate.support.test.beans.TestScoreBean;
 import com.cisco.mongodb.aggregate.support.test.beans.ScoreResultsBean;
 
@@ -45,4 +47,14 @@ public interface TestAddFieldsRepository extends TestMongoRepository<TestScoreBe
                             order = 1)
              })
   List<ScoreResultsBean> addFieldsToScore();
+
+  @Aggregate2(inputType = TestScoreBean.class, outputBeanType = ScoreResultsBean.class)
+  @AddFields2(query = "{\n" +
+                      "       totalHomework: { $sum: \"$homework\" } ,\n" +
+                      "       totalQuiz: { $sum: \"$quiz\" }\n" +
+                      "     }", order = 0)
+  @AddFields2(query = "{ totalScore:\n" +
+                    "       { $add: [ \"$totalHomework\", \"$totalQuiz\", \"$extraCredit\" ] } }",
+            order = 1)
+  List<ScoreResultsBean> addFieldsToScore2();
 }

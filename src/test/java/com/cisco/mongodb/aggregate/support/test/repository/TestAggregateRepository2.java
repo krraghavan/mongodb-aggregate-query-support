@@ -27,6 +27,7 @@ import java.util.Map;
 
 /**
  * Created by rkolliva on 10/18/2015.
+ *
  */
 public interface TestAggregateRepository2 extends TestMongoRepository<TestAggregateAnnotation2FieldsBean, String> {
 

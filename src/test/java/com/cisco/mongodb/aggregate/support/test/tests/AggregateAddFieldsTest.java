@@ -20,13 +20,18 @@
 package com.cisco.mongodb.aggregate.support.test.tests;
 
 import com.cisco.mongodb.aggregate.support.test.beans.ScoreResultsBean;
+import com.cisco.mongodb.aggregate.support.test.beans.TestReplaceRootBean;
+import com.cisco.mongodb.aggregate.support.test.beans.TestScoreBean;
 import com.cisco.mongodb.aggregate.support.test.config.AggregateTestConfiguration;
+import com.cisco.mongodb.aggregate.support.test.fixtures.AggregateQueryFixtures;
 import com.cisco.mongodb.aggregate.support.test.repository.TestAddFieldsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import java.io.IOException;
 import java.util.List;
 
 import static org.testng.Assert.assertEquals;
@@ -45,16 +50,36 @@ public class AggregateAddFieldsTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private TestAddFieldsRepository testAddFieldsRepository;
 
-  @Test(enabled = false)
+  @BeforeClass
+  private void setupRepository() throws IOException {
+    List<TestScoreBean> testScoreBeans = AggregateQueryFixtures.newTestScoresFixture();
+    testAddFieldsRepository.save(testScoreBeans);
+  }
+
+  @Test
   public void mustAddFieldsToResults() {
     assertNotNull(testAddFieldsRepository);
 
     List<ScoreResultsBean> resultsBeanList = testAddFieldsRepository.addFieldsToScore();
     assertNotNull(resultsBeanList);
     assertEquals(resultsBeanList.size(), 2);
+    validateResults(resultsBeanList);
+  }
+
+  @Test
+  public void mustAddFieldsToResults2() {
+    assertNotNull(testAddFieldsRepository);
+
+    List<ScoreResultsBean> resultsBeanList = testAddFieldsRepository.addFieldsToScore2();
+    assertNotNull(resultsBeanList);
+    assertEquals(resultsBeanList.size(), 2);
+    validateResults(resultsBeanList);
+  }
+
+  private void validateResults(List<ScoreResultsBean> resultsBeanList) {
     for (ScoreResultsBean scoreResultsBean : resultsBeanList) {
       int totalHw, totalScore, totalQuiz = 0;
-      if(scoreResultsBean.getId() == 1) {
+      if(scoreResultsBean.get_id() == 1) {
         totalHw = 25;
         totalQuiz = 18;
         totalScore = 43;
@@ -69,6 +94,4 @@ public class AggregateAddFieldsTest extends AbstractTestNGSpringContextTests {
       assertEquals(scoreResultsBean.getTotalScore(), totalScore);
     }
   }
-
-
 }

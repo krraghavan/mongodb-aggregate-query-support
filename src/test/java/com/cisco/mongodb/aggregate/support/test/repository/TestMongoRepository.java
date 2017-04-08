@@ -25,6 +25,7 @@ import java.io.Serializable;
 
 /**
  * Created by rkolliva on 10/20/2015.
+ *
  */
 public interface TestMongoRepository<T extends AbstractTestAggregateBean, ID extends Serializable>
     extends MongoRepository<T, ID> {

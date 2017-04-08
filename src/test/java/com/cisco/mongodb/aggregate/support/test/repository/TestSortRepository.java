@@ -22,6 +22,8 @@ package com.cisco.mongodb.aggregate.support.test.repository;
 import com.cisco.mongodb.aggregate.support.annotation.Aggregate;
 import com.cisco.mongodb.aggregate.support.annotation.Sort;
 import com.cisco.mongodb.aggregate.support.annotation.Unwind;
+import com.cisco.mongodb.aggregate.support.test.beans.Artwork;
+import com.cisco.mongodb.aggregate.support.test.beans.ArtworkSortTestBean;
 import com.cisco.mongodb.aggregate.support.test.beans.TestSortResultsBean;
 
 import java.util.List;
@@ -31,10 +33,10 @@ import java.util.List;
  * 1/26/17.
  */
 
-public interface TestSortRepository extends TestMongoRepository<TestSortResultsBean, String> {
+public interface TestSortRepository extends TestMongoRepository<ArtworkSortTestBean, String> {
 
 
-  @Aggregate(inputType = TestSortResultsBean.class,
+  @Aggregate(inputType = ArtworkSortTestBean.class,
              unwind =
                  {
                      @Unwind(query = "\"$tags\"", order = 0)

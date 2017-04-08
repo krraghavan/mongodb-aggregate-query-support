@@ -4,14 +4,15 @@ import com.cisco.mongodb.aggregate.support.test.beans.Score;
 import com.cisco.mongodb.aggregate.support.test.config.AggregateTestConfiguration;
 import com.cisco.mongodb.aggregate.support.test.repository.PageableRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.io.IOException;
@@ -24,15 +25,17 @@ import static org.testng.Assert.*;
 /**
  * camejavi 3/15/17
  */
+@SuppressWarnings("ConstantConditions")
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
 public class AggregatePageableTest extends AbstractTestNGSpringContextTests {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(AggregatePageableTest.class);
 
   @Autowired
   private PageableRepository pageableRepository;
 
-  int[] scoreArr = {70, 75, 80, 85, 90, 95};
+  @Autowired
+  private MongoTemplate mongoTemplate;
+
+  private int[] scoreArr = {70, 75, 80, 85, 90, 95};
 
   private final String[] SCORE_DOCS = {"{ \"id\" : 1, \"subject\" : \"History\", \"score\" : " + scoreArr[0] + " }",
                                        "{ \"id\" : 2, \"subject\" : \"History\", \"score\" : " + scoreArr[5] + " }",
@@ -59,20 +62,27 @@ public class AggregatePageableTest extends AbstractTestNGSpringContextTests {
     pageableRepository.insert(scores);
   }
 
-  @Test
-  public void mustReturnCorrectPagesAfterSortingDocuments() {
-    checkPageableResult(0, 2);
-    checkPageableResult(1, 2);
-    checkPageableResult(2, 2);
-    checkPageableResult(0, 3);
-    checkPageableResult(1, 3);
+  @DataProvider
+  public Object[][] pagingFixture() {
+    return new Object[][]{
+        new Object[]{0, 2},
+        new Object[]{1, 2},
+        new Object[]{2, 2},
+        new Object[]{0, 3},
+        new Object[]{1, 3}
+    };
   }
 
-  public void checkPageableResult(int page, int size) {
+  @Test
+  public void checkPageableResult() {
     assertNotNull(pageableRepository, "Must have a repository");
     List<Score> scores = pageableRepository.findAll();
     assertNotNull(scores);
     assertEquals(scores.size(), SCORE_DOCS.length);
+  }
+
+  @Test(dataProvider = "pagingFixture")
+  public void mustReturnCorrectPagesFromQueryWithPageable(int page, int size) {
     Pageable pageable = new PageRequest(page, size);
     List scoresAfterSkip = pageableRepository.getPageableScores(pageable);
 
@@ -85,12 +95,45 @@ public class AggregatePageableTest extends AbstractTestNGSpringContextTests {
     }
   }
 
+  @Test(dataProvider = "pagingFixture")
+  public void mustReturnCorrectPagesFromQueryWithPageable2(int page, int size) {
+    Pageable pageable = new PageRequest(page, size);
+    Page<Score> scoresAfterSkip = pageableRepository.getPageableScores2(pageable);
+
+    validateResults(page, size, pageable, scoresAfterSkip);
+  }
+
   @Test
   public void mustNotThrowErrorWhenPageIsOutOfBounds() {
     int scoresLen = SCORE_DOCS.length;
     Pageable pageable = new PageRequest(2, scoresLen / 2);
     List scoresAfterSkip = pageableRepository.getPageableScores(pageable);
     assertNull(scoresAfterSkip);
+  }
+
+  @Test(dataProvider = "pagingFixture")
+  public void mustReturnPageEvenIfQueryHasAFacet(int page, int size) {
+    Pageable pageable = new PageRequest(page, size);
+    Page<Score> scoresAfterSkip = pageableRepository.getPageableWithFacet(pageable);
+    validateResults(page, size, pageable, scoresAfterSkip);
+  }
+
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void mustThrowExceptionIfPageObjectIsUsedWithOriginalAggregateAnnotation() {
+    Pageable pageable = new PageRequest(0, 2);
+    Page<Score> scoresAfterSkip = pageableRepository.getPageableScoresWithInvalidReturnType(pageable);
+    assertNull(scoresAfterSkip);
+  }
+
+  private void validateResults(int page, int size, Pageable pageable, Page<Score> scoresAfterSkip) {
+    assertNotNull(scoresAfterSkip);
+    assertEquals(scoresAfterSkip.getSize(), pageable.getPageSize());
+    List<Score> content = scoresAfterSkip.getContent();
+    for (int i = 0; i < content.size(); i++) {
+      Score score = content.get(i);
+      //map the returned score in the page to the entry in scoreArr
+      assertEquals(score.getScore(), scoreArr[page * size + i]);
+    }
   }
 
 }

@@ -19,6 +19,7 @@
 package com.cisco.mongodb.aggregate.support.query;
 
 import com.cisco.mongodb.aggregate.support.annotation.Aggregate;
+import com.cisco.mongodb.aggregate.support.annotation.v2.Aggregate2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.query.*;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.lang.annotation.Annotation;
@@ -36,6 +38,7 @@ import java.lang.reflect.Method;
  * Created by rkolliva
  * 10/10/2015.
  */
+@Component
 public class AggregateMongoQuery extends AbstractMongoQuery {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AggregateMongoQuery.class);
@@ -67,11 +70,9 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
     MongoParameterAccessor mongoParameterAccessor = new MongoParametersParameterAccessor(getQueryMethod(), parameters);
     ConvertingParameterAccessor parameterAccessor = new ConvertingParameterAccessor(mongoOperations.getConverter(),
                                                                                     mongoParameterAccessor);
-    Annotation annotation = method.getAnnotation(Aggregate.class);
-    Assert.notNull(annotation);
     try {
-      AggregateQueryProvider aggregateQueryProvider = new AggregateQueryProvider(method, mongoParameterAccessor,
-                                                                                 parameterAccessor);
+      AbstractAggregateQueryProvider aggregateQueryProvider = createAggregateQueryProvider(mongoParameterAccessor,
+                                                                                           parameterAccessor);
       return queryExecutor.executeQuery(aggregateQueryProvider);
     }
     catch (MongoQueryException e) {
@@ -82,6 +83,27 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
       LOGGER.error("Invalid aggregation query", e);
       throw new IllegalArgumentException(e);
     }
+  }
+
+  /**
+   * Factory method for creating the proper Query provider
+   *
+   * @param mongoParameterAccessor - mongo parameter accessor
+   * @param parameterAccessor      - converting parameter accessor
+   * @return - the query provider
+   * @throws InvalidAggregationQueryException - if there was an error creating the query provider
+   */
+  private AbstractAggregateQueryProvider createAggregateQueryProvider(MongoParameterAccessor mongoParameterAccessor,
+                                                                      ConvertingParameterAccessor parameterAccessor)
+      throws InvalidAggregationQueryException {
+
+    Annotation annotation = method.getAnnotation(Aggregate.class);
+    if (annotation != null) {
+      return new AggregateQueryProvider(method, mongoParameterAccessor, parameterAccessor);
+    }
+    annotation = method.getAnnotation(Aggregate2.class);
+    Assert.notNull(annotation, "Either Aggregate or Aggregate2 must be specified on the method");
+    return new AggregateQueryProvider2(method, mongoParameterAccessor, parameterAccessor);
   }
 
   @Override

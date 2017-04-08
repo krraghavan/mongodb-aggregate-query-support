@@ -22,6 +22,9 @@ package com.cisco.mongodb.aggregate.support.test.repository;
 import com.cisco.mongodb.aggregate.support.annotation.Aggregate;
 import com.cisco.mongodb.aggregate.support.annotation.Count;
 import com.cisco.mongodb.aggregate.support.annotation.Match;
+import com.cisco.mongodb.aggregate.support.annotation.v2.Aggregate2;
+import com.cisco.mongodb.aggregate.support.annotation.v2.Count2;
+import com.cisco.mongodb.aggregate.support.annotation.v2.Match2;
 import com.cisco.mongodb.aggregate.support.test.beans.Score;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -46,4 +49,13 @@ public interface CountRepository extends MongoRepository<Score, Integer> {
              }
   )
   Integer getPassingScores();
+
+  @Aggregate2(inputType = Score.class, outputBeanType = Integer.class, resultKey = "passing_scores")
+  @Match2(query = "{\n" +
+                  "        score: {\n" +
+                  "          $gt: 80\n" +
+                  "        }\n" +
+                  "      }", order = 0)
+  @Count2(query = "\"passing_scores\"", order = 1)
+  Integer getPassingScores2();
 }
