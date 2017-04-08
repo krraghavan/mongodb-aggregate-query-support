@@ -31,6 +31,15 @@ import java.lang.annotation.*;
 public @interface Aggregate {
 
   /**
+   * A name assigned to the query to make it easy to identify it in debug messages
+   *
+   * @return - a name assigned to the aggregate query.  Not validated.  Just for
+   * debuggability purposes.
+   *
+   */
+  String name() default "unnamed";
+
+  /**
    * @return The class name of the input collection on which the aggregation pipeline starts
    */
   Class inputType();

@@ -178,7 +178,7 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider {
       addToEndOfQuery(pipelineCount, outAnnotationPresent, isPageable, out, queries, mongoParameterAccessor.getPageable());
 
       //noinspection ConfusingArgumentToVarargsMethod
-      LOGGER.debug("Aggregate pipeline after forming queries - {}", (String[])queries);
+      LOGGER.debug("Aggregate pipeline for query ({}) after forming queries - {}", aggregateAnnotation.name(), queries);
       aggregateQueryPipeline = arrayUtils.packToList(queries);
     }
   }

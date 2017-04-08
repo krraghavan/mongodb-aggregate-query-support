@@ -127,7 +127,7 @@ class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
         queries[pipelineCount - 1] = query;
       }
     }
-    LOGGER.debug("Aggregate pipeline after forming queries - {}", (Object[]) queries);
+    LOGGER.debug("Aggregate pipeline for query {} after forming queries - {}", aggregateAnnotation.name(), queries);
     aggregateQueryPipeline = arrayUtils.packToList(queries);
   }
 
