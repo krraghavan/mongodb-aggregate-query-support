@@ -34,17 +34,27 @@ import java.util.function.Function;
 
 import static com.cisco.mongodb.aggregate.support.query.AbstractAggregateQueryProvider.AggregationType.*;
 import static com.cisco.mongodb.aggregate.support.utils.ArrayUtils.NULL_STRING;
+import static org.slf4j.LoggerFactory.getLogger;
 
 /**
  * Created by rkolliva on 10/21/2015.
  * A query provider allowing aggregate queries
+ * @deprecated
  */
 @SuppressWarnings("WeakerAccess")
+@Deprecated
 public class AggregateQueryProvider extends AbstractAggregateQueryProvider {
 
   private static final String EMPTY_PIPELINE_FOR_AGGREGATION = "Empty pipeline for aggregation";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AggregateQueryProvider.class);
+
+  /**
+   * A separate logger used for query purposes so that clients can only dump the queries that
+   * are created by this provider
+   */
+  private static final Logger QUERY_LOGGER = getLogger("com.cisco.mongodb.aggregate.support.query.AggregateQueryProvider.Query");
+
   private Class outputClass;
   private String collectioName;
   private Aggregate aggregateAnnotation;
@@ -178,7 +188,7 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider {
       addToEndOfQuery(pipelineCount, outAnnotationPresent, isPageable, out, queries, mongoParameterAccessor.getPageable());
 
       //noinspection ConfusingArgumentToVarargsMethod
-      LOGGER.debug("Aggregate pipeline for query ({}) after forming queries - {}", aggregateAnnotation.name(), queries);
+      QUERY_LOGGER.debug("Aggregate pipeline for query ({}) after forming queries - {}", aggregateAnnotation.name(), queries);
       aggregateQueryPipeline = arrayUtils.packToList(queries);
     }
   }

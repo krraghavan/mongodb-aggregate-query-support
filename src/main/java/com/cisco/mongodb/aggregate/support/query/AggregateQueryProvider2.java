@@ -30,7 +30,6 @@ import com.cisco.mongodb.aggregate.support.processor.ParameterPlaceholderReplaci
 import com.cisco.mongodb.aggregate.support.processor.PipelineStageQueryProcessor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.query.ConvertingParameterAccessor;
@@ -44,6 +43,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static org.slf4j.LoggerFactory.getLogger;
+
 /**
  * Created by rkolliva
  * 4/1/17.
@@ -52,7 +53,14 @@ import java.util.Map;
 class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
 
   private static final String COULD_NOT_DETERMINE_QUERY = "Could not determine query";
-  private static final Logger LOGGER = LoggerFactory.getLogger(AggregateQueryProvider2.class);
+
+  private static final Logger LOGGER = getLogger(AggregateQueryProvider2.class);
+
+  /**
+   * A separate logger used for query purposes so that clients can only dump the queries that
+   * are created by this provider
+   */
+  private static final Logger QUERY_LOGGER = getLogger("com.cisco.mongodb.aggregate.support.query.AggregateQueryProvider2.Query");
 
   private DefaultPipelineStageQueryProcessorFactory queryProcessorFactory;
 
@@ -127,7 +135,7 @@ class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
         queries[pipelineCount - 1] = query;
       }
     }
-    LOGGER.debug("Aggregate pipeline for query {} after forming queries - {}", aggregateAnnotation.name(), queries);
+    QUERY_LOGGER.debug("Aggregate pipeline for query {} after forming queries - {}", aggregateAnnotation.name(), queries);
     aggregateQueryPipeline = arrayUtils.packToList(queries);
   }
 

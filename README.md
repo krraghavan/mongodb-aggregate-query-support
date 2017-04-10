@@ -121,6 +121,14 @@ Since these annotations were not supported in the previous releases, they do not
  ```
 Note the actual position of the annotations don't matter but putting the annotations in their natural order improves readability.
 
+### ADDITIONAL CHANGES
+1. An additional logger was added to the QueryProvider implementations so that callers can log only the generated query
+at debug levels.  These loggers are com.cisco.mongodb.aggregate.support.query.AggregateQueryProvider.Query and 
+com.cisco.mongodb.aggregate.support.query.AggregateQueryProvider2.Query respectively for the ```@Aggregate``` and 
+```@Aggregate2``` annotations.
+2. A name attribute has been added to the ```@Aggregate``` and ```@Aggregate2``` annotations to aid debuggability.  For 
+backward compatibility reasons, the name defaults to ```unnamed```.
+
 ## New in 0.7.9 version
 In this version, support for the $skip pipeline stage is added along with support for Pageable in aggregate query methods.
  Using pageable will automatically add $skip and $limit pipeline stages and allows aggregate query results to be paged. 
