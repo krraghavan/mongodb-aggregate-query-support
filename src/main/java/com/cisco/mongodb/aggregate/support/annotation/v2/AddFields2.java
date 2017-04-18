@@ -33,7 +33,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
-@Repeatable(AddFieldss.class)
+@Repeatable(AddFields.class)
 public @interface AddFields2 {
 
   String query();

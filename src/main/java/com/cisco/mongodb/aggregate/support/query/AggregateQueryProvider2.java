@@ -237,7 +237,7 @@ class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
            annotationType == Projects.class ||
            annotationType == Buckets.class ||
            annotationType == Facets.class ||
-           annotationType == AddFieldss.class ||
+           annotationType == AddFields.class ||
            annotationType == Counts.class ||
            annotationType == BucketAutos.class ||
            annotationType == SortByCounts.class ||
@@ -246,6 +246,7 @@ class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
            annotationType == ReplaceRoots.class ||
            annotationType == Skips.class ||
            annotationType == Unwinds.class ||
+           annotationType == Sorts.class ||
            annotationType == Groups.class
         ;
   }
