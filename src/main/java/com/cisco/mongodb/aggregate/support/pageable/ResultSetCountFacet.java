@@ -19,9 +19,10 @@
 
 package com.cisco.mongodb.aggregate.support.pageable;
 
-import com.cisco.mongodb.aggregate.support.annotation.v2.Count2;
+import com.cisco.mongodb.aggregate.support.annotation.Conditional;
 import com.cisco.mongodb.aggregate.support.annotation.v2.FacetPipeline;
 import com.cisco.mongodb.aggregate.support.annotation.v2.FacetPipelineStage;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.annotation.Annotation;
 
@@ -44,5 +45,15 @@ public class ResultSetCountFacet implements FacetPipeline {
   @Override
   public FacetPipelineStage[] stages() {
     return new FacetPipelineStage[] {new PageableTotalCountFacetPipelineStage()};
+  }
+
+  @Override
+  public String query() {
+    return StringUtils.EMPTY;
+  }
+
+  @Override
+  public Conditional[] condition() {
+    return new Conditional[0];
   }
 }

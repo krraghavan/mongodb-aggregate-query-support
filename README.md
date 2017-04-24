@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.11-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
+[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.12-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -23,6 +23,12 @@ Not all aggregate pipeline steps are supported.  As of 0.7.2 support is provided
 * Facet (Mongo 3.4+) - added in v0.7.3
 * Count - added in v0.7.4
 * Skip - added in v0.7.9
+
+## New in 0.7.12 version
+1. Facet pipeline stages and pipelines both support Conditional - entire pipelines or selected stages in a pipeline can
+be excluded/included based on Conditions
+2. Added support for query string or stages in ```FacetPipeline``` annotations.  ```query()``` and ```stages()``` are
+mutually exclusive (query takes precedence)
 
 ## New in 0.7.11 version
 A new set of Aggregate annotations have been created that allow the pipelines to be specified in their natural order by

@@ -19,22 +19,17 @@
 
 package com.cisco.mongodb.aggregate.support.condition;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
  * Created by rkolliva
- * 3/7/17.
+ * 4/15/17.
  */
-public class ParameterValueNotNullCondition extends AbstractCondition {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ParameterValueNotNullCondition.class);
+public class ParameterValueTrueCondition extends ParameterValueFalseCondition {
 
   @Override
   public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
-    LOGGER.trace(">>>> ParameterValueNotNullCondition::matches");
-    return getParameterByIndex(conditionContext, annotatedTypeMetadata) != null;
+    return !super.matches(conditionContext, annotatedTypeMetadata);
   }
 }

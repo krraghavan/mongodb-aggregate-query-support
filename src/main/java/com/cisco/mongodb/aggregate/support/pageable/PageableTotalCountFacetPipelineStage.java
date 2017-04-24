@@ -19,6 +19,7 @@
 
 package com.cisco.mongodb.aggregate.support.pageable;
 
+import com.cisco.mongodb.aggregate.support.annotation.Conditional;
 import com.cisco.mongodb.aggregate.support.annotation.v2.Count2;
 import com.cisco.mongodb.aggregate.support.annotation.v2.FacetPipelineStage;
 
@@ -43,5 +44,10 @@ public class PageableTotalCountFacetPipelineStage implements FacetPipelineStage 
   @Override
   public String query() {
     return "'totalResultSetCount'";
+  }
+
+  @Override
+  public Conditional[] condition() {
+    return new Conditional[0];
   }
 }

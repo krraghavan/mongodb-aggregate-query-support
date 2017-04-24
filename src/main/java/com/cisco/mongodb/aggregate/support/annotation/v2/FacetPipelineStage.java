@@ -19,6 +19,8 @@
 
 package com.cisco.mongodb.aggregate.support.annotation.v2;
 
+import com.cisco.mongodb.aggregate.support.annotation.Conditional;
+
 import java.lang.annotation.Annotation;
 
 /**
@@ -30,4 +32,11 @@ public @interface FacetPipelineStage {
   Class<? extends Annotation> stageType();
 
   String query();
+
+  /**
+   * A condition based on which the pipeline stage is included/excluded
+   *
+   * @return - the Conditions to be evaluated.
+   */
+  Conditional [] condition() default {};
 }

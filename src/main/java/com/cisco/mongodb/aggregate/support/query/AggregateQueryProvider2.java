@@ -245,6 +245,7 @@ class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
            annotationType == Lookups.class ||
            annotationType == ReplaceRoots.class ||
            annotationType == Skips.class ||
+           annotationType == Sorts.class ||
            annotationType == Unwinds.class ||
            annotationType == Groups.class
         ;

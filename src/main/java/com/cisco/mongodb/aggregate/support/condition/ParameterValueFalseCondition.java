@@ -26,15 +26,22 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 
 /**
  * Created by rkolliva
- * 3/7/17.
+ * 4/15/17.
  */
-public class ParameterValueNotNullCondition extends AbstractCondition {
+
+
+public class ParameterValueFalseCondition extends AbstractCondition {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ParameterValueNotNullCondition.class);
 
   @Override
   public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
-    LOGGER.trace(">>>> ParameterValueNotNullCondition::matches");
-    return getParameterByIndex(conditionContext, annotatedTypeMetadata) != null;
+    LOGGER.trace(">>>> ParameterValueFalseCondition::matches");
+    Object parameter = getParameterByIndex(conditionContext, annotatedTypeMetadata);
+    if(Boolean.class.isAssignableFrom(parameter.getClass())) {
+      return !(Boolean) parameter;
+    }
+    int parameterIndex = getParameterIndex(annotatedTypeMetadata);
+    throw new IllegalArgumentException("Argument at index " + parameterIndex + " not convertible to boolean");
   }
 }
