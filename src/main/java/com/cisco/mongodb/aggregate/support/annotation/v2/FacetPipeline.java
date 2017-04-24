@@ -19,11 +19,14 @@
 
 package com.cisco.mongodb.aggregate.support.annotation.v2;
 
+import com.cisco.mongodb.aggregate.support.annotation.Conditional;
+
 import java.lang.annotation.*;
 
 /**
  * Created by rkolliva
  * 4/1/17.
+ * @since 0.7.11
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -33,5 +36,30 @@ public @interface FacetPipeline {
 
   String name();
 
-  FacetPipelineStage [] stages();
+  /**
+   * An array of pipeline stages - allows each stage of the pipeline in a facet
+   * to be specified independently.  Promotes readability.  If query() is also
+   * specified - this is ignored.
+   */
+  FacetPipelineStage [] stages() default {};
+
+  /**
+   * A query string for the pipeline stage.  Mutually exclusive with FacetPipelineStage [].
+   * Basically replicates the behavior of the @Facet annotation.  Use of this takes precedence
+   * over the FacetPipelineStage
+   *
+   * @return - The string to use for this pipeline
+   * @since 0.7.12
+   */
+  String query() default "";
+
+  /**
+   * An optional conditional that determines whether this pipeline stage should be included
+   * in the facet or not.
+   *
+   * @return - A condition class that evaluates the conditional.
+   * @since 0.7.12
+   *
+   */
+  Conditional[] condition() default {};
 }

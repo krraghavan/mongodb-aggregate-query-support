@@ -19,6 +19,7 @@
 
 package com.cisco.mongodb.aggregate.support.pageable;
 
+import com.cisco.mongodb.aggregate.support.annotation.Conditional;
 import com.cisco.mongodb.aggregate.support.annotation.v2.FacetPipelineStage;
 import com.cisco.mongodb.aggregate.support.annotation.v2.Skip2;
 
@@ -49,5 +50,10 @@ public class PageableSkipFacetPipelineStage implements FacetPipelineStage {
   @Override
   public String query() {
     return String.valueOf(offset);
+  }
+
+  @Override
+  public Conditional[] condition() {
+    return new Conditional[0];
   }
 }

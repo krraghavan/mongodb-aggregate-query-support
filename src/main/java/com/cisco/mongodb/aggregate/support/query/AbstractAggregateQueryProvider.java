@@ -340,7 +340,7 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
     }
   }
 
-  public enum AggregationType {
+  @SuppressWarnings("deprecation") public enum AggregationType {
     MATCH("$match", Match.class),
     MATCH2("$match", Match2.class),
     GROUP("$group", Group.class),
@@ -409,7 +409,7 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
 
     private final Conditional[] conditionalClasses;
 
-    AggregationStage(AggregationType aggregationType, Conditional[] conditionClass) {
+    public AggregationStage(AggregationType aggregationType, Conditional[] conditionClass) {
       this.aggregationType = aggregationType;
       this.conditionalClasses = conditionClass;
     }

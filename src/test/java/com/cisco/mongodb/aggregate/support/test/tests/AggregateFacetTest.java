@@ -108,5 +108,65 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
     assertTrue(facets.containsKey("categorizedByPrice"));
   }
 
+  @Test
+  public void mustHonorConditionalsInFacetPipeline() {
+    assertNotNull(artworkRepository, "Must have a repository");
+    List<Artwork> artworks = artworkRepository.findAll();
+    assertNotNull(artworks);
+    assertEquals(artworks.size(), artworks.size());
+    Map<String, Object> facets = artworkRepository.getFacetResultsWithConditional(false);
+    assertNotNull(facets);
+    assertEquals(facets.size(), 1);
+    assertFalse(facets.containsKey("categorizedByTags"));
+    assertTrue(facets.containsKey("categorizedByPrice"));
+  }
+
+  @Test
+  public void mustHonorConditionalsInFacetPipeline2() {
+    assertNotNull(artworkRepository, "Must have a repository");
+    List<Artwork> artworks = artworkRepository.findAll();
+    assertNotNull(artworks);
+    assertEquals(artworks.size(), artworks.size());
+    Map<String, Object> facets = artworkRepository.getFacetResultsWithConditional(true);
+    assertNotNull(facets);
+    assertEquals(facets.size(), 2);
+    assertTrue(facets.containsKey("categorizedByTags"));
+    assertTrue(facets.containsKey("categorizedByPrice"));
+  }
+
+  @Test
+  public void mustHonorConditionalsInFacetPipelineStage() {
+    assertNotNull(artworkRepository, "Must have a repository");
+    List<Artwork> artworks = artworkRepository.findAll();
+    assertNotNull(artworks);
+    assertEquals(artworks.size(), artworks.size());
+    Map<String, Object> facets = artworkRepository.getFacetResultsWithConditional(true, false, true);
+    assertNotNull(facets);
+    assertEquals(facets.size(), 2);
+    assertTrue(facets.containsKey("categorizedByTags"));
+    assertTrue(facets.containsKey("categorizedByPrice"));
+    Object priceCategories = facets.get("categorizedByPrice");
+    assertNotNull(priceCategories);
+    List priceCategoryList = (List)priceCategories;
+    assertTrue(priceCategoryList.size() == 3);
+  }
+
+  @Test
+  public void mustHonorConditionalsInFacetPipelineStage2() {
+    assertNotNull(artworkRepository, "Must have a repository");
+    List<Artwork> artworks = artworkRepository.findAll();
+    assertNotNull(artworks);
+    assertEquals(artworks.size(), artworks.size());
+    Map<String, Object> facets = artworkRepository.getFacetResultsWithConditional(true, true, false);
+    assertNotNull(facets);
+    assertEquals(facets.size(), 2);
+    assertTrue(facets.containsKey("categorizedByTags"));
+    assertTrue(facets.containsKey("categorizedByPrice"));
+    Object priceCategories = facets.get("categorizedByPrice");
+    assertNotNull(priceCategories);
+    List priceCategoryList = (List)priceCategories;
+    assertTrue(priceCategoryList.size() == 2);
+  }
+
 
 }

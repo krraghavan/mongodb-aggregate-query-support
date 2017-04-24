@@ -27,6 +27,8 @@ import com.cisco.mongodb.aggregate.support.condition.AggregateQueryMethodConditi
 import com.cisco.mongodb.aggregate.support.condition.ConditionalAnnotationMetadata;
 import com.cisco.mongodb.aggregate.support.query.AbstractAggregateQueryProvider;
 import com.cisco.mongodb.aggregate.support.query.AbstractAggregateQueryProvider.AggregationType;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
@@ -41,18 +43,21 @@ import java.util.List;
  */
 
 
+@SuppressWarnings({"WeakerAccess", "squid:S134"})
 public class Facet2PipelineStageQueryProcessor extends DefaultPipelineStageQueryProcessor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Facet2PipelineStageQueryProcessor.class);
-  public static final String QUOTE = "\"";
-  public static final String COLON = ":";
-  public static final String OPEN_BRACKET = "[";
-  public static final String OPEN_BRACE = "{";
-  public static final String CLOSE_BRACE = "}";
-  public static final String CLOSE_BRACKET = "]";
-  public static final String COMMA = ",";
+
+  private static final String QUOTE = "\"";
+  private static final String COLON = ":";
+  private static final String OPEN_BRACKET = "[";
+  private static final String OPEN_BRACE = "{";
+  private static final String CLOSE_BRACE = "}";
+  private static final String CLOSE_BRACKET = "]";
+  private static final String COMMA = ",";
 
   public Facet2PipelineStageQueryProcessor() {
+    //
   }
 
   @Override
@@ -64,6 +69,46 @@ public class Facet2PipelineStageQueryProcessor extends DefaultPipelineStageQuery
     // process each pipeline.
     // if this annotation is to be processed - evaluate conditional
     Conditional [] conditionals = facet2.condition();
+    boolean shouldProcessFacet = shouldProcessStage(context, conditionals);
+    if(shouldProcessFacet) {
+      FacetPipeline[] pipelines = facet2.pipelines();
+      stringBuilder.append(OPEN_BRACE);
+      AbstractAggregateQueryProvider queryProvider = (AbstractAggregateQueryProvider) context.queryProvider();
+      int pipelineCount = 0;
+      for(FacetPipeline pipeline : pipelines) {
+        if(shouldProcessStage(context, pipeline.condition())) {
+          processFacetPipelineStage(context, stringBuilder, queryProvider, pipelineCount, pipeline);
+          pipelineCount++;
+        }
+      }
+      stringBuilder.append(CLOSE_BRACE);
+      String ret = String.format("{$facet:%s}", stringBuilder.toString());
+      LOGGER.debug("Facet query {}", ret);
+      return ret;
+    }
+    return null;
+  }
+
+  private void processFacetPipelineStage(QueryProcessorContext context, StringBuilder stringBuilder,
+                                         AbstractAggregateQueryProvider queryProvider, int pipelineCount,
+                                         FacetPipeline pipeline) {
+    addFacetPipelineName(stringBuilder, pipelineCount, pipeline);
+    String pipelineStagQuery = pipeline.query();
+    if (!StringUtils.isEmpty(pipelineStagQuery)) {
+      LOGGER.debug("Appending raw query string {} for pipeline stage");
+      if (ArrayUtils.isNotEmpty(pipeline.stages())) {
+        String pipelineName = pipeline.name();
+        LOGGER.warn("Both query() and stages() are specified for {}.  query string is used and stages is ignored",
+                    pipelineName);
+      }
+      stringBuilder.append(pipelineStagQuery);
+    }
+    else {
+      processFacetPipeline(context, stringBuilder, queryProvider, pipeline);
+    }
+  }
+
+  private boolean shouldProcessStage(QueryProcessorContext context, Conditional[] conditionals) {
     boolean shouldProcess = true;
     for(Conditional conditional : conditionals) {
       try {
@@ -79,38 +124,49 @@ public class Facet2PipelineStageQueryProcessor extends DefaultPipelineStageQuery
         LOGGER.error("Condition class must have default constructor", e);
       }
     }
-    if(shouldProcess) {
-      FacetPipeline[] pipelines = facet2.pipelines();
-      stringBuilder.append(OPEN_BRACE);
-      AbstractAggregateQueryProvider queryProvider = (AbstractAggregateQueryProvider) context.queryProvider();
-      int pipelineCount = 0;
-      for(FacetPipeline pipeline : pipelines) {
-        if(pipelineCount++ > 0) {
+    return shouldProcess;
+  }
+
+  private void processFacetPipeline(QueryProcessorContext context, StringBuilder stringBuilder,
+                                    AbstractAggregateQueryProvider queryProvider, FacetPipeline pipeline) {
+    FacetPipelineStage[] pipelineStages = pipeline.stages();
+    int count = 0;
+    openFacetPipeline(stringBuilder);
+    String name = pipeline.name();
+    LOGGER.debug("Building pipeline for {}", name);
+    for (FacetPipelineStage pipelineStage : pipelineStages) {
+      if(shouldProcessStage(context, pipelineStage.condition())) {
+        if (count++ != 0) {
           stringBuilder.append(COMMA);
         }
-        String facetName = pipeline.name();
-        stringBuilder.append(QUOTE).append(facetName).append(QUOTE).append(COLON).append(OPEN_BRACKET);
-        FacetPipelineStage [] pipelineStages = pipeline.stages();
-        int count = 0;
-        for(FacetPipelineStage pipelineStage : pipelineStages) {
-          if(count++ != 0) {
-            stringBuilder.append(COMMA);
-          }
-          Class<? extends Annotation> stageType = pipelineStage.stageType();
-          AggregationType type = AggregationType.from(stageType);
-          AbstractAggregateQueryProvider.AggregationStage stage = queryProvider.new AggregationStage(type);
-          ParameterPlaceholderReplacingContext sctx = new ParameterPlaceholderReplacingContext(context, stage, pipelineStage);
-          String stageQueryString = super.getQuery(sctx);
-          LOGGER.debug("Facet stage query:{}", stageQueryString);
-          stringBuilder.append(stageQueryString);
-        }
-        stringBuilder.append(CLOSE_BRACKET);
+        Class<? extends Annotation> stageType = pipelineStage.stageType();
+        AggregationType type = AggregationType.from(stageType);
+        AbstractAggregateQueryProvider.AggregationStage stage = queryProvider.new AggregationStage(type,
+                                                                                                   pipelineStage
+                                                                                                       .condition());
+        ParameterPlaceholderReplacingContext sctx = new ParameterPlaceholderReplacingContext(context, stage,
+                                                                                             pipelineStage);
+        String stageQueryString = super.getQuery(sctx);
+        LOGGER.debug("Facet stage #[{}], query:{}", count, stageQueryString);
+        stringBuilder.append(stageQueryString);
       }
-      stringBuilder.append(CLOSE_BRACE);
-      String ret = String.format("{$facet:%s}", stringBuilder.toString());
-      LOGGER.debug("Facet query {}", ret);
-      return ret;
     }
-    return null;
+    closeFacetPipeline(stringBuilder);
+  }
+
+  private void addFacetPipelineName(StringBuilder stringBuilder, int pipelineCount, FacetPipeline pipeline) {
+    if (pipelineCount > 0) {
+      stringBuilder.append(COMMA);
+    }
+    String facetName = pipeline.name();
+    stringBuilder.append(QUOTE).append(facetName).append(QUOTE).append(COLON);
+  }
+
+  private void openFacetPipeline(StringBuilder stringBuilder) {
+    stringBuilder.append(OPEN_BRACKET);
+  }
+
+  private void closeFacetPipeline(StringBuilder stringBuilder) {
+    stringBuilder.append(CLOSE_BRACKET);
   }
 }
