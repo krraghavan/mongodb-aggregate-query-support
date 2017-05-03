@@ -29,6 +29,7 @@ import com.cisco.mongodb.aggregate.support.processor.DefaultPipelineStageQueryPr
 import com.cisco.mongodb.aggregate.support.processor.ParameterPlaceholderReplacingContext;
 import com.cisco.mongodb.aggregate.support.processor.PipelineStageQueryProcessor;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +44,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static com.cisco.mongodb.aggregate.support.utils.ArrayUtils.NULL_STRING;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -127,7 +129,10 @@ class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
       PipelineStageQueryProcessor queryProcessor = queryProcessorFactory.getQueryProcessor(context);
       String query = queryProcessor.getQuery(context);
       int index = queryProcessor.getOrder(context);
-      if (query != null && index >= 0) {
+      if (query != null && index >= 0 && !NULL_STRING.equals(query)) {
+        if (!StringUtils.isEmpty(queries[index])) {
+          LOGGER.warn("Two stages have the same order and the second one did not evaluate to a false condition");
+        }
         queries[index] = query;
       }
       else if (query != null && index == -1) {
