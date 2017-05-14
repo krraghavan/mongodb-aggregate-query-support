@@ -31,6 +31,10 @@ import org.springframework.test.util.AssertionErrors;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * Created by rkolliva
  * 5/13/17.
@@ -50,6 +54,30 @@ public class NumberLongTest extends AbstractTestNGSpringContextTests {
     TestLongBean actualBean = testLongRepository.getRandomLong(randomLong);
     Assert.assertNotNull(actualBean);
     Assert.assertEquals(actualBean.getRandomLong(), longBean.getRandomLong());
+  }
+
+  @Test
+  public void mustReturnLongValueQueriedWithListOfNumberLong() {
+    TestLongBean longBean1 = new TestLongBean();
+    long randomLong1 = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    longBean1.setRandomLong(randomLong1);
+    testLongRepository.save(longBean1);
+    TestLongBean longBean2 = new TestLongBean();
+    long randomLong2 = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    longBean2.setRandomLong(randomLong2);
+    testLongRepository.save(longBean2);
+
+    List<TestLongBean> actualBean = testLongRepository.queryWithAListOfLongs(Arrays.asList(randomLong1, randomLong2));
+    Assert.assertNotNull(actualBean);
+    Assert.assertEquals(actualBean.size(), 2);
+    Assert.assertTrue(actualBean.contains(longBean1));
+    Assert.assertTrue(actualBean.contains(longBean2));
+
+    actualBean = testLongRepository.queryWithAnArrayOfLongs(new long[] {randomLong1, randomLong2});
+    Assert.assertNotNull(actualBean);
+    Assert.assertEquals(actualBean.size(), 2);
+    Assert.assertTrue(actualBean.contains(longBean1));
+    Assert.assertTrue(actualBean.contains(longBean2));
   }
 
   @Test

@@ -24,6 +24,8 @@ import com.cisco.mongodb.aggregate.support.annotation.v2.Match2;
 import com.cisco.mongodb.aggregate.support.test.beans.TestLongBean;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.List;
+
 /**
  * Created by rkolliva
  * 5/13/17.
@@ -33,6 +35,16 @@ public interface TestLongRepository extends MongoRepository<TestLongBean, String
   @Aggregate2(name = "getRandomLong", inputType = TestLongBean.class, outputBeanType = TestLongBean.class)
   @Match2(query = "{'randomLong' : #}", order = 0)
   TestLongBean getRandomLong(Long longValue);
+
+  @Aggregate2(name = "queryWithAnArrayOfLongs", inputType = TestLongBean.class,
+          outputBeanType = TestLongBean.class)
+  @Match2(query = "{'randomLong' : { $in : # }}", order = 0)
+  List<TestLongBean> queryWithAnArrayOfLongs(long[] randomLongArray);
+
+  @Aggregate2(name = "queryWithAListOfLongs", inputType = TestLongBean.class,
+          outputBeanType = TestLongBean.class)
+  @Match2(query = "{'randomLong' : { $in : # }}", order = 0)
+  List<TestLongBean> queryWithAListOfLongs(List<Long> randomLongList);
 
   @Aggregate2(name = "queryWithMixOfSpringAndJongoPlaceholders", inputType = TestLongBean.class,
               outputBeanType = TestLongBean.class)
