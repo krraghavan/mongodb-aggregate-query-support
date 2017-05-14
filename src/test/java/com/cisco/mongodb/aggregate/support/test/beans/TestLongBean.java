@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2016 the original author or authors.
+ *  Copyright (c) 2017 the original author or authors.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,13 +16,36 @@
  *
  *
  */
-package com.cisco.mongodb.aggregate.support.query;
+
+package com.cisco.mongodb.aggregate.support.test.beans;
+
+import org.jongo.marshall.jackson.oid.MongoId;
+import org.springframework.data.annotation.Id;
 
 /**
- * Created by rkolliva on 10/21/2015.
- * An interface allowing for different implementations of query execution
+ * Created by rkolliva
+ * 5/13/17.
  */
-public interface MongoQueryExecutor {
+public class TestLongBean {
 
-  Object executeQuery(QueryProvider queryProvider, Object... params) throws MongoQueryException;
+  private Long randomLong;
+
+  @Id @MongoId
+  private String id;
+
+  public Long getRandomLong() {
+    return randomLong;
+  }
+
+  public void setRandomLong(Long randomLong) {
+    this.randomLong = randomLong;
+  }
+
+  public String getId() {
+    return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
 }

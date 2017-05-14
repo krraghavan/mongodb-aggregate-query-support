@@ -73,7 +73,7 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
     try {
       AbstractAggregateQueryProvider aggregateQueryProvider = createAggregateQueryProvider(mongoParameterAccessor,
                                                                                            parameterAccessor);
-      return queryExecutor.executeQuery(aggregateQueryProvider);
+      return queryExecutor.executeQuery(aggregateQueryProvider, parameters);
     }
     catch (MongoQueryException e) {
       LOGGER.error("Error executing aggregate query", e);

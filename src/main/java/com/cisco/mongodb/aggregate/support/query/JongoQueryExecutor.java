@@ -44,8 +44,11 @@ import java.util.*;
 public class JongoQueryExecutor implements MongoQueryExecutor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JongoQueryExecutor.class);
-  public static final String UNEXPECTED_NULL_AGGREGATE_QUERY = "Unexpected null aggregate query";
-  public static final String QUERY_RETURN_ERROR_STR = "Query is expecting a single object to be returned but the result set had multiple rows";
+
+  private static final String UNEXPECTED_NULL_AGGREGATE_QUERY = "Unexpected null aggregate query";
+
+  private static final String QUERY_RETURN_ERROR_STR = "Query is expecting a single object to be returned but " +
+                                                       "the result set had multiple rows";
 
   private final Jongo jongo;
 
@@ -55,7 +58,7 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
   }
 
   @Override
-  public Object executeQuery(QueryProvider queryProvider) throws MongoQueryException {
+  public Object executeQuery(QueryProvider queryProvider, Object... params) throws MongoQueryException {
     Iterator<String> iterator = (Iterator) queryProvider;
     int i = 0;
     Aggregate aggregate = null;
@@ -63,7 +66,7 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
     while (iterator.hasNext()) {
       String query = iterator.next();
       if (i++ == 0) {
-        aggregate = jongo.getCollection(queryProvider.getCollectionName()).aggregate(query);
+        aggregate = jongo.getCollection(queryProvider.getCollectionName()).aggregate(query, params);
       }
       else {
         Assert.notNull(aggregate, UNEXPECTED_NULL_AGGREGATE_QUERY);
