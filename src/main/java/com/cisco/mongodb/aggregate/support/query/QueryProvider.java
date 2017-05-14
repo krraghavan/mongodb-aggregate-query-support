@@ -86,8 +86,10 @@ public interface QueryProvider {
   /**
    * @return - a set containing the indexes that have yet to be consumed
    * by conditionals and spring mongo parameters.  These remaining params
-   * are passed to the underlying query executor engine (Jongo in our case)
+   * are passed to the underlying query executor engine (Jongo for instance)
    * to be processed using the query executor's templating mechanism.
+   *
+   * @since 0.7.14
    */
   Object[] getUnusedParameters();
 }
