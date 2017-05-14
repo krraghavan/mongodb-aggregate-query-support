@@ -114,6 +114,7 @@ public class Facet2PipelineStageQueryProcessor extends DefaultPipelineStageQuery
       try {
         Condition condition = conditional.condition().newInstance();
         List<Object> parameterValues = context.getAggregationStage().getParameterValues();
+        conditionalIndexes.add(conditional.parameterIndex());
         ConditionalAnnotationMetadata metadata = new ConditionalAnnotationMetadata(conditional);
         AggregateQueryMethodConditionContext ctx = new AggregateQueryMethodConditionContext(context.getMethod(),
                                                                                             parameterValues);

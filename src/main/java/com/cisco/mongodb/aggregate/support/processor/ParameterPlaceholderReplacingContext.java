@@ -22,12 +22,10 @@ package com.cisco.mongodb.aggregate.support.processor;
 import com.cisco.mongodb.aggregate.support.query.AbstractAggregateQueryProvider;
 import com.cisco.mongodb.aggregate.support.query.AbstractAggregateQueryProvider.AggregationStage;
 import com.cisco.mongodb.aggregate.support.query.QueryProvider;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Map;
 import java.util.function.BiFunction;
 
 /**
@@ -36,6 +34,7 @@ import java.util.function.BiFunction;
  */
 
 
+@SuppressWarnings("WeakerAccess")
 public class ParameterPlaceholderReplacingContext implements QueryProcessorContext {
 
   private final Annotation annotation;

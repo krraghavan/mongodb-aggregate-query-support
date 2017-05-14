@@ -66,7 +66,8 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
     while (iterator.hasNext()) {
       String query = iterator.next();
       if (i++ == 0) {
-        aggregate = jongo.getCollection(queryProvider.getCollectionName()).aggregate(query, params);
+        aggregate = jongo.getCollection(queryProvider.getCollectionName()).aggregate(query,
+                                                                                     queryProvider.getUnusedParameters());
       }
       else {
         Assert.notNull(aggregate, UNEXPECTED_NULL_AGGREGATE_QUERY);
