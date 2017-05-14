@@ -20,6 +20,9 @@ package com.cisco.mongodb.aggregate.support.query;
 
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * Created by rkolliva on 10/21/2015.
  *
@@ -79,4 +82,14 @@ public interface QueryProvider {
    * @return true if the query was being served using the @Aggregate2 annotation, false otherwise
    */
   boolean isAggregate2();
+
+  /**
+   * @return - a set containing the indexes that have yet to be consumed
+   * by conditionals and spring mongo parameters.  These remaining params
+   * are passed to the underlying query executor engine (Jongo for instance)
+   * to be processed using the query executor's templating mechanism.
+   *
+   * @since 0.7.14
+   */
+  Object[] getUnusedParameters();
 }

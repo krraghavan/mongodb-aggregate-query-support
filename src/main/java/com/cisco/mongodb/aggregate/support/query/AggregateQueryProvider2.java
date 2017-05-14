@@ -39,10 +39,7 @@ import org.springframework.data.mongodb.repository.query.MongoParameterAccessor;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.cisco.mongodb.aggregate.support.utils.ArrayUtils.NULL_STRING;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -128,6 +125,7 @@ class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
                                                    annotation, getQueryString);
       PipelineStageQueryProcessor queryProcessor = queryProcessorFactory.getQueryProcessor(context);
       String query = queryProcessor.getQuery(context);
+      consumedParameters.addAll(queryProcessor.getConditionalIndexes());
       int index = queryProcessor.getOrder(context);
       if (query != null && index >= 0 && !NULL_STRING.equals(query)) {
         if (!StringUtils.isEmpty(queries[index])) {

@@ -19,7 +19,7 @@
 
 package com.cisco.mongodb.aggregate.support.processor;
 
-import java.lang.annotation.Annotation;
+import java.util.Set;
 
 /**
  * Created by rkolliva
@@ -37,4 +37,6 @@ public interface PipelineStageQueryProcessor {
   String getQuery(QueryProcessorContext context);
 
   int getOrder(QueryProcessorContext context);
+
+  Set<Integer> getConditionalIndexes();
 }

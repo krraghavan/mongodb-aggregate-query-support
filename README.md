@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.13-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
+[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.14-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -23,6 +23,11 @@ Not all aggregate pipeline steps are supported.  As of 0.7.2 support is provided
 * Facet (Mongo 3.4+) - added in v0.7.3
 * Count - added in v0.7.4
 * Skip - added in v0.7.9
+
+## New in 0.7.14 version
+Allow use of Jongo Templating mechanism (using # as a placeholder in queries).  This was needed to correctly handle 
+queries that needed to be replaced with NumberLong("<a long value>").
+
 
 ## New in 0.7.13 version
 1. Minor bug fix where conditionals were not getting ignored correctly in ```@Aggregate2``` annotated query pipelines

@@ -25,6 +25,8 @@ import org.slf4j.LoggerFactory;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created by rkolliva
@@ -35,6 +37,8 @@ import java.lang.reflect.Method;
 public class DefaultPipelineStageQueryProcessor implements PipelineStageQueryProcessor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultPipelineStageQueryProcessor.class);
+
+  protected Set<Integer> conditionalIndexes = new HashSet<>();
 
   public DefaultPipelineStageQueryProcessor() {
   }
@@ -59,6 +63,11 @@ public class DefaultPipelineStageQueryProcessor implements PipelineStageQueryPro
     catch (IllegalAccessException | InvocationTargetException e) {
       throw new IllegalArgumentException("Could not determine order for query", e);
     }
+  }
+
+  @Override
+  public Set<Integer> getConditionalIndexes() {
+    return conditionalIndexes;
   }
 
 }

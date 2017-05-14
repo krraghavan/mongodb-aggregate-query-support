@@ -24,5 +24,5 @@ package com.cisco.mongodb.aggregate.support.query;
  */
 public interface MongoQueryExecutor {
 
-  Object executeQuery(QueryProvider queryProvider) throws MongoQueryException;
+  Object executeQuery(QueryProvider queryProvider, Object... params) throws MongoQueryException;
 }

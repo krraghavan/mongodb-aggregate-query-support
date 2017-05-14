@@ -28,6 +28,7 @@ import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.util.JSON;
 import com.mongodb.util.JSONParseException;
+import org.apache.commons.collections.ArrayStack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
@@ -70,6 +71,10 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
   protected final Iterator<String> queryIterator;
   protected ArrayUtils arrayUtils = new ArrayUtils();
 
+  private List<Integer> paramsForAggregateEngine = new ArrayList<>();
+
+  protected Set<Object> consumedParameters = new HashSet<>();
+
   protected final BiFunction<AggregationStage, String, String> getQueryString = (aggregationStage, query) -> {
     if (aggregationStage.allowStage()) {
       String queryStringForStage = replacePlaceholders(query);
@@ -90,8 +95,18 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
     initializeAnnotation(method);
     // set up the query pipeline
     createAggregateQuery();
+    computeTemplateEngineParameters();
     // create the iterator - this class decorates the iterator
     this.queryIterator = aggregateQueryPipeline.iterator();
+  }
+
+  private void computeTemplateEngineParameters() {
+    int numArgs = method.getParameterCount();
+    for(int i = 0; i < numArgs; i++) {
+      if(!consumedParameters.contains(i)) {
+        paramsForAggregateEngine.add(i);
+      }
+    }
   }
 
   protected abstract void initializeAnnotation(Method method);
@@ -209,6 +224,7 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
       int idx = result.indexOf(parameter);
       String parameterValueForBinding = getParameterValueForBinding(convertingParameterAccessor, binding);
       if (idx != -1) {
+        consumedParameters.add(binding.getParameterIndex());
         result.replace(idx, idx + parameter.length(), parameterValueForBinding);
       }
     }
@@ -234,6 +250,10 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
     private static final String LHS_PARSEABLE_PARAMETER = LHS_PARAMETER_PREFIX + "$1";
     private static final Pattern LHS_PARAMETER_BINDING_PATTERN = Pattern.compile("@(\\d+)");
     private static final Pattern LHS_PARSEABLE_BINDING_PATTERN = Pattern.compile(LHS_PARAMETER_PREFIX + "(\\d+)?");
+
+    private static final String QUERY_ENGINE_PARAMETER_PREFIX = "@#@";
+    private static final String QUERY_ENGINE_PARSEABLE_PARAMETER = "\"" + QUERY_ENGINE_PARAMETER_PREFIX + "\"";
+    private static final Pattern QUERY_ENGINE_PARAMETER_BINDING_PATTERN = Pattern.compile("#");
 
     private static final int PARAMETER_INDEX_GROUP = 1;
 
@@ -267,6 +287,10 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
     private String makeParameterReferencesParseable(String input) {
       Matcher matcher = PARAMETER_BINDING_PATTERN.matcher(input);
       String retval = matcher.replaceAll(PARSEABLE_PARAMETER);
+
+      // make underlying aggregation engine template parameters parseable.
+      Matcher templateEnginePlaceholderMatcher = QUERY_ENGINE_PARAMETER_BINDING_PATTERN.matcher(retval);
+      retval = templateEnginePlaceholderMatcher.replaceAll(QUERY_ENGINE_PARSEABLE_PARAMETER);
 
       // now parse any LHS placeholders
       Matcher lhsMatcher = LHS_PARAMETER_BINDING_PATTERN.matcher(retval);
@@ -434,6 +458,7 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
                                                                                                   parameterValues);
           Condition condition = conditional.condition().newInstance();
           boolean isTrue = condition.matches(context, metadata);
+          consumedParameters.add(conditional.parameterIndex());
           if (isTrue) {
             return true;
           }
@@ -514,5 +539,18 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
   @Override
   public Pageable getPageable() {
     return mongoParameterAccessor.getPageable();
+  }
+
+  @Override
+  public Object[] getUnusedParameters() {
+    List<Object> params = new ArrayList<>();
+    for (Integer paramIndex : paramsForAggregateEngine) {
+
+      Object e = mongoParameterAccessor.getValues()[paramIndex];
+      if(e != null && !Pageable.class.isAssignableFrom(e.getClass())) {
+        params.add(e);
+      }
+    }
+    return params.toArray();
   }
 }
