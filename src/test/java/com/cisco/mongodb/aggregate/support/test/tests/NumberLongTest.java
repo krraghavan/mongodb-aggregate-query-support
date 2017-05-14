@@ -22,10 +22,12 @@ package com.cisco.mongodb.aggregate.support.test.tests;
 import com.cisco.mongodb.aggregate.support.test.beans.TestLongBean;
 import com.cisco.mongodb.aggregate.support.test.config.AggregateTestConfiguration;
 import com.cisco.mongodb.aggregate.support.test.repository.TestLongRepository;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.springframework.test.util.AssertionErrors;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -47,6 +49,71 @@ public class NumberLongTest extends AbstractTestNGSpringContextTests {
     testLongRepository.save(longBean);
     TestLongBean actualBean = testLongRepository.getRandomLong(randomLong);
     Assert.assertNotNull(actualBean);
-
+    Assert.assertEquals(actualBean.getRandomLong(), longBean.getRandomLong());
   }
+
+  @Test
+  public void mustAllowCombinedPlaceholdersToBeUsed() {
+    TestLongBean longBean = new TestLongBean();
+    long randomLong = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    String randomString = RandomStringUtils.randomAlphabetic(10);
+    longBean.setRandomString(randomString);
+    longBean.setRandomLong(randomLong);
+    testLongRepository.save(longBean);
+    TestLongBean actualBean = testLongRepository.queryWithMixOfSpringAndJongoPlaceholders(randomString, randomLong);
+    Assert.assertNotNull(actualBean);
+    Assert.assertTrue(actualBean.equals(longBean));
+  }
+
+  @Test
+  public void mustAllowCombinedPlaceholdersToBeUsedInAnyOrder() {
+    TestLongBean longBean = new TestLongBean();
+    long randomLong = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    String randomString = RandomStringUtils.randomAlphabetic(10);
+    longBean.setRandomString(randomString);
+    longBean.setRandomLong(randomLong);
+    testLongRepository.save(longBean);
+    TestLongBean actualBean = testLongRepository.queryWithMixOfSpringAndJongoPlaceholdersRegardlessOfOrder(randomLong,
+                                                                                                           randomString);
+    Assert.assertNotNull(actualBean);
+    Assert.assertTrue(actualBean.equals(longBean));
+  }
+
+  @Test
+  public void mustAllowMultipleQueryEnginePlaceholders() {
+    TestLongBean longBean = new TestLongBean();
+    long randomLong = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    long randomLong2 = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+
+    String randomString = RandomStringUtils.randomAlphabetic(10);
+    longBean.setRandomString(randomString);
+    longBean.setRandomLong(randomLong);
+    longBean.setRandomLong2(randomLong2);
+    testLongRepository.save(longBean);
+    TestLongBean actualBean = testLongRepository.queryWithMultipleTemplateEnginePlaceholders(randomLong, randomLong2);
+    Assert.assertNotNull(actualBean);
+    Assert.assertTrue(actualBean.equals(longBean));
+  }
+
+
+  @Test
+  public void mustAllowMultipleQueryEnginePlaceholdersMixedWithSpringPlaceholders() {
+    TestLongBean longBean = new TestLongBean();
+    long randomLong = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    long randomLong2 = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+
+    String randomString = RandomStringUtils.randomAlphabetic(10);
+    longBean.setRandomString(randomString);
+    longBean.setRandomLong(randomLong);
+    longBean.setRandomLong2(randomLong2);
+    testLongRepository.save(longBean);
+    TestLongBean actualBean = testLongRepository.queryWithMultipleTemplateEnginePlaceholdersAndSpringPlaceholders(randomLong,
+                                                                                                                  randomString,
+                                                                                                                  randomLong2);
+    Assert.assertNotNull(actualBean);
+    Assert.assertTrue(actualBean.equals(longBean));
+  }
+
+
+
 }

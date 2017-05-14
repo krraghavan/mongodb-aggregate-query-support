@@ -251,6 +251,10 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
     private static final Pattern LHS_PARAMETER_BINDING_PATTERN = Pattern.compile("@(\\d+)");
     private static final Pattern LHS_PARSEABLE_BINDING_PATTERN = Pattern.compile(LHS_PARAMETER_PREFIX + "(\\d+)?");
 
+    private static final String QUERY_ENGINE_PARAMETER_PREFIX = "@#@";
+    private static final String QUERY_ENGINE_PARSEABLE_PARAMETER = "\"" + QUERY_ENGINE_PARAMETER_PREFIX + "\"";
+    private static final Pattern QUERY_ENGINE_PARAMETER_BINDING_PATTERN = Pattern.compile("#");
+
     private static final int PARAMETER_INDEX_GROUP = 1;
 
     /**
@@ -283,6 +287,10 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
     private String makeParameterReferencesParseable(String input) {
       Matcher matcher = PARAMETER_BINDING_PATTERN.matcher(input);
       String retval = matcher.replaceAll(PARSEABLE_PARAMETER);
+
+      // make underlying aggregation engine template parameters parseable.
+      Matcher templateEnginePlaceholderMatcher = QUERY_ENGINE_PARAMETER_BINDING_PATTERN.matcher(retval);
+      retval = templateEnginePlaceholderMatcher.replaceAll(QUERY_ENGINE_PARSEABLE_PARAMETER);
 
       // now parse any LHS placeholders
       Matcher lhsMatcher = LHS_PARAMETER_BINDING_PATTERN.matcher(retval);

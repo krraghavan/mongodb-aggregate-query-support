@@ -19,6 +19,7 @@
 
 package com.cisco.mongodb.aggregate.support.test.beans;
 
+import com.google.common.base.Objects;
 import org.jongo.marshall.jackson.oid.MongoId;
 import org.springframework.data.annotation.Id;
 
@@ -29,6 +30,10 @@ import org.springframework.data.annotation.Id;
 public class TestLongBean {
 
   private Long randomLong;
+
+  private String randomString;
+
+  private Long randomLong2;
 
   @Id @MongoId
   private String id;
@@ -47,5 +52,41 @@ public class TestLongBean {
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public String getRandomString() {
+    return randomString;
+  }
+
+  public void setRandomString(String randomString) {
+    this.randomString = randomString;
+  }
+
+  public Long getRandomLong2() {
+    return randomLong2;
+  }
+
+  public void setRandomLong2(Long randomLong2) {
+    this.randomLong2 = randomLong2;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    TestLongBean longBean = (TestLongBean) o;
+    return Objects.equal(randomLong, longBean.randomLong) &&
+           Objects.equal(randomString, longBean.randomString) &&
+           Objects.equal(randomLong2, longBean.randomLong2) &&
+           Objects.equal(id, longBean.id);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(randomLong, randomString, randomLong2, id);
   }
 }
