@@ -81,6 +81,18 @@ public class NumberLongTest extends AbstractTestNGSpringContextTests {
   }
 
   @Test
+  public void mustAllowCombinedMatchStageAndFacet() {
+    TestLongBean longBean = new TestLongBean();
+    long randomLong = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    longBean.setRandomLong(randomLong);
+    testLongRepository.save(longBean);
+    List<TestLongBean> actualBeans = testLongRepository.queryWithALongAndFacet(Collections.singletonList(randomLong), 1);
+    Assert.assertNotNull(actualBeans);
+    Assert.assertEquals(actualBeans.size(), 1);
+    Assert.assertTrue(actualBeans.get(0).equals(longBean));
+  }
+
+  @Test
   public void mustAllowCombinedPlaceholdersToBeUsed() {
     TestLongBean longBean = new TestLongBean();
     long randomLong = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
