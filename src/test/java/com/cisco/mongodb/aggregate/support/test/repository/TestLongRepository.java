@@ -19,8 +19,7 @@
 
 package com.cisco.mongodb.aggregate.support.test.repository;
 
-import com.cisco.mongodb.aggregate.support.annotation.v2.Aggregate2;
-import com.cisco.mongodb.aggregate.support.annotation.v2.Match2;
+import com.cisco.mongodb.aggregate.support.annotation.v2.*;
 import com.cisco.mongodb.aggregate.support.test.beans.TestLongBean;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -45,6 +44,15 @@ public interface TestLongRepository extends MongoRepository<TestLongBean, String
           outputBeanType = TestLongBean.class)
   @Match2(query = "{'randomLong' : { $in : # }}", order = 0)
   List<TestLongBean> queryWithAListOfLongs(List<Long> randomLongList);
+
+  @Aggregate2(name = "queryWithALongAndFacet", inputType = TestLongBean.class,
+          outputBeanType = TestLongBean.class)
+  @Match2(query = "{'randomLong' : { $in : # }}", order = 0)
+  @FacetPipeline(name = "testFacet", stages = {
+          @FacetPipelineStage(stageType = Limit2.class,
+                  query = "?1")
+  })
+  List<TestLongBean> queryWithALongAndFacet(List<Long> randomLongList, int limit);
 
   @Aggregate2(name = "queryWithMixOfSpringAndJongoPlaceholders", inputType = TestLongBean.class,
               outputBeanType = TestLongBean.class)
