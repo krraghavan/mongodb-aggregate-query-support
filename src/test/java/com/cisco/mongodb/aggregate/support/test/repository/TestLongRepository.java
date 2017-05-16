@@ -32,22 +32,22 @@ import java.util.List;
 public interface TestLongRepository extends MongoRepository<TestLongBean, String> {
 
   @Aggregate2(name = "getRandomLong", inputType = TestLongBean.class, outputBeanType = TestLongBean.class)
-  @Match2(query = "{'randomLong' : #}", order = 0)
+  @Match2(query = "{'randomLong' : ?0 }", order = 0)
   TestLongBean getRandomLong(Long longValue);
 
   @Aggregate2(name = "queryWithAnArrayOfLongs", inputType = TestLongBean.class,
           outputBeanType = TestLongBean.class)
-  @Match2(query = "{'randomLong' : { $in : # }}", order = 0)
+  @Match2(query = "{'randomLong' : { $in : ?0 }}", order = 0)
   List<TestLongBean> queryWithAnArrayOfLongs(long[] randomLongArray);
 
   @Aggregate2(name = "queryWithAListOfLongs", inputType = TestLongBean.class,
           outputBeanType = TestLongBean.class)
-  @Match2(query = "{'randomLong' : { $in : # }}", order = 0)
+  @Match2(query = "{'randomLong' : { $in : ?0 }}", order = 0)
   List<TestLongBean> queryWithAListOfLongs(List<Long> randomLongList);
 
   @Aggregate2(name = "queryWithALongAndFacet", inputType = TestLongBean.class,
           outputBeanType = TestLongBean.class)
-  @Match2(query = "{'randomLong' : { $in : # }}", order = 0)
+  @Match2(query = "{'randomLong' : { $in : ?0 }}", order = 0)
   @FacetPipeline(name = "testFacet", stages = {
           @FacetPipelineStage(stageType = Limit2.class,
                   query = "?1")
@@ -56,22 +56,22 @@ public interface TestLongRepository extends MongoRepository<TestLongBean, String
 
   @Aggregate2(name = "queryWithMixOfSpringAndJongoPlaceholders", inputType = TestLongBean.class,
               outputBeanType = TestLongBean.class)
-  @Match2(query = "{'randomString' : ?0, 'randomLong' : #}", order = 0)
+  @Match2(query = "{'randomString' : ?0, 'randomLong' : ?1 }", order = 0)
   TestLongBean queryWithMixOfSpringAndJongoPlaceholders(String randomString, long randomLong);
 
   @Aggregate2(name = "queryWithMixOfSpringAndJongoPlaceholdersRegardlessOfOrder", inputType = TestLongBean.class,
               outputBeanType = TestLongBean.class)
-  @Match2(query = "{'randomString' : ?1, 'randomLong' : #}", order = 0)
+  @Match2(query = "{'randomString' : ?1, 'randomLong' : ?0 }", order = 0)
   TestLongBean queryWithMixOfSpringAndJongoPlaceholdersRegardlessOfOrder(long randomLong, String randomString);
 
   @Aggregate2(name = "queryWithMultipleTemplateEnginePlaceholders", inputType = TestLongBean.class,
               outputBeanType = TestLongBean.class)
-  @Match2(query = "{'randomLong' : #, 'randomLong2' : #}", order = 0)
+  @Match2(query = "{'randomLong' : ?0, 'randomLong2' : ?1}", order = 0)
   TestLongBean queryWithMultipleTemplateEnginePlaceholders(long randomLong, long randomLong2);
 
   @Aggregate2(name = "queryWithMultipleTemplateEnginePlaceholdersAndSpringPlaceholders", inputType = TestLongBean.class,
               outputBeanType = TestLongBean.class)
-  @Match2(query = "{'randomString':?1, 'randomLong' : #, 'randomLong2' : #}", order = 0)
+  @Match2(query = "{'randomString':?1, 'randomLong' : ?0, 'randomLong2' : ?2}", order = 0)
   TestLongBean queryWithMultipleTemplateEnginePlaceholdersAndSpringPlaceholders(long randomLong, String springPlaceholder,
                                                                                 long randomLong2);
 }

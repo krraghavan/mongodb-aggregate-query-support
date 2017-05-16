@@ -45,10 +45,17 @@ public class NumberLongTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private TestLongRepository testLongRepository;
 
+  private static long generateRandomEightByteLong() {
+    long result = (System.currentTimeMillis() / 1000) << 32;
+    result += RandomUtils.nextInt(0, Integer.MAX_VALUE);
+    System.err.println("generateRandomEightByteLong() " + result);
+    return result;
+  }
+
   @Test
   public void mustReturnLongValueQueriedWithNumberLong() {
     TestLongBean longBean = new TestLongBean();
-    long randomLong = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    long randomLong = generateRandomEightByteLong();
     longBean.setRandomLong(randomLong);
     testLongRepository.save(longBean);
     TestLongBean actualBean = testLongRepository.getRandomLong(randomLong);
@@ -59,11 +66,11 @@ public class NumberLongTest extends AbstractTestNGSpringContextTests {
   @Test
   public void mustReturnLongValueQueriedWithListOfNumberLong() {
     TestLongBean longBean1 = new TestLongBean();
-    long randomLong1 = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    long randomLong1 = generateRandomEightByteLong();
     longBean1.setRandomLong(randomLong1);
     testLongRepository.save(longBean1);
     TestLongBean longBean2 = new TestLongBean();
-    long randomLong2 = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    long randomLong2 = generateRandomEightByteLong();
     longBean2.setRandomLong(randomLong2);
     testLongRepository.save(longBean2);
 
@@ -83,7 +90,7 @@ public class NumberLongTest extends AbstractTestNGSpringContextTests {
   @Test
   public void mustAllowCombinedMatchStageAndFacet() {
     TestLongBean longBean = new TestLongBean();
-    long randomLong = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    long randomLong = generateRandomEightByteLong();
     longBean.setRandomLong(randomLong);
     testLongRepository.save(longBean);
     List<TestLongBean> actualBeans = testLongRepository.queryWithALongAndFacet(Collections.singletonList(randomLong), 1);
@@ -95,7 +102,7 @@ public class NumberLongTest extends AbstractTestNGSpringContextTests {
   @Test
   public void mustAllowCombinedPlaceholdersToBeUsed() {
     TestLongBean longBean = new TestLongBean();
-    long randomLong = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    long randomLong = generateRandomEightByteLong();
     String randomString = RandomStringUtils.randomAlphabetic(10);
     longBean.setRandomString(randomString);
     longBean.setRandomLong(randomLong);
@@ -108,7 +115,7 @@ public class NumberLongTest extends AbstractTestNGSpringContextTests {
   @Test
   public void mustAllowCombinedPlaceholdersToBeUsedInAnyOrder() {
     TestLongBean longBean = new TestLongBean();
-    long randomLong = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    long randomLong = generateRandomEightByteLong();
     String randomString = RandomStringUtils.randomAlphabetic(10);
     longBean.setRandomString(randomString);
     longBean.setRandomLong(randomLong);
@@ -122,8 +129,8 @@ public class NumberLongTest extends AbstractTestNGSpringContextTests {
   @Test
   public void mustAllowMultipleQueryEnginePlaceholders() {
     TestLongBean longBean = new TestLongBean();
-    long randomLong = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
-    long randomLong2 = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    long randomLong = generateRandomEightByteLong();
+    long randomLong2 = generateRandomEightByteLong();
 
     String randomString = RandomStringUtils.randomAlphabetic(10);
     longBean.setRandomString(randomString);
@@ -139,8 +146,8 @@ public class NumberLongTest extends AbstractTestNGSpringContextTests {
   @Test
   public void mustAllowMultipleQueryEnginePlaceholdersMixedWithSpringPlaceholders() {
     TestLongBean longBean = new TestLongBean();
-    long randomLong = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
-    long randomLong2 = RandomUtils.nextLong(System.nanoTime(), System.nanoTime() + 1000000);
+    long randomLong = generateRandomEightByteLong();
+    long randomLong2 = generateRandomEightByteLong();
 
     String randomString = RandomStringUtils.randomAlphabetic(10);
     longBean.setRandomString(randomString);
