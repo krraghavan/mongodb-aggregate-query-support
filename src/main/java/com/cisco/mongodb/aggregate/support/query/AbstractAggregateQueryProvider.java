@@ -38,6 +38,12 @@ import org.springframework.data.mongodb.repository.query.ConvertingParameterAcce
 import org.springframework.data.mongodb.repository.query.MongoParameterAccessor;
 import org.springframework.data.mongodb.repository.query.MongoParametersParameterAccessor;
 import org.springframework.data.repository.query.Parameter;
+import org.springframework.expression.Expression;
+import org.springframework.expression.ParseException;
+import org.springframework.expression.ParserContext;
+import org.springframework.expression.common.LiteralExpression;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
@@ -69,6 +75,10 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
   protected List<String> aggregateQueryPipeline;
   protected final Iterator<String> queryIterator;
   protected ArrayUtils arrayUtils = new ArrayUtils();
+
+  protected static final SpelExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
+
+  protected StandardEvaluationContext context = new StandardEvaluationContext();
 
   protected final BiFunction<AggregationStage, String, String> getQueryString = (aggregationStage, query) -> {
     if (aggregationStage.allowStage()) {
@@ -107,6 +117,12 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
       if(StringUtils.isEmpty(collectionName)) {
         collectionName = getSimpleCollectionName(className);
       }
+      else {
+        Expression expression = detectExpression(collectionName);
+        if(expression != null) {
+          collectionName = expression.getValue(context, String.class);
+        }
+      }
     }
     else {
       collectionName = getSimpleCollectionName(className);
@@ -114,6 +130,17 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
 
     Assert.notNull(collectionName);
     return collectionName;
+  }
+
+  private Expression detectExpression(String collectionName) {
+    Expression expression = null;
+    try {
+      expression = EXPRESSION_PARSER.parseExpression(collectionName, ParserContext.TEMPLATE_EXPRESSION);
+    }
+    catch (ParseException pe) {
+      LOGGER.warn("Not able to parse the collection name expression {}", collectionName);
+    }
+    return expression instanceof LiteralExpression ? null : expression;
   }
 
   protected String getSimpleCollectionName(Class className) {
