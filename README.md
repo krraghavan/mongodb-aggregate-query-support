@@ -24,6 +24,10 @@ Not all aggregate pipeline steps are supported.  As of 0.7.2 support is provided
 * Count - added in v0.7.4
 * Skip - added in v0.7.9
 
+## New in 0.7.15 version
+Remove bad 0.7.14 build changes.
+Add support for expressions in Document annotations
+
 ## New in 0.7.13 version
 1. Minor bug fix where conditionals were not getting ignored correctly in ```@Aggregate2``` annotated query pipelines
 
