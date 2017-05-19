@@ -8,22 +8,6 @@ The @Query annotation provided by Spring Data MongoDb allows queries to be execu
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
 
-## Current Limitations (Deprecated in v0.7.11)
-Not all aggregate pipeline steps are supported.  As of 0.7.2 support is provided for
-* Project
-* Unwind
-* Lookup
-* Group
-* Match
-* Out
-* Limit
-* Bucket (Mongo 3.4+) - added in v0.7.2
-* AddFields (Mongo 3.4+) - added in v0.7.2
-* ReplaceRoot (Mongo 3.4+) - added in v0.7.2
-* Facet (Mongo 3.4+) - added in v0.7.3
-* Count - added in v0.7.4
-* Skip - added in v0.7.9
-
 ## New in 0.7.15 version
 Remove bad 0.7.14 build changes.
 Add support for expressions in Document annotations
