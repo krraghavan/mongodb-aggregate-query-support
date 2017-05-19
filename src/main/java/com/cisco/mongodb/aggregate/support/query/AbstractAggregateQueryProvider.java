@@ -39,7 +39,6 @@ import org.springframework.data.mongodb.repository.query.MongoParameterAccessor;
 import org.springframework.data.mongodb.repository.query.MongoParametersParameterAccessor;
 import org.springframework.data.repository.query.Parameter;
 import org.springframework.expression.Expression;
-import org.springframework.expression.ParseException;
 import org.springframework.expression.ParserContext;
 import org.springframework.expression.common.LiteralExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
@@ -133,13 +132,7 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
   }
 
   private Expression detectExpression(String collectionName) {
-    Expression expression = null;
-    try {
-      expression = EXPRESSION_PARSER.parseExpression(collectionName, ParserContext.TEMPLATE_EXPRESSION);
-    }
-    catch (ParseException pe) {
-      LOGGER.warn("Not able to parse the collection name expression {}", collectionName);
-    }
+    Expression expression = EXPRESSION_PARSER.parseExpression(collectionName, ParserContext.TEMPLATE_EXPRESSION);
     return expression instanceof LiteralExpression ? null : expression;
   }
 
