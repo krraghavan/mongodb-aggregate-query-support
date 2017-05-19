@@ -20,7 +20,10 @@
 package com.cisco.mongodb.aggregate.support.query;
 
 import com.cisco.mongodb.aggregate.support.factory.AggregateQuerySupportingRepositoryFactory;
+import com.cisco.mongodb.aggregate.support.test.beans.TestNoDocumentAnnotationBean;
+import com.cisco.mongodb.aggregate.support.test.beans.TestValidDocumentAnnotationBean;
 import com.cisco.mongodb.aggregate.support.test.config.AggregateTestConfiguration;
+import com.cisco.mongodb.aggregate.support.test.fixtures.DocumentAnnotationFixture;
 import com.cisco.mongodb.aggregate.support.test.repository.TestAggregateRepository22;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -41,6 +44,7 @@ import java.lang.reflect.Method;
 import static org.springframework.data.repository.query.QueryLookupStrategy.Key.CREATE_IF_NOT_FOUND;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Created by rkolliva
@@ -85,6 +89,23 @@ public class AggregateQueryProvider2Test extends AbstractTestNGSpringContextTest
     assertNotNull(query);
     Object object = query.execute(new Object[0]);
     assertNull(object);
+  }
+
+  @Test
+  public void testValidDocumentAnnotationValue() {
+    //Valid Spring Expression Document name validation
+    String validCollectionName = mongoOperations.getCollectionName(TestValidDocumentAnnotationBean.class);
+    assertNotNull(validCollectionName);
+    assertTrue(DocumentAnnotationFixture.RANDOM_COLLECTION.equals(validCollectionName));
+  }
+
+  @Test
+  public void testNoDocumentAnnotationValue() {
+    //No Spring Expression Document annotation specified
+    //Since the expression is invalid it should pick up the class name as collection name
+    String noAnnotationCollectionName = mongoOperations.getCollectionName(TestNoDocumentAnnotationBean.class);
+    assertNotNull(noAnnotationCollectionName);
+    assertTrue(TestNoDocumentAnnotationBean.class.getSimpleName().equalsIgnoreCase(noAnnotationCollectionName));
   }
 
 }

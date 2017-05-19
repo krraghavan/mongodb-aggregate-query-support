@@ -32,9 +32,16 @@ import org.springframework.data.repository.query.ExtensionAwareEvaluationContext
 
 /**
  * @author rkolliva.
+ *
+ * DocumentAnnotationTestConfiguration should be loaded before the Mongo repositories configuration as the @Document
+ * collection value should be calcuated before repository interface creation
  */
 @Configuration
-@Import({MongoDBTestConfiguration.class, TestMongoRepositoryConfiguration.class})
+@Import({
+   DocumentAnnotationTestConfiguration.class,
+   MongoDBTestConfiguration.class,
+   TestMongoRepositoryConfiguration.class
+})
 public class AggregateTestConfiguration {
 
   @Bean
