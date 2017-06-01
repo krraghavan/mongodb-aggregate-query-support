@@ -8,6 +8,9 @@ The @Query annotation provided by Spring Data MongoDb allows queries to be execu
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
 
+## New in 0.7.16 version
+1. Use strict mode JSON serializer so that binary data gets serialized correctly by Mongo Java driver
+
 ## New in 0.7.15 version
 Remove bad 0.7.14 build changes.
 Add support for expressions in Document annotations
