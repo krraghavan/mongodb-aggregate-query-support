@@ -28,6 +28,7 @@ import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.util.JSON;
 import com.mongodb.util.JSONParseException;
+import com.mongodb.util.JSONSerializers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
@@ -198,7 +199,13 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
       return (String) value;
     }
 
-    return JSON.serialize(value);
+    return serialize(value);
+  }
+
+  private static String serialize(Object object) {
+    StringBuilder buf = new StringBuilder();
+    JSONSerializers.getStrict().serialize(object, buf);
+    return buf.toString();
   }
 
   /*
