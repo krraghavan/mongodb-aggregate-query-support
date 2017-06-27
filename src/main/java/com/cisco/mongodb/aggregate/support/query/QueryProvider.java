@@ -79,4 +79,9 @@ public interface QueryProvider {
    * @return true if the query was being served using the @Aggregate2 annotation, false otherwise
    */
   boolean isAggregate2();
+
+  /**
+   * @return true if the query is allowed to use disk space to avoid sort/groupBy space limitations
+   */
+  boolean isAllowDiskUse();
 }

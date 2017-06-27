@@ -18,6 +18,7 @@
  */
 package com.cisco.mongodb.aggregate.support.query;
 
+import com.mongodb.AggregationOptions;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.jongo.Aggregate;
@@ -71,6 +72,7 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
       }
     }
     Assert.notNull(aggregate, UNEXPECTED_NULL_AGGREGATE_QUERY);
+    aggregate.options(AggregationOptions.builder().allowDiskUse(queryProvider.isAllowDiskUse()).build());
     ResultsIterator resultsIterator = aggregate.as(HashMap.class);
     if (resultsIterator == null || !resultsIterator.hasNext() || Void.TYPE.equals(queryProvider.getMethodReturnType())) {
       return null;

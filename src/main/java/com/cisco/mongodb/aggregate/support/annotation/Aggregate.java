@@ -142,4 +142,9 @@ public @interface Aggregate {
    *
    */
   Skip [] skip() default {};
+
+  /**
+   * @return true if the query is allowed to use disk space to avoid sort/groupBy space limitations
+   */
+  boolean isAllowDiskUse() default false;
 }
