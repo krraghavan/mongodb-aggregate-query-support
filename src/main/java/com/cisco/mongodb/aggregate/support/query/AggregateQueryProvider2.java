@@ -111,6 +111,11 @@ class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
   }
 
   @Override
+  public boolean isAllowDiskUse() {
+    return aggregateAnnotation.isAllowDiskUse();
+  }
+
+  @Override
   void createAggregateQuery() throws InvalidAggregationQueryException {
     LOGGER.debug(">>>> createAggregateQuery:: Forming aggregation pipeline");
     Annotation[] annotations = method.getAnnotations();

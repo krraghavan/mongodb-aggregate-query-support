@@ -57,4 +57,9 @@ public @interface Aggregate2 {
    * By default whole object will be considered when it is empty
    */
   String resultKey() default "";
+
+  /**
+   * @return true if the query is allowed to use disk space to avoid sort/groupBy space limitations
+   */
+  boolean isAllowDiskUse() default false;
 }
