@@ -117,6 +117,11 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
   }
 
   @Override
+  protected boolean isExistsQuery() {
+    return false;
+  }
+
+  @Override
   protected boolean isDeleteQuery() {
     return false;
   }

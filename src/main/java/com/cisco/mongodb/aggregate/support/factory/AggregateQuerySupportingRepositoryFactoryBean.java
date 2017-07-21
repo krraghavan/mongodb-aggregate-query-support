@@ -26,6 +26,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.MongoRepositoryFactoryBean;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
+import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
@@ -34,13 +35,16 @@ import java.io.Serializable;
  * Created by rkolliva
  * 9/7/16.
  */
+@Component
 public class AggregateQuerySupportingRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extends Serializable>
     extends MongoRepositoryFactoryBean<T, S, ID> {
 
   private final MongoQueryExecutor queryExecutor;
 
   @Autowired
-  public AggregateQuerySupportingRepositoryFactoryBean(MongoQueryExecutor queryExecutor) {
+  public AggregateQuerySupportingRepositoryFactoryBean(Class<? extends T> repositoryInterface,
+                                                       MongoQueryExecutor queryExecutor) {
+    super(repositoryInterface);
     this.queryExecutor = queryExecutor;
   }
 
