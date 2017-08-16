@@ -19,6 +19,10 @@
 
 package com.cisco.mongodb.aggregate.support.test.beans;
 
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.deser.BeanDeserializer;
+import com.fasterxml.jackson.databind.deser.std.StringArrayDeserializer;
 import org.jongo.marshall.jackson.oid.MongoId;
 import org.springframework.data.annotation.Id;
 
@@ -28,7 +32,6 @@ import java.util.List;
  * Created by rkolliva
  * 2/19/17.
  */
-
 
 public class Artwork extends AbstractTestAggregateBean {
 

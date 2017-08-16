@@ -145,39 +145,39 @@ public class AggregateQueryFixtures {
                                                       "  \"extraCredit\": 8\n" +
                                                       "}]";
 
-  private static final String TEST_ARTWORK_DOCUMENTS = "[{ \"_id\" : 1, \"title\" : \"The Pillars of Society\", " +
-                                                       "    \"artist\" : \"Grosz\", \"year\" : 1926,\n" +
-                                                       "    \"price\" : 199.99 },\n" +
-                                                       "{ \"_id\" : 2, \"title\" : \"Melancholy III\", " +
-                                                       "  \"artist\" : \"Munch\", \"year\" : 1902,\n" +
-                                                       "  \"price\" : 280.00 },\n" +
-                                                       "{ \"_id\" : 3, \"title\" : \"Dancer\", " +
-                                                       "   \"artist\" : \"Miro\", \"year\" : 1925,\n" +
-                                                       "   \"price\" : 76.04 },\n" +
-                                                       "{ \"_id\" : 4, \"title\" : \"The Great Wave off Kanagawa\"," +
-                                                       "  \"artist\" : \"Hokusai\",\n" +
-                                                       "  \"price\" : 167.30 },\n" +
-                                                       "{ \"_id\" : 5, \"title\" : \"The Persistence of Memory\", " +
-                                                       "  \"artist\" : \"Dali\", \"year\" : 1931,\n" +
-                                                       "  \"price\" : 483.00 },\n" +
-                                                       "{ \"_id\" : 6, \"title\" : \"Composition VII\", " +
-                                                       "  \"artist\" : \"Kandinsky\", \"year\" : 1913,\n" +
-                                                       "  \"price\" : 385.00 },\n" +
-                                                       "{ \"_id\" : 7, \"title\" : \"The Scream\", " +
-                                                       "  \"artist\" : \"Munch\", \"year\" : 1893,  \"price\" : 480.00\n" +
-                                                       " },\n" +
-                                                       "{ \"_id\" : 8, \"title\" : \"Blue Flower\", " +
-                                                       "  \"artist\" : \"O'Keefe\", \"year\" : 1918,\n" +
-                                                       "    \"price\" : 118.42 }]";
+  public static final String TEST_ARTWORK_DOCUMENTS = "[{ \"_id\" : 1, \"title\" : \"The Pillars of Society\", " +
+                                                      "    \"artist\" : \"Grosz\", \"year\" : 1926,\n" +
+                                                      "    \"price\" : 199.99 },\n" +
+                                                      "{ \"_id\" : 2, \"title\" : \"Melancholy III\", " +
+                                                      "  \"artist\" : \"Munch\", \"year\" : 1902,\n" +
+                                                      "  \"price\" : 280.00 },\n" +
+                                                      "{ \"_id\" : 3, \"title\" : \"Dancer\", " +
+                                                      "   \"artist\" : \"Miro\", \"year\" : 1925,\n" +
+                                                      "   \"price\" : 76.04 },\n" +
+                                                      "{ \"_id\" : 4, \"title\" : \"The Great Wave off Kanagawa\"," +
+                                                      "  \"artist\" : \"Hokusai\",\n" +
+                                                      "  \"price\" : 167.30 },\n" +
+                                                      "{ \"_id\" : 5, \"title\" : \"The Persistence of Memory\", " +
+                                                      "  \"artist\" : \"Dali\", \"year\" : 1931,\n" +
+                                                      "  \"price\" : 483.00 },\n" +
+                                                      "{ \"_id\" : 6, \"title\" : \"Composition VII\", " +
+                                                      "  \"artist\" : \"Kandinsky\", \"year\" : 1913,\n" +
+                                                      "  \"price\" : 385.00 },\n" +
+                                                      "{ \"_id\" : 7, \"title\" : \"The Scream\", " +
+                                                      "  \"artist\" : \"Munch\", \"year\" : 1893,  \"price\" : 480.00\n" +
+                                                      " },\n" +
+                                                      "{ \"_id\" : 8, \"title\" : \"Blue Flower\", " +
+                                                      "  \"artist\" : \"O'Keefe\", \"year\" : 1918,\n" +
+                                                      "    \"price\" : 118.42 }]";
 
-  private static final String TEST_ARTWORK_WITH_TAGS_DOCUMENT = "[{ \"_id\" : 1, \"title\" : \"The Pillars of Society\", \"artist\" : \"Grosz\", \"year\" : 1926, \"tags\" : [ \"painting\", \"satire\", \"Expressionism\", \"caricature\" ] },\n" +
-                                                                "{ \"_id\" : 2, \"title\" : \"Melancholy III\", \"artist\" : \"Munch\", \"year\" : 1902, \"tags\" : [ \"woodcut\", \"Expressionism\" ] },\n" +
-                                                                "{ \"_id\" : 3, \"title\" : \"Dancer\", \"artist\" : \"Miro\", \"year\" : 1925, \"tags\" : [ \"oil\", \"Surrealism\", \"painting\" ] },\n" +
-                                                                "{ \"_id\" : 4, \"title\" : \"The Great Wave off Kanagawa\", \"artist\" : \"Hokusai\", \"tags\" : [ \"woodblock\", \"ukiyo-e\" ] },\n" +
-                                                                "{ \"_id\" : 5, \"title\" : \"The Persistence of Memory\", \"artist\" : \"Dali\", \"year\" : 1931, \"tags\" : [ \"Surrealism\", \"painting\", \"oil\" ] },\n" +
-                                                                "{ \"_id\" : 6, \"title\" : \"Composition VII\", \"artist\" : \"Kandinsky\", \"year\" : 1913, \"tags\" : [ \"oil\", \"painting\", \"abstract\" ] },\n" +
-                                                                "{ \"_id\" : 7, \"title\" : \"The Scream\", \"artist\" : \"Munch\", \"year\" : 1893, \"tags\" : [ \"Expressionism\", \"painting\", \"oil\" ] },\n" +
-                                                                "{ \"_id\" : 8, \"title\" : \"Blue Flower\", \"artist\" : \"O'Keefe\", \"year\" : 1918, \"tags\" : [ \"abstract\", \"painting\" ] }]";
+  private static final String TEST_ARTWORK_WITH_TAGS_DOCUMENT = "[{ \"_id\" : 1, \"title\" : \"The Pillars of Society\", \"price\" : 199.99, \"artist\" : \"Grosz\", \"year\" : 1926, \"tags\" : [ \"painting\", \"satire\", \"Expressionism\", \"caricature\" ] },\n" +
+                                                                "{ \"_id\" : 2, \"title\" : \"Melancholy III\", \"price\" : 280.00, \"artist\" : \"Munch\", \"year\" : 1902, \"tags\" : [ \"woodcut\", \"Expressionism\" ] },\n" +
+                                                                "{ \"_id\" : 3, \"title\" : \"Dancer\", \"price\" : 76.04, \"artist\" : \"Miro\", \"year\" : 1925, \"tags\" : [ \"oil\", \"Surrealism\", \"painting\" ] },\n" +
+                                                                "{ \"_id\" : 4, \"title\" : \"The Great Wave off Kanagawa\", \"price\" : 167.30, \"artist\" : \"Hokusai\", \"tags\" : [ \"woodblock\", \"ukiyo-e\" ] },\n" +
+                                                                "{ \"_id\" : 5, \"title\" : \"The Persistence of Memory\", \"price\" : 483.00, \"artist\" : \"Dali\", \"year\" : 1931, \"tags\" : [ \"Surrealism\", \"painting\", \"oil\" ] },\n" +
+                                                                "{ \"_id\" : 6, \"title\" : \"Composition VII\", \"price\" : 385.00, \"artist\" : \"Kandinsky\", \"year\" : 1913, \"tags\" : [ \"oil\", \"painting\", \"abstract\" ] },\n" +
+                                                                "{ \"_id\" : 7, \"title\" : \"The Scream\", \"price\" : 480.00, \"artist\" : \"Munch\", \"year\" : 1893, \"tags\" : [ \"Expressionism\", \"painting\", \"oil\" ] },\n" +
+                                                                "{ \"_id\" : 8, \"title\" : \"Blue Flower\", \"price\" : 118.42, \"artist\" : \"O'Keefe\", \"year\" : 1918, \"tags\" : [ \"abstract\", \"painting\" ] }]";
 
   public static List<TestReplaceRootBean> newReplaceRootFixture() throws IOException {
     ObjectMapper mapper = new ObjectMapper();
@@ -195,7 +195,7 @@ public class AggregateQueryFixtures {
   public static List<Artwork> newArtworkBeans() throws IOException {
     ObjectMapper mapper = new ObjectMapper();
     TypeReference<List<Artwork>> typeReference = new TypeReference<List<Artwork>>() {};
-    return mapper.readValue(TEST_ARTWORK_DOCUMENTS, typeReference);
+    return mapper.readValue(TEST_ARTWORK_WITH_TAGS_DOCUMENT, typeReference);
   }
 
   public static List<ArtworkSortTestBean> newArtworkBeansWithTags() throws IOException {

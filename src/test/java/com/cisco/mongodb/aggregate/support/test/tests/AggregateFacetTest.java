@@ -46,32 +46,6 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private ArtworkRepository artworkRepository;
 
-  private static final String [] ARTWORK_DOCUMENTS = {
-      "{ \"_id\" : 1, \"title\" : \"The Pillars of Society\", \"artist\" : \"Grosz\", \"year\" : 1926,\n" +
-      "  \"price\" : 199.99,\n" +
-      "  \"tags\" : [ \"painting\", \"satire\", \"Expressionism\", \"caricature\" ] }\n",
-      "{ \"_id\" : 2, \"title\" : \"Melancholy III\", \"artist\" : \"Munch\", \"year\" : 1902,\n" +
-      "  \"price\" : 280.00,\n" +
-      "  \"tags\" : [ \"woodcut\", \"Expressionism\" ] }\n",
-      "{ \"_id\" : 3, \"title\" : \"Dancer\", \"artist\" : \"Miro\", \"year\" : 1925,\n" +
-      "  \"price\" : 76.04,\n" +
-      "  \"tags\" : [ \"oil\", \"Surrealism\", \"painting\" ] }\n",
-      "{ \"_id\" : 4, \"title\" : \"The Great Wave off Kanagawa\", \"artist\" : \"Hokusai\",\n" +
-      "  \"price\" : 167.30,\n" +
-      "  \"tags\" : [ \"woodblock\", \"ukiyo-e\" ] }\n",
-      "{ \"_id\" : 5, \"title\" : \"The Persistence of Memory\", \"artist\" : \"Dali\", \"year\" : 1931,\n" +
-      "  \"price\" : 483.00,\n" +
-      "  \"tags\" : [ \"Surrealism\", \"painting\", \"oil\" ] }\n",
-      "{ \"_id\" : 6, \"title\" : \"Composition VII\", \"artist\" : \"Kandinsky\", \"year\" : 1913,\n" +
-      "  \"price\" : 385.00,\n" +
-      "  \"tags\" : [ \"oil\", \"painting\", \"abstract\" ] }\n",
-      "{ \"_id\" : 7, \"title\" : \"The Scream\", \"artist\" : \"Munch\", \"year\" : 1893,\n" +
-      "  \"tags\" : [ \"Expressionism\", \"painting\", \"oil\" ] }\n",
-      "{ \"_id\" : 8, \"title\" : \"Blue Flower\", \"artist\" : \"O'Keefe\", \"year\" : 1918,\n" +
-      "  \"price\" : 118.42,\n" +
-      "  \"tags\" : [ \"abstract\", \"painting\" ] }"
-  };
-
   @BeforeClass
   public void setup() throws Exception {
     List<Artwork> artworks = AggregateQueryFixtures.newArtworkBeans();
@@ -87,7 +61,7 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
     assertNotNull(artworkRepository, "Must have a repository");
     List<Artwork> artworks = artworkRepository.findAll();
     assertNotNull(artworks);
-    assertEquals(artworks.size(), ARTWORK_DOCUMENTS.length);
+    assertEquals(artworks.size(), 8);
     Map<String, Object> facets = artworkRepository.getFacetResults();
     assertNotNull(facets);
     assertEquals(facets.size(), 2);
@@ -106,6 +80,18 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
     assertEquals(facets.size(), 2);
     assertTrue(facets.containsKey("categorizedByTags"));
     assertTrue(facets.containsKey("categorizedByPrice"));
+  }
+
+  @Test
+  public void mustReturnResultsWithMultipleFacets() {
+    assertNotNull(artworkRepository, "Must have a repository");
+    List<Artwork> artworks = artworkRepository.findAll();
+    assertNotNull(artworks);
+    assertEquals(artworks.size(), artworks.size());
+    Map<String, Object> facets = artworkRepository.getFacetResultsWithMultipleFacets();
+    assertNotNull(facets);
+    assertEquals(facets.size(), 1);
+    assertTrue(facets.containsKey("count"));
   }
 
   @Test
@@ -139,7 +125,6 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
     assertNotNull(artworkRepository, "Must have a repository");
     List<Artwork> artworks = artworkRepository.findAll();
     assertNotNull(artworks);
-    assertEquals(artworks.size(), artworks.size());
     Map<String, Object> facets = artworkRepository.getFacetResultsWithConditional(true, false, true);
     assertNotNull(facets);
     assertEquals(facets.size(), 2);

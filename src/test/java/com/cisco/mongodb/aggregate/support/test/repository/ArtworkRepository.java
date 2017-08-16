@@ -91,6 +91,36 @@ public interface ArtworkRepository extends MongoRepository<Artwork, Integer> {
                      stages = {
                          @FacetPipelineStage(stageType = Unwind2.class, query = "'$tags'"),
                          @FacetPipelineStage(stageType = SortByCount.class, query = "'$tags'")
+                     }),
+      @FacetPipeline(name = "categorizedByPrice",
+                     stages = {
+                         @FacetPipelineStage(stageType = Match2.class, query = "{ price: { $exists: 1 } }"),
+                         @FacetPipelineStage(stageType = Bucket2.class, query = "{" +
+                                                                                "  groupBy: \"$price\",\n" +
+                                                                                "  boundaries: [  0, 150, 200, 300, 400 ],\n" +
+                                                                                "  default: \"Other\",\n" +
+                                                                                "  output: {\n" +
+                                                                                "  \"count\": { $sum: 1 },\n" +
+                                                                                "  \"titles\": { $push: \"$title\" }\n" +
+                                                                                "  }\n" +
+                                                                                "}")
+                     })}
+      , order = 0)
+  @Facet2(pipelines = {
+      @FacetPipeline(name = "count",
+                     stages = {
+                         @FacetPipelineStage(stageType = Count2.class, query = "'resultSetCount'")
+                     })
+  }
+      , order = 1)
+  Map<String, Object> getFacetResultsWithMultipleFacets();
+
+  @Aggregate2(inputType = Artwork.class, genericType = true, outputBeanType = HashMap.class)
+  @Facet2(pipelines = {
+      @FacetPipeline(name = "categorizedByTags",
+                     stages = {
+                         @FacetPipelineStage(stageType = Unwind2.class, query = "'$tags'"),
+                         @FacetPipelineStage(stageType = SortByCount.class, query = "'$tags'")
                      }, condition = {
           @Conditional(condition = ParameterValueTrueCondition.class, parameterIndex = 0)
       }),

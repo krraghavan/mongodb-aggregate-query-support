@@ -33,6 +33,7 @@ import java.lang.annotation.*;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
+@Repeatable(Facets.class)
 public @interface Facet2 {
 
   FacetPipeline [] pipelines();
