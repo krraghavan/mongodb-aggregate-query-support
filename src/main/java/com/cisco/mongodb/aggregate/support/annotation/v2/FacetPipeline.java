@@ -28,7 +28,7 @@ import java.lang.annotation.*;
  * 4/1/17.
  * @since 0.7.11
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Repeatable(FacetPipelines.class)

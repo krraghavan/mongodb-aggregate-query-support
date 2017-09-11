@@ -19,6 +19,7 @@
 
 package com.cisco.mongodb.aggregate.support.query;
 
+import com.cisco.mongodb.aggregate.support.annotation.AggregateMetaAnnotation;
 import com.cisco.mongodb.aggregate.support.annotation.Conditional;
 import com.cisco.mongodb.aggregate.support.annotation.Out;
 import com.cisco.mongodb.aggregate.support.annotation.v2.*;
@@ -45,6 +46,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.cisco.mongodb.aggregate.support.utils.ArrayUtils.NULL_STRING;
+import static java.lang.String.*;
 import static org.slf4j.LoggerFactory.getLogger;
 
 /**
@@ -55,6 +57,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
 
   private static final String COULD_NOT_DETERMINE_QUERY = "Could not determine query";
+
+  private static final String COULD_NOT_DETERMINE_ORDER = "Could not determine order for annotation %s with query %s";
 
   private static final Logger LOGGER = getLogger(AggregateQueryProvider2.class);
 
@@ -134,15 +138,19 @@ class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
       PipelineStageQueryProcessor queryProcessor = queryProcessorFactory.getQueryProcessor(context);
       String query = queryProcessor.getQuery(context);
       int index = queryProcessor.getOrder(context);
+      Class<? extends Annotation> annotationType = annotation.annotationType();
       if (query != null && index >= 0 && !NULL_STRING.equals(query)) {
         if (!StringUtils.isEmpty(queries[index])) {
           LOGGER.warn("Two stages have the same order and the second one did not evaluate to a false condition");
         }
         queries[index] = query;
       }
-      else if (query != null && index == -1) {
+      else if (query != null && index == -1 && annotationType == Out.class) {
         // out stage only - add to end.
         queries[pipelineCount - 1] = query;
+      }
+      else if(index == -1){
+        throw new IllegalArgumentException(format(COULD_NOT_DETERMINE_ORDER, annotationType.getCanonicalName(), query));
       }
     }
     QUERY_LOGGER.debug("Aggregate pipeline for query {} after forming queries - {}", aggregateAnnotation.name(), queries);
@@ -180,9 +188,23 @@ class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
           retval.addAll(unwindAnnotations(containingAnnotation));
         }
       }
+      else if(isAggregationMetaAnnotation(annotation)) {
+        Annotation[] containingAnnotations = getAggregateAnnotationsInMetaAnnotation(annotation);
+        if(ArrayUtils.isNotEmpty(containingAnnotations)) {
+          retval.addAll(unwindAnnotations(containingAnnotations));
+        }
+      }
     }
     LOGGER.trace("<<<< unwindAnnotations - unwinding annotations");
     return retval;
+  }
+
+  private boolean isAggregationMetaAnnotation(Annotation annotation) {
+    return annotation.annotationType().getAnnotation(AggregateMetaAnnotation.class) != null;
+  }
+
+  private Annotation[] getAggregateAnnotationsInMetaAnnotation(Annotation annotation) {
+    return annotation.annotationType().getAnnotations();
   }
 
   private Annotation[] getContainingAnnotation(Annotation annotation) {

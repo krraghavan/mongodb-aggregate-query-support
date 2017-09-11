@@ -30,7 +30,7 @@ import java.lang.annotation.*;
  *
  * @since 0.7.10
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Repeatable(Facets.class)

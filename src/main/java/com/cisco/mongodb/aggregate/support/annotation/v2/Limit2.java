@@ -29,7 +29,7 @@ import java.lang.annotation.*;
  *
  * Created by sukhdevs on 4/8/16.
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Repeatable(Limits.class)

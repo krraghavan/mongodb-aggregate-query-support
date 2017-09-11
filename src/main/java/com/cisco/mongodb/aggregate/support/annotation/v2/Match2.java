@@ -26,7 +26,7 @@ import java.lang.annotation.*;
  * Created by rkolliva on 4/1/2017.
  * A pipeline step in an aggregate query. See {@link Aggregate2} for further details
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Repeatable(Matches.class)

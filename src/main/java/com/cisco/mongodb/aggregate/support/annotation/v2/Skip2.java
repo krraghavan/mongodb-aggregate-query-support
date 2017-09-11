@@ -30,7 +30,7 @@ import java.lang.annotation.*;
  * @since 0.7.9
  *
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Repeatable(Skips.class)
