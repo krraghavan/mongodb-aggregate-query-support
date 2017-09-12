@@ -153,8 +153,8 @@ class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
         throw new IllegalArgumentException(format(COULD_NOT_DETERMINE_ORDER, annotationType.getCanonicalName(), query));
       }
     }
-    QUERY_LOGGER.debug("Aggregate pipeline for query {} after forming queries - {}", aggregateAnnotation.name(), queries);
     aggregateQueryPipeline = arrayUtils.packToList(queries);
+    QUERY_LOGGER.debug("Aggregate pipeline for query {} after forming queries - {}", aggregateAnnotation.name(), aggregateQueryPipeline);
   }
 
   private void addPageableStages(List<Annotation> unwoundAnnotations) {

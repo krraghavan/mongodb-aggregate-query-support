@@ -23,6 +23,8 @@ import com.cisco.mongodb.aggregate.support.annotation.Aggregate;
 import com.cisco.mongodb.aggregate.support.annotation.Conditional;
 import com.cisco.mongodb.aggregate.support.annotation.Match;
 import com.cisco.mongodb.aggregate.support.annotation.Sort;
+import com.cisco.mongodb.aggregate.support.annotation.v2.Aggregate2;
+import com.cisco.mongodb.aggregate.support.annotation.v2.Match2;
 import com.cisco.mongodb.aggregate.support.condition.ParameterValueNotNullCondition;
 import com.cisco.mongodb.aggregate.support.condition.ParameterValueNullCondition;
 import com.cisco.mongodb.aggregate.support.test.beans.Possessions;
@@ -75,21 +77,19 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Stri
              })
   List<Possessions> getPossesionsSortedByTag(String tag, String sort);
 
-  @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class,
-             match = {
-                 @Match(query = "{" +
-                                "   \"tag\"  : ?0," +
-                                "   \"assets.cars\" : { $exists: true, $ne : []}" +
-                                "}", order = 0, condition = {
-                     @Conditional(condition = ParameterValueNotNullCondition.class, parameterIndex = 1)
-                 }),
-                 @Match(query = "{" +
+  @Aggregate2(inputType = Possessions.class, outputBeanType = Possessions.class)
+  @Match2(query = "{" +
+                                 "   \"tag\"  : ?0," +
+                                 "   \"assets.cars\" : { $exists: true, $ne : []}" +
+                                 "}", order = 0, condition = {
+                     @Conditional(condition = ParameterValueNotNullCondition.class, parameterIndex = 1)}
+                 )
+                 @Match2(query = "{" +
                                 "   \"tag\": ?0," +
                                 "   \"assets.homes\" : { $exists: true, $ne : []}" +
                                 "}", order = 0, condition = {
                      @Conditional(condition = ParameterValueNotNullCondition.class, parameterIndex = 2)
                  })
-             })
   List<Possessions> mutuallyExclusiveStages(String tag, Boolean getCars, Boolean getHomes);
 
   @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class,
