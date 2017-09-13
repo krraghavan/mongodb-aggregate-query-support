@@ -24,7 +24,7 @@
 
   <groupId>com.github.krraghavan</groupId>
   <artifactId>mongodb-aggregate-query-support</artifactId>
-  <version>0.7.20-SNAPSHOT</version>
+  <version>0.7.20</version>
 
   <name>Annotation based Mongo DB Aggregation Query Support</name>
   <description>Spring Data @Query like support for Mongo Aggregation queries</description>
@@ -45,7 +45,7 @@
       <organizationUrl>http://www.cisco.com</organizationUrl>
     </developer>
     <developer>
-      <name>Sukhdev Singh</name>
+      <name>Anusha Kasa</name>
       <organization>Cisco</organization>
       <organizationUrl>http://www.cisco.com</organizationUrl>
     </developer>
