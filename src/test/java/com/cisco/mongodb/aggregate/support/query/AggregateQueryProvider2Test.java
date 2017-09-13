@@ -26,6 +26,7 @@ import com.cisco.mongodb.aggregate.support.test.config.AggregateTestConfiguratio
 import com.cisco.mongodb.aggregate.support.test.fixtures.DocumentAnnotationFixture;
 import com.cisco.mongodb.aggregate.support.test.repository.TestAggregateRepository22;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
@@ -38,7 +39,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+import org.testng.internal.PackageUtils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 import static org.springframework.data.repository.query.QueryLookupStrategy.Key.CREATE_IF_NOT_FOUND;

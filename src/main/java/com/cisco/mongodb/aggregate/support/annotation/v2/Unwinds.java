@@ -26,7 +26,7 @@ import java.lang.annotation.*;
  * 4/1/17.
  */
 
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface Unwinds {

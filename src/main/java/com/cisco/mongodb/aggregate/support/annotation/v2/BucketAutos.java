@@ -25,7 +25,7 @@ import java.lang.annotation.*;
  * Created by rkolliva
  * 4/2/17.
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 public @interface BucketAutos {

@@ -28,7 +28,7 @@ import java.lang.annotation.*;
  * @author rkolliva.
  *         A pipeline step in an aggregate query. See {@link Aggregate2} for further details
  */
-@Target(ElementType.METHOD)
+@Target({ElementType.METHOD, ElementType.ANNOTATION_TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Inherited
 @Repeatable(Lookups.class)

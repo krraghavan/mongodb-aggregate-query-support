@@ -77,10 +77,7 @@ public class AggregateCountTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void mustReturnBucketsFromRepository() {
-    assertNotNull(countRepository, "Must have a repository");
-    List<Score> scores = countRepository.findAll();
-    assertNotNull(scores);
-    assertEquals(scores.size(), COUNT_TEST_DOCS.length);
+    validateRepository();
     Integer passingScores = countRepository.getPassingScores();
     assertNotNull(passingScores);
     assertEquals((int)passingScores, 4);
@@ -88,15 +85,25 @@ public class AggregateCountTest extends AbstractTestNGSpringContextTests {
 
   @Test
   public void mustReturnBucketsFromRepository2() {
-    assertNotNull(countRepository, "Must have a repository");
-    List<Score> scores = countRepository.findAll();
-    assertNotNull(scores);
-    assertEquals(scores.size(), COUNT_TEST_DOCS.length);
+    validateRepository();
     Integer passingScores = countRepository.getPassingScores2();
     assertNotNull(passingScores);
     assertEquals((int)passingScores, 4);
   }
 
+  @Test
+  public void mustReturnBucketsFromRepository2UsingMetaAnnotation() {
+    validateRepository();
+    Integer scoresGreaterThan75 = countRepository.scoresGreaterThan75UsingMetaAnnotation();
+    assertNotNull(scoresGreaterThan75);
+    assertEquals((int)scoresGreaterThan75, 5);
+  }
 
+  private void validateRepository() {
+    assertNotNull(countRepository, "Must have a repository");
+    List<Score> scores = countRepository.findAll();
+    assertNotNull(scores);
+    assertEquals(scores.size(), COUNT_TEST_DOCS.length);
+  }
 
 }
