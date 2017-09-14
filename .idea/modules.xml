@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/mongodb-aggregate-query-support.iml" filepath="$PROJECT_DIR$/mongodb-aggregate-query-support.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mongodb-aggregate-query-support.iml" filepath="$PROJECT_DIR$/mongodb-aggregate-query-support.iml" />
     </modules>
   </component>
 </project>
