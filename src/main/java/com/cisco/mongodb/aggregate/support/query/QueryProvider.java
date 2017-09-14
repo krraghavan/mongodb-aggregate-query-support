@@ -88,7 +88,7 @@ public interface QueryProvider {
   boolean isAllowDiskUse();
 
   /**
-   * @return true if the query is allowed to use disk space to avoid sort/groupBy space limitations
+   * @return updated aggregate query with the new stage
    */
   List<String> modifyAggregateQueryPipeline(String newStage, int stage);
 
