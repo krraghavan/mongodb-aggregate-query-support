@@ -90,6 +90,6 @@ public interface QueryProvider {
   /**
    * @return true if the query is allowed to use disk space to avoid sort/groupBy space limitations
    */
-  List<String> modifyAggregateQueryPipeline(List<String> aggregateQueryPipeline, String newStage, int stage);
+  List<String> modifyAggregateQueryPipeline(String newStage, int stage);
 
 }
