@@ -20,6 +20,8 @@ package com.cisco.mongodb.aggregate.support.query;
 
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 /**
  * Created by rkolliva on 10/21/2015.
  *
@@ -84,4 +86,10 @@ public interface QueryProvider {
    * @return true if the query is allowed to use disk space to avoid sort/groupBy space limitations
    */
   boolean isAllowDiskUse();
+
+  /**
+   * @return updated aggregate query with the new stage
+   */
+  List<String> modifyAggregateQueryPipeline(String newStage, int stage);
+
 }

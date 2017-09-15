@@ -73,7 +73,7 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
   protected final ConvertingParameterAccessor convertingParameterAccessor;
   protected final Method method;
   protected List<String> aggregateQueryPipeline;
-  protected final Iterator<String> queryIterator;
+  protected Iterator<String> queryIterator = null;
   protected ArrayUtils arrayUtils = new ArrayUtils();
 
   protected static final SpelExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
@@ -100,10 +100,14 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
     initializeAnnotation(method);
     // set up the query pipeline
     createAggregateQuery();
-    // create the iterator - this class decorates the iterator
-    this.queryIterator = aggregateQueryPipeline.iterator();
   }
 
+  private void initializeIterator() {
+    // create the iterator - this class decorates the iterator
+    if (this.queryIterator == null) {
+      this.queryIterator = aggregateQueryPipeline.iterator();
+    }
+  }
   protected abstract void initializeAnnotation(Method method);
 
   public abstract String getQueryForStage(Annotation annotation);
@@ -166,21 +170,25 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
 
   @Override
   public boolean hasNext() {
+    initializeIterator();
     return queryIterator.hasNext();
   }
 
   @Override
   public String next() {
+    initializeIterator();
     return queryIterator.next();
   }
 
   @Override
   public void remove() {
+    initializeIterator();
     queryIterator.remove();
   }
 
   @Override
   public void forEachRemaining(Consumer<? super String> action) {
+    initializeIterator();
     queryIterator.forEachRemaining(action);
   }
 
@@ -541,5 +549,11 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
   @Override
   public Pageable getPageable() {
     return mongoParameterAccessor.getPageable();
+  }
+
+  @Override
+  public List<String> modifyAggregateQueryPipeline(String query, int stage){
+    aggregateQueryPipeline.add(stage, query);
+    return aggregateQueryPipeline;
   }
 }
