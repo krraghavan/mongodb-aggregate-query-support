@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.20-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
+[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.21-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -7,6 +7,9 @@ Spring Data module.
 The @Query annotation provided by Spring Data MongoDb allows queries to be executed with minimum code being written.  
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
+
+## New in 0.7.21 version
+Added the ability to modify a pipeline before executing it.
 
 ## New in 0.7.20 version
 Added a meta annotation ```@AggregateMetaAnnotation``` that can be used to combine commonly used pipeline query structures and 
@@ -278,3 +281,4 @@ pipeline on a MongoDB client (like RoboMongo or MongoChef) and then copy the pip
 * Cameron Javier
 * Tom Monk
 * Anusha Kasa
+* Dulanjalie Ganegedara
