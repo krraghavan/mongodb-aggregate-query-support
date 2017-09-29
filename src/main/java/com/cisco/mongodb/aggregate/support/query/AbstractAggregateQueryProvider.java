@@ -73,7 +73,11 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
   protected final ConvertingParameterAccessor convertingParameterAccessor;
   protected final Method method;
   protected List<String> aggregateQueryPipeline;
+<<<<<<< HEAD
   protected Iterator<String> queryIterator = null;
+=======
+  protected Iterator<String> queryIterator;
+>>>>>>> Adding support to add a new query stage to aggregate2
   protected ArrayUtils arrayUtils = new ArrayUtils();
 
   protected static final SpelExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
@@ -100,6 +104,10 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
     initializeAnnotation(method);
     // set up the query pipeline
     createAggregateQuery();
+<<<<<<< HEAD
+=======
+    this.queryIterator = null;
+>>>>>>> Adding support to add a new query stage to aggregate2
   }
 
   private void initializeIterator() {
@@ -182,14 +190,26 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
 
   @Override
   public void remove() {
+<<<<<<< HEAD
     initializeIterator();
     queryIterator.remove();
+=======
+    if (queryIterator != null) {
+      queryIterator.remove();
+    }
+>>>>>>> Adding support to add a new query stage to aggregate2
   }
 
   @Override
   public void forEachRemaining(Consumer<? super String> action) {
+<<<<<<< HEAD
     initializeIterator();
     queryIterator.forEachRemaining(action);
+=======
+    if (queryIterator != null) {
+      queryIterator.forEachRemaining(action);
+    }
+>>>>>>> Adding support to add a new query stage to aggregate2
   }
 
   /**
