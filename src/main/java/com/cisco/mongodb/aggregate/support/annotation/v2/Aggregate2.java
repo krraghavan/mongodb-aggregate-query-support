@@ -61,5 +61,5 @@ public @interface Aggregate2 {
   /**
    * @return true if the query is allowed to use disk space to avoid sort/groupBy space limitations
    */
-  boolean isAllowDiskUse() default false;
+  boolean isAllowDiskUse() default true;
 }
