@@ -8,6 +8,9 @@ The @Query annotation provided by Spring Data MongoDb allows queries to be execu
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
 
+## New in 0.7.22 version
+Change allowDiskUse to true by default for Aggregate queries
+
 ## New in 0.7.21 version
 Added the ability to modify a pipeline before executing it.
 
