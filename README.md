@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.22-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
+[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.23-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -7,6 +7,9 @@ Spring Data module.
 The @Query annotation provided by Spring Data MongoDb allows queries to be executed with minimum code being written.  
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
+
+## New in 0.7.23 version
+Conditional inclusion of pipeline stages can now specify ANY or ALL conditions to match allowing AND and OR logic to be used.  For ANY the stage is included if at least one condition matches.  For ALL, all conditions specified in the conditional must evaluate to true.
 
 ## New in 0.7.22 version
 Change allowDiskUse to true by default for Aggregate queries
