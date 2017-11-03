@@ -153,5 +153,30 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
     assertTrue(priceCategoryList.size() == 2);
   }
 
+  @Test
+  public void mustDoOrAndOnConditionalsInFacetPipelineStage2() {
+    assertNotNull(artworkRepository, "Must have a repository");
+    List<Artwork> artworks = artworkRepository.findAll();
+    assertNotNull(artworks);
+    assertEquals(artworks.size(), artworks.size());
+
+    //When 2 conditions are false, should limit the results to 3
+    Map<String, Object> facets = artworkRepository.getFacetResultsOnMultipleConditionals(false, false);
+    assertNotNull(facets);
+    Object limitPipeline = facets.get("limitPipeline");
+    assertNotNull(limitPipeline);
+    assertTrue(limitPipeline instanceof List);
+    List limitPipelineList = (List)limitPipeline;
+    assertEquals(limitPipelineList.size(), 3);
+
+    //When 1 condition is false and the other is true, should limit the results to 2
+    facets = artworkRepository.getFacetResultsOnMultipleConditionals(false, true);
+    assertNotNull(facets);
+    limitPipeline = facets.get("limitPipeline");
+    assertNotNull(limitPipeline);
+    assertTrue(limitPipeline instanceof List);
+    limitPipelineList = (List)limitPipeline;
+    assertEquals(limitPipelineList.size(), 2);
+  }
 
 }

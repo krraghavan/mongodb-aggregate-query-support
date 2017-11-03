@@ -20,10 +20,8 @@ package com.cisco.mongodb.aggregate.support.query;
 
 import com.cisco.mongodb.aggregate.support.annotation.*;
 import com.cisco.mongodb.aggregate.support.annotation.v2.*;
-import com.cisco.mongodb.aggregate.support.bean.UnbindableObject;
-import com.cisco.mongodb.aggregate.support.condition.AggregateQueryMethodConditionContext;
-import com.cisco.mongodb.aggregate.support.condition.ConditionalAnnotationMetadata;
 import com.cisco.mongodb.aggregate.support.utils.ArrayUtils;
+import com.cisco.mongodb.aggregate.support.utils.ProcessorUtils;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import com.mongodb.util.JSON;
@@ -31,14 +29,11 @@ import com.mongodb.util.JSONParseException;
 import com.mongodb.util.JSONSerializers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Condition;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.repository.query.ConvertingParameterAccessor;
 import org.springframework.data.mongodb.repository.query.MongoParameterAccessor;
-import org.springframework.data.mongodb.repository.query.MongoParametersParameterAccessor;
-import org.springframework.data.repository.query.Parameter;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ParserContext;
 import org.springframework.expression.common.LiteralExpression;
@@ -55,6 +50,7 @@ import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.cisco.mongodb.aggregate.support.annotation.Conditional.*;
 import static com.cisco.mongodb.aggregate.support.utils.ArrayUtils.NULL_STRING;
 
 /**
@@ -75,6 +71,7 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
   protected List<String> aggregateQueryPipeline;
   protected Iterator<String> queryIterator = null;
   protected ArrayUtils arrayUtils = new ArrayUtils();
+  protected ProcessorUtils processorUtils = new ProcessorUtils();
 
   protected static final SpelExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
 
@@ -444,13 +441,16 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
 
     private final Conditional[] conditionalClasses;
 
-    public AggregationStage(AggregationType aggregationType, Conditional[] conditionClass) {
+    private ConditionalMatchType conditionalMatchType;
+
+    public AggregationStage(AggregationType aggregationType, Conditional[] conditionClass, ConditionalMatchType conditionalMatchType) {
       this.aggregationType = aggregationType;
       this.conditionalClasses = conditionClass;
+      this.conditionalMatchType = conditionalMatchType;
     }
 
     public AggregationStage(AggregationType aggregationType) {
-      this(aggregationType, new Conditional[0]);
+      this(aggregationType, new Conditional[0], ConditionalMatchType.ANY);
     }
 
     AggregationType getAggregationType() {
@@ -458,42 +458,13 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
     }
 
     public boolean allowStage() {
-      if (conditionalClasses.length == 0) {
-        return true;
-      }
-      try {
-        for (Conditional conditional : conditionalClasses) {
-          List<Object> parameterValues = getParameterValues();
-          ConditionalAnnotationMetadata metadata = new ConditionalAnnotationMetadata(conditional);
-          AggregateQueryMethodConditionContext context = new AggregateQueryMethodConditionContext(method,
-                                                                                                  parameterValues);
-          Condition condition = conditional.condition().newInstance();
-          boolean isTrue = condition.matches(context, metadata);
-          if (isTrue) {
-            return true;
-          }
-        }
-      }
-      catch (InstantiationException | IllegalAccessException e) {
-        throw new IllegalStateException("Could not create an instance of the condition class", e);
-      }
-      return false;
+      return processorUtils.allowStage(conditionalClasses, conditionalMatchType, method,
+                                       mongoParameterAccessor, convertingParameterAccessor);
     }
 
-    public List<Object> getParameterValues() {
-      List<Object> retval = new ArrayList<>();
-      int numArgs = method.getParameterCount();
-      for (int i = 0; i < numArgs; i++) {
-        Parameter param = ((MongoParametersParameterAccessor) mongoParameterAccessor).getParameters().getParameter(i);
-        if (param.isBindable()) {
-          retval.add(convertingParameterAccessor.getBindableValue(i));
-        }
-        else {
-          LOGGER.debug("{} was unbindable, adding it as an unbindable object", param.getName());
-          retval.add(new UnbindableObject(param.getName()));
-        }
-      }
-      return retval;
+    public boolean allowStage(Conditional[] conditionals, ConditionalMatchType type) {
+      return processorUtils.allowStage(conditionals, type, method,
+          mongoParameterAccessor, convertingParameterAccessor);
     }
 
     public Conditional[] getConditionalClasses() {

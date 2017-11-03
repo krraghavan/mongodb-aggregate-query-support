@@ -23,6 +23,8 @@ import com.cisco.mongodb.aggregate.support.annotation.Conditional;
 
 import java.lang.annotation.*;
 
+import static com.cisco.mongodb.aggregate.support.annotation.Conditional.*;
+
 /**
  * Created by rkolliva
  * 4/1/17.
@@ -62,4 +64,13 @@ public @interface FacetPipeline {
    *
    */
   Conditional[] condition() default {};
+
+  /**
+   * An optional conditional type to determines whether all the conditions should be true or any one of them
+   *
+   * @return - A condition class that evaluates the conditional.
+   * @since 0.7.23
+   *
+   */
+  ConditionalMatchType conditionMatchType() default ConditionalMatchType.ANY;
 }

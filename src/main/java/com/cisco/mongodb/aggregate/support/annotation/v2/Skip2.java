@@ -23,6 +23,8 @@ import com.cisco.mongodb.aggregate.support.annotation.Conditional;
 
 import java.lang.annotation.*;
 
+import static com.cisco.mongodb.aggregate.support.annotation.Conditional.*;
+
 /**
  * Created by camejavi
  * 2/20/17.
@@ -41,4 +43,6 @@ public @interface Skip2 {
   int order();
 
   Conditional[] condition() default {};
+
+  ConditionalMatchType conditionMatchType() default ConditionalMatchType.ANY;
 }

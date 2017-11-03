@@ -35,4 +35,10 @@ public @interface Conditional {
   Class<? extends Condition> condition();
 
   int parameterIndex() default -1;
+
+  enum ConditionalMatchType {
+    ALL,
+    ANY
+  }
+
 }

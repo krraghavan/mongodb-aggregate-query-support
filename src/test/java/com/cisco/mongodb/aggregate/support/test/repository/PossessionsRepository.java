@@ -24,9 +24,9 @@ import com.cisco.mongodb.aggregate.support.annotation.Conditional;
 import com.cisco.mongodb.aggregate.support.annotation.Match;
 import com.cisco.mongodb.aggregate.support.annotation.Sort;
 import com.cisco.mongodb.aggregate.support.annotation.v2.Aggregate2;
+import com.cisco.mongodb.aggregate.support.annotation.v2.Limit2;
 import com.cisco.mongodb.aggregate.support.annotation.v2.Match2;
-import com.cisco.mongodb.aggregate.support.condition.ParameterValueNotNullCondition;
-import com.cisco.mongodb.aggregate.support.condition.ParameterValueNullCondition;
+import com.cisco.mongodb.aggregate.support.condition.*;
 import com.cisco.mongodb.aggregate.support.test.beans.Possessions;
 import com.mongodb.DBObject;
 import org.apache.commons.collections.CollectionUtils;
@@ -34,6 +34,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
+
+import static com.cisco.mongodb.aggregate.support.annotation.Conditional.*;
 
 /**
  * Created by rkolliva
@@ -147,4 +149,18 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Stri
                   @Sort(query = "{\"sortTestNumber\" : -1}", order = 1)
           })
   List<Possessions> getPossessionsWithPotentiallyNullIdList(String tag, List<String> ids);
+
+  @Aggregate2(inputType = Possessions.class, outputBeanType = Possessions.class)
+  @Match2(order = 0, query = "{'tag' : ?0}")
+  @Limit2(order = 1, query = "4", conditionMatchType = ConditionalMatchType.ANY,
+          condition = {
+             @Conditional(condition = ParameterValueTrueCondition.class, parameterIndex = 1),
+             @Conditional(condition = ParameterValueTrueCondition.class, parameterIndex = 2)
+          })
+  @Limit2(order = 2, query = "8", conditionMatchType = ConditionalMatchType.ALL,
+      condition = {
+          @Conditional(condition = ParameterValueFalseCondition.class, parameterIndex = 1),
+          @Conditional(condition = ParameterValueFalseCondition.class, parameterIndex = 2)
+      })
+  List<Possessions> getPosessionsBasedOnConditionType(String tag, boolean condition1, boolean condition2);
 }

@@ -24,6 +24,8 @@ import com.cisco.mongodb.aggregate.support.annotation.v2.Unwind2;
 
 import java.lang.annotation.Annotation;
 
+import static com.cisco.mongodb.aggregate.support.annotation.Conditional.*;
+
 /**
  * Created by rkolliva
  * 4/6/17.
@@ -58,4 +60,8 @@ public class PageableUnwind implements Unwind2 {
     return new Conditional[0];
   }
 
+  @Override
+  public ConditionalMatchType conditionMatchType() {
+    return ConditionalMatchType.ANY;
+  }
 }

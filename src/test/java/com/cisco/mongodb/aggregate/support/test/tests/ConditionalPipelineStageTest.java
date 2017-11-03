@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import static com.cisco.mongodb.aggregate.support.test.utils.FixtureUtils.createPossessions;
 import static com.cisco.mongodb.aggregate.support.test.utils.FixtureUtils.createPossessionsWithSortField;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -142,4 +143,23 @@ public class ConditionalPipelineStageTest extends AbstractTestNGSpringContextTes
     });
   }
 
+  @Test
+  public void mustApplyOrAndOnConditionalsWhenConditionType() {
+    String tag = "mustApplyOrAndOnConditionalsWhenConditionType";
+
+    //Creating 10 Possessions
+    for (int i=0; i<10; i++) {
+      possessionsRepository.save(createPossessions(true, false, tag));
+    }
+    //Must return 4 possessions only when one condition is true and the other one is false
+    List<Possessions> possessions =
+        possessionsRepository.getPosessionsBasedOnConditionType(tag, true, false);
+    assertNotNull(possessions);
+    assertTrue(possessions.size() == 4);
+
+    //Must return 8 possessions when both conditions are false
+    possessions = possessionsRepository.getPosessionsBasedOnConditionType(tag, false, false);
+    assertNotNull(possessions);
+    assertTrue(possessions.size() == 8);
+  }
 }

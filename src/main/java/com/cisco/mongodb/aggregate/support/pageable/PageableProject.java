@@ -24,6 +24,8 @@ import com.cisco.mongodb.aggregate.support.annotation.v2.Project2;
 
 import java.lang.annotation.Annotation;
 
+import static com.cisco.mongodb.aggregate.support.annotation.Conditional.*;
+
 /**
  * Created by rkolliva
  * 4/6/17.
@@ -57,5 +59,10 @@ public class PageableProject implements Project2 {
   @Override
   public Conditional[] condition() {
     return new Conditional[0];
+  }
+
+  @Override
+  public ConditionalMatchType conditionMatchType() {
+    return ConditionalMatchType.ANY;
   }
 }

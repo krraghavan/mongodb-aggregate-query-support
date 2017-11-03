@@ -20,9 +20,10 @@
 package com.cisco.mongodb.aggregate.support.annotation.v2;
 
 import com.cisco.mongodb.aggregate.support.annotation.Conditional;
-import com.cisco.mongodb.aggregate.support.processor.PipelineStageQueryProcessor;
 
 import java.lang.annotation.*;
+
+import static com.cisco.mongodb.aggregate.support.annotation.Conditional.*;
 
 /**
  * Created by rkolliva
@@ -41,5 +42,7 @@ public @interface Facet2 {
   int order();
 
   Conditional[] condition() default {};
+
+  ConditionalMatchType conditionMatchType() default ConditionalMatchType.ANY;
 
 }

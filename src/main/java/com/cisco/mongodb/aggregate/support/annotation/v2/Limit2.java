@@ -24,6 +24,8 @@ import com.cisco.mongodb.aggregate.support.annotation.Conditional;
 
 import java.lang.annotation.*;
 
+import static com.cisco.mongodb.aggregate.support.annotation.Conditional.*;
+
 /**
  * This $limit pipeline step in mongoDB aggregation query
  *
@@ -40,4 +42,6 @@ public @interface Limit2 {
   int order();
 
   Conditional[] condition() default {};
+
+  ConditionalMatchType conditionMatchType() default ConditionalMatchType.ANY;
 }

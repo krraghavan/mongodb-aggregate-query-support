@@ -26,6 +26,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.lang.annotation.Annotation;
 
+import static com.cisco.mongodb.aggregate.support.annotation.Conditional.*;
+
 /**
  * Created by rkolliva
  * 4/7/17.
@@ -67,6 +69,11 @@ public class ResultFacet implements FacetPipeline {
   @Override
   public Conditional[] condition() {
     return new Conditional[0];
+  }
+
+  @Override
+  public ConditionalMatchType conditionMatchType() {
+    return ConditionalMatchType.ANY;
   }
 }
 
