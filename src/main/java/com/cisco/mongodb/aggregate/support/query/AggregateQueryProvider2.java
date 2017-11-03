@@ -45,6 +45,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static com.cisco.mongodb.aggregate.support.annotation.Conditional.*;
 import static com.cisco.mongodb.aggregate.support.utils.ArrayUtils.NULL_STRING;
 import static java.lang.String.*;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -131,9 +132,11 @@ class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
     for (Annotation annotation : unwoundAnnotations) {
       Map<String, Object> attributes = AnnotationUtils.getAnnotationAttributes(annotation);
       Conditional [] conditionals = (Conditional[]) attributes.get("condition");
+      ConditionalMatchType conditionalMatchType = (ConditionalMatchType) attributes.get("conditionMatchType");
       ParameterPlaceholderReplacingContext context =
           new ParameterPlaceholderReplacingContext(this, method,
-                                                   new AggregationStage(AggregationType.from(annotation), conditionals),
+                                                   new AggregationStage(AggregationType.from(annotation), conditionals,
+                                                       conditionalMatchType),
                                                    annotation, getQueryString);
       PipelineStageQueryProcessor queryProcessor = queryProcessorFactory.getQueryProcessor(context);
       String query = queryProcessor.getQuery(context);

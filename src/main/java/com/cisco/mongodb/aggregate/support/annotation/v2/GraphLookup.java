@@ -23,6 +23,8 @@ import com.cisco.mongodb.aggregate.support.annotation.Conditional;
 
 import java.lang.annotation.*;
 
+import static com.cisco.mongodb.aggregate.support.annotation.Conditional.*;
+
 /**
  * Created by rkolliva
  * 4/2/17.
@@ -39,4 +41,6 @@ public @interface GraphLookup {
   String query();
 
   Conditional [] conditional() default {};
+
+  ConditionalMatchType conditionMatchType() default ConditionalMatchType.ANY;
 }

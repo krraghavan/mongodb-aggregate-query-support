@@ -22,6 +22,8 @@ import com.cisco.mongodb.aggregate.support.annotation.Conditional;
 
 import java.lang.annotation.*;
 
+import static com.cisco.mongodb.aggregate.support.annotation.Conditional.*;
+
 /**
  * Created by rkolliva on 4/1/2017.
  * A pipeline step in an aggregate query. See {@link Aggregate2} for further details
@@ -38,4 +40,5 @@ public @interface Project2 {
 
   Conditional[] condition() default {};
 
+  ConditionalMatchType conditionMatchType() default ConditionalMatchType.ANY;
 }

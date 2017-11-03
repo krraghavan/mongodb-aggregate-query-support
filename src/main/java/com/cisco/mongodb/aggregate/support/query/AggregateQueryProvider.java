@@ -32,6 +32,7 @@ import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.function.Function;
 
+import static com.cisco.mongodb.aggregate.support.annotation.Conditional.*;
 import static com.cisco.mongodb.aggregate.support.query.AbstractAggregateQueryProvider.AggregationType.*;
 import static com.cisco.mongodb.aggregate.support.utils.ArrayUtils.NULL_STRING;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -330,7 +331,7 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider {
   }
 
   private void setupQuery(String[] queries, AggregationType aggType, Conditional[] conditional, int order, String query) {
-    AggregationStage stage = new AggregationStage(aggType, conditional);
+    AggregationStage stage = new AggregationStage(aggType, conditional, ConditionalMatchType.ANY);
     String queryString = getQueryString.apply(stage, query);
     if(!StringUtils.isEmpty(queries[order]) && !NULL_STRING.equals(queryString)) {
       // this stage is not empty - replace contents only if the query string is not null

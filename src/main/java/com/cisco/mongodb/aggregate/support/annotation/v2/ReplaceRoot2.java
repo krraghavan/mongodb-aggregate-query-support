@@ -23,6 +23,8 @@ import com.cisco.mongodb.aggregate.support.annotation.Conditional;
 
 import java.lang.annotation.*;
 
+import static com.cisco.mongodb.aggregate.support.annotation.Conditional.*;
+
 /**
  * Created by rkolliva
  * 4/1/17.
@@ -38,4 +40,6 @@ public @interface ReplaceRoot2 {
   int order();
 
   Conditional[] condition() default {};
+
+  ConditionalMatchType conditionMatchType() default ConditionalMatchType.ANY;
 }
