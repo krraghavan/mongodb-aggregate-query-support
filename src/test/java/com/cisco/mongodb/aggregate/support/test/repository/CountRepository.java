@@ -37,7 +37,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 public interface CountRepository extends MongoRepository<Score, Integer> {
 
-  @Aggregate(inputType = Score.class, outputBeanType = Integer.class, resultKey = "passing_scores",
+  @Aggregate(inputType = Score.class, outputBeanType = Integer.class, resultKey = "passing_scores", maxTimeMS = 60_000L,
              match = {
                  @Match(query = "{\n" +
                                 "        score: {\n" +
@@ -51,7 +51,7 @@ public interface CountRepository extends MongoRepository<Score, Integer> {
   )
   Integer getPassingScores();
 
-  @Aggregate2(inputType = Score.class, outputBeanType = Integer.class, resultKey = "passing_scores")
+  @Aggregate2(inputType = Score.class, outputBeanType = Integer.class, resultKey = "passing_scores", maxTimeMS = 60_000L)
   @Match2(query = "{\n" +
                   "        score: {\n" +
                   "          $gt: 80\n" +

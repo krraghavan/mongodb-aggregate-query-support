@@ -18,6 +18,7 @@
  */
 package com.cisco.mongodb.aggregate.support.annotation;
 
+import com.cisco.mongodb.aggregate.support.query.QueryProvider;
 import org.bson.BsonDocument;
 import java.lang.annotation.*;
 
@@ -147,4 +148,11 @@ public @interface Aggregate {
    * @return true if the query is allowed to use disk space to avoid sort/groupBy space limitations
    */
   boolean isAllowDiskUse() default false;
+
+  /**
+   * @return time limit in milliseconds for processing aggregate query.
+   * Default value is two minutes.
+   *
+   */
+  long maxTimeMS() default QueryProvider.DEFAULT_MAX_TIME_MS;
 }

@@ -113,6 +113,11 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider {
   }
 
   @Override
+  public long getMaxTimeMS() {
+    return aggregateAnnotation.maxTimeMS();
+  }
+
+  @Override
   void createAggregateQuery() throws InvalidAggregationQueryException {
     // create the pipeline.
     LOGGER.debug("Getting aggregate operations");

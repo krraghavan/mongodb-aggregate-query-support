@@ -35,6 +35,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by rkolliva on 10/21/2015.
@@ -72,7 +73,10 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
       }
     }
     Assert.notNull(aggregate, UNEXPECTED_NULL_AGGREGATE_QUERY);
-    aggregate.options(AggregationOptions.builder().allowDiskUse(queryProvider.isAllowDiskUse()).build());
+    aggregate.options(AggregationOptions.builder()
+            .allowDiskUse(queryProvider.isAllowDiskUse())
+            .maxTime(queryProvider.getMaxTimeMS(), TimeUnit.MILLISECONDS)
+            .build());
     ResultsIterator resultsIterator = aggregate.as(HashMap.class);
     if (resultsIterator == null || !resultsIterator.hasNext() || Void.TYPE.equals(queryProvider.getMethodReturnType())) {
       return null;
