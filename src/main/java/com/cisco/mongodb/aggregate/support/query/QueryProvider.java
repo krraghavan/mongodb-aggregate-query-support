@@ -28,6 +28,10 @@ import java.util.List;
  */
 public interface QueryProvider {
 
+  // Define default value of two minutes on the server side for an aggregate
+  // query to finish running before timing out.
+  long DEFAULT_MAX_TIME_MS = 120_000L;
+
   /**
    * @return query
    */
@@ -86,6 +90,20 @@ public interface QueryProvider {
    * @return true if the query is allowed to use disk space to avoid sort/groupBy space limitations
    */
   boolean isAllowDiskUse();
+
+  /**
+   * @return "time limit in milliseconds for processing operations on a cursor.
+   * If you do not specify a value for maxTimeMS, operations will not time out.
+   * A value of 0 explicitly specifies the default unbounded behavior."
+   *
+   * "MongoDB terminates operations that exceed their allotted time limit using
+   * the same mechanism as db.killOp(). MongoDB only terminates an operation at
+   * one of its designated interrupt points."
+   *
+   * Reference: https://docs.mongodb.com/manual/reference/command/aggregate/
+   *
+   */
+  long getMaxTimeMS();
 
   /**
    * @return updated aggregate query with the new stage
