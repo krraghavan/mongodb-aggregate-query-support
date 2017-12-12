@@ -28,9 +28,9 @@ import java.util.List;
  */
 public interface QueryProvider {
 
-  // Define default value of two minutes on the server side for an aggregate
+  // Define default value of five minutes on the server side for an aggregate
   // query to finish running before timing out.
-  long DEFAULT_MAX_TIME_MS = 120_000L;
+  long DEFAULT_MAX_TIME_MS = 300_000L;
 
   /**
    * @return query

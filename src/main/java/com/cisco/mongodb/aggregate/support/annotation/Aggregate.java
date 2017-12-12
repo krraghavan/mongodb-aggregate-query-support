@@ -151,7 +151,7 @@ public @interface Aggregate {
 
   /**
    * @return time limit in milliseconds for processing aggregate query.
-   * Default value is two minutes.
+   * Default value is five minutes.
    *
    */
   long maxTimeMS() default QueryProvider.DEFAULT_MAX_TIME_MS;
