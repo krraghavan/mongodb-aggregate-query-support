@@ -189,11 +189,6 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
     queryIterator.forEachRemaining(action);
   }
 
-  @Override
-  public long getMaxTimeMS() {
-    return QueryProvider.DEFAULT_MAX_TIME_MS;
-  }
-
   /**
    * Returns the serialized value to be used for the given {@link ParameterBinding}.
    *
