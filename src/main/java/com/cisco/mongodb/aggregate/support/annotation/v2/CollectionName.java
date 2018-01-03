@@ -42,7 +42,7 @@ import java.lang.annotation.Target;
  *
  * @since 0.7.26
  *
- * @implNote Works only with @{@link Aggregate2} style annotations.
+ * Note: Works only with @{@link Aggregate2} style annotations.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
