@@ -46,8 +46,8 @@ import java.util.concurrent.TimeUnit;
 public class JongoQueryExecutor implements MongoQueryExecutor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JongoQueryExecutor.class);
-  public static final String UNEXPECTED_NULL_AGGREGATE_QUERY = "Unexpected null aggregate query";
-  public static final String QUERY_RETURN_ERROR_STR = "Query is expecting a single object to be returned but the result set had multiple rows";
+  private static final String UNEXPECTED_NULL_AGGREGATE_QUERY = "Unexpected null aggregate query";
+  private static final String QUERY_RETURN_ERROR_STR = "Query is expecting a single object to be returned but the result set had multiple rows";
 
   private final Jongo jongo;
 
@@ -74,15 +74,16 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
     }
     Assert.notNull(aggregate, UNEXPECTED_NULL_AGGREGATE_QUERY);
     aggregate.options(AggregationOptions.builder()
-            .allowDiskUse(queryProvider.isAllowDiskUse())
-            .maxTime(queryProvider.getMaxTimeMS(), TimeUnit.MILLISECONDS)
-            .build());
+                                        .allowDiskUse(queryProvider.isAllowDiskUse())
+                                        .maxTime(queryProvider.getMaxTimeMS(), TimeUnit.MILLISECONDS)
+                                        .build());
     ResultsIterator resultsIterator = aggregate.as(HashMap.class);
-    if (resultsIterator == null || !resultsIterator.hasNext() || Void.TYPE.equals(queryProvider.getMethodReturnType())) {
+    if (resultsIterator == null || !resultsIterator.hasNext() || Void.TYPE
+        .equals(queryProvider.getMethodReturnType())) {
       return null;
     }
     final String resultKey = queryProvider.getQueryResultKey();
-    if(isPageReturnType(queryProvider) && !queryProvider.isAggregate2()) {
+    if (isPageReturnType(queryProvider) && !queryProvider.isAggregate2()) {
       throw new IllegalArgumentException("Page can be used as a return type only with @Aggregate2 annotation");
     }
     if (!queryProvider.isPageable() || (queryProvider.isPageable() &&
@@ -110,7 +111,7 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
     for (Object result : results) {
       unmarshallResult(queryProvider, retval, result);
     }
-    final int count = (int)valueMap.get("totalResultSetCount");
+    final int count = (int) valueMap.get("totalResultSetCount");
     // return type is pageable
 
     return new PageImpl(retval, queryProvider.getPageable(), count);
@@ -121,7 +122,7 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
     final List retval = new ArrayList();
     resultsIterator.forEachRemaining(o -> {
       LOGGER.debug("Got object {}", o.toString());
-      Assert.isTrue(o instanceof Map);
+      Assert.isTrue(o instanceof Map, "expecting map");
       Map<String, Object> instanceMap = (Map) o;
       Object valueObject;
       //If there is no result key, we should consider the whole return values map
@@ -143,7 +144,8 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
     else if (!queryProvider.returnCollection() && retval.size() == 1) {
       return retval.get(0);
     }
-    throw new MongoQueryException("Query is expecting a single object to be returned but the result set had multiple rows");
+    throw new MongoQueryException(
+        "Query is expecting a single object to be returned but the result set had multiple rows");
   }
 
   private void unmarshallResult(QueryProvider queryProvider, List retval, Object valueObject) {

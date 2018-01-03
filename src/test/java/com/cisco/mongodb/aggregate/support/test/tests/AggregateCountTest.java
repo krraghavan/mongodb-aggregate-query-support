@@ -34,9 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * Created by rkolliva
@@ -47,21 +45,24 @@ import static org.testng.Assert.assertTrue;
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
 public class AggregateCountTest extends AbstractTestNGSpringContextTests {
 
+  final String[] COUNT_TEST_DOCS = {"{ \"id\" : 1, \"subject\" : \"History\", \"score\" : 88 }",
+                                    "{ \"id\" : 2, \"subject\" : \"History\", \"score\" : 92 }",
+                                    "{ \"id\" : 3, \"subject\" : \"History\", \"score\" : 97 }",
+                                    "{ \"id\" : 4, \"subject\" : \"History\", \"score\" : 71 }",
+                                    "{ \"id\" : 5, \"subject\" : \"History\", \"score\" : 79 }",
+                                    "{ \"id\" : 6, \"subject\" : \"History\", \"score\" : 83 }"};
   @Autowired
   private CountRepository countRepository;
-
-  private final String[] COUNT_TEST_DOCS = {"{ \"id\" : 1, \"subject\" : \"History\", \"score\" : 88 }",
-                                            "{ \"id\" : 2, \"subject\" : \"History\", \"score\" : 92 }",
-                                            "{ \"id\" : 3, \"subject\" : \"History\", \"score\" : 97 }",
-                                            "{ \"id\" : 4, \"subject\" : \"History\", \"score\" : 71 }",
-                                            "{ \"id\" : 5, \"subject\" : \"History\", \"score\" : 79 }",
-                                            "{ \"id\" : 6, \"subject\" : \"History\", \"score\" : 83 }"};
-
 
   @BeforeClass
   @SuppressWarnings("Duplicates")
   public void setup() throws Exception {
     countRepository.deleteAll();
+    List<Score> scores = getScoresDocuments();
+    countRepository.insert(scores);
+  }
+
+  List<Score> getScoresDocuments() {
     ObjectMapper mapper = new ObjectMapper();
     List<Score> scores = new ArrayList<>();
     Arrays.asList(COUNT_TEST_DOCS).forEach((s) -> {
@@ -72,7 +73,7 @@ public class AggregateCountTest extends AbstractTestNGSpringContextTests {
         assertTrue(false, e.getMessage());
       }
     });
-    countRepository.insert(scores);
+    return scores;
   }
 
   @Test
@@ -80,7 +81,7 @@ public class AggregateCountTest extends AbstractTestNGSpringContextTests {
     validateRepository();
     Integer passingScores = countRepository.getPassingScores();
     assertNotNull(passingScores);
-    assertEquals((int)passingScores, 4);
+    assertEquals((int) passingScores, 4);
   }
 
   @Test
@@ -88,7 +89,7 @@ public class AggregateCountTest extends AbstractTestNGSpringContextTests {
     validateRepository();
     Integer passingScores = countRepository.getPassingScores2();
     assertNotNull(passingScores);
-    assertEquals((int)passingScores, 4);
+    assertEquals((int) passingScores, 4);
   }
 
   @Test
@@ -96,7 +97,7 @@ public class AggregateCountTest extends AbstractTestNGSpringContextTests {
     validateRepository();
     Integer scoresGreaterThan75 = countRepository.scoresGreaterThan75UsingMetaAnnotation();
     assertNotNull(scoresGreaterThan75);
-    assertEquals((int)scoresGreaterThan75, 5);
+    assertEquals((int) scoresGreaterThan75, 5);
   }
 
   private void validateRepository() {

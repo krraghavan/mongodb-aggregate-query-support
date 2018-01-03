@@ -66,7 +66,7 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider {
   }
 
   @Override
-  protected void initializeAnnotation(Method method) {
+  protected void initializeAnnotation(Method method) throws InvalidAggregationQueryException {
     this.aggregateAnnotation = method.getAnnotation(Aggregate.class);
     this.outputClass = aggregateAnnotation.outputBeanType();
     this.collectioName = deriveCollectionName(aggregateAnnotation.inputType());

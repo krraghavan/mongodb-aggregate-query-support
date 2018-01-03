@@ -23,9 +23,11 @@ import com.cisco.mongodb.aggregate.support.annotation.Aggregate;
 import com.cisco.mongodb.aggregate.support.annotation.Count;
 import com.cisco.mongodb.aggregate.support.annotation.Match;
 import com.cisco.mongodb.aggregate.support.annotation.v2.Aggregate2;
+import com.cisco.mongodb.aggregate.support.annotation.v2.CollectionName;
 import com.cisco.mongodb.aggregate.support.annotation.v2.Count2;
 import com.cisco.mongodb.aggregate.support.annotation.v2.Match2;
 import com.cisco.mongodb.aggregate.support.test.CountGt75AggregateAnnotationsContainer;
+import com.cisco.mongodb.aggregate.support.test.annotations.TestNotNull;
 import com.cisco.mongodb.aggregate.support.test.beans.Score;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -60,8 +62,36 @@ public interface CountRepository extends MongoRepository<Score, Integer> {
   @Count2(query = "\"passing_scores\"", order = 1)
   Integer getPassingScores2();
 
+  @Aggregate2(inputType = Score.class, outputBeanType = Integer.class, resultKey = "passing_scores", maxTimeMS = 60_000L)
+  @Match2(query = "{\n" +
+                  "        score: {\n" +
+                  "          $gt: 80\n" +
+                  "        }\n" +
+                  "      }", order = 0)
+  @Count2(query = "\"passing_scores\"", order = 1)
+  Integer getPassingScores2FromSpecifiedCollection(@CollectionName String collName);
+
   @Aggregate2(inputType = Score.class, outputBeanType = Integer.class, resultKey = "scores_gt_75")
   @CountGt75AggregateAnnotationsContainer
   Integer scoresGreaterThan75UsingMetaAnnotation();
 
+  @Aggregate2(inputType = Score.class, outputBeanType = Integer.class, resultKey = "passing_scores", maxTimeMS = 60_000L)
+  @Match2(query = "{\n" +
+                  "        score: {\n" +
+                  "          $gt: 80\n" +
+                  "        }\n" +
+                  "      }", order = 0)
+  @Count2(query = "\"passing_scores\"", order = 1)
+  Integer invalidGetPassingScores2FromSpecifiedCollection(@CollectionName String collName, Object randomParam,
+                                                          @CollectionName String collName2);
+
+  @Aggregate2(inputType = Score.class, outputBeanType = Integer.class, resultKey = "passing_scores", maxTimeMS = 60_000L)
+  @Match2(query = "{\n" +
+                  "        score: {\n" +
+                  "          $gt: 80\n" +
+                  "        }\n" +
+                  "      }", order = 0)
+  @Count2(query = "\"passing_scores\"", order = 1)
+  Integer invalidGetPassingScores2FromSpecifiedCollection2(@CollectionName String collName, Object randomParam,
+                                                           @CollectionName @TestNotNull String collName2);
 }

@@ -87,7 +87,45 @@ class AggregateQueryProvider2 extends AbstractAggregateQueryProvider {
   }
 
   @Override
-  protected void initializeAnnotation(Method method) {
+  protected String deriveCollectionName(Class className) throws InvalidAggregationQueryException {
+    // if the aggregate query has a parameter annotated with @CollectionName use that
+    Annotation[][] parameterAnnotations = method.getParameterAnnotations();
+    int parameterCount = method.getParameterCount();
+    String retval = null;
+    int collectionNameAnnotationCount = 0;
+    List<Integer> invalidParamPositions = new ArrayList<>();
+    for(int i = 0; i < parameterCount; i++) {
+      // validate each parameter - we only allow @CollectionName to occur once.
+      Annotation[] annotationsOnParameter = parameterAnnotations[i];
+      int parameterAnnotationCount = annotationsOnParameter.length;
+      if(parameterAnnotationCount > 0) {
+        LOGGER.debug("Parameter at position {} has {} annotations", i, parameterAnnotationCount);
+        for (Annotation parameterAnnotation : annotationsOnParameter) {
+          if (parameterAnnotation.annotationType() == CollectionName.class) {
+            retval = mongoParameterAccessor.getValues()[i].toString();
+            collectionNameAnnotationCount++;
+            invalidParamPositions.add(i);
+          }
+        }
+      }
+    }
+
+    if(collectionNameAnnotationCount > 1) {
+      String msg = String.format("Found more than one CollectionName annotation on parameters.  Found at positions:%s",
+                                 StringUtils.join(invalidParamPositions, ","));
+      LOGGER.error(msg);
+      throw new InvalidAggregationQueryException(msg);
+
+    }
+    else if(collectionNameAnnotationCount == 0) {
+      // no collection name annotation present.
+      retval = super.deriveCollectionName(className);
+    }
+    return retval;
+  }
+
+  @Override
+  protected void initializeAnnotation(Method method) throws InvalidAggregationQueryException {
     this.aggregateAnnotation = method.getAnnotation(Aggregate2.class);
     this.outputClass = aggregateAnnotation.outputBeanType();
     this.collectioName = deriveCollectionName(aggregateAnnotation.inputType());

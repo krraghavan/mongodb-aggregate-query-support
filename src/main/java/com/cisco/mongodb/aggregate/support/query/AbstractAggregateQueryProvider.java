@@ -105,11 +105,11 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
       this.queryIterator = aggregateQueryPipeline.iterator();
     }
   }
-  protected abstract void initializeAnnotation(Method method);
+  protected abstract void initializeAnnotation(Method method) throws InvalidAggregationQueryException;
 
   public abstract String getQueryForStage(Annotation annotation);
 
-  protected String deriveCollectionName(Class className) {
+  protected String deriveCollectionName(Class className) throws InvalidAggregationQueryException {
 
     Document documentAnnotation = AnnotationUtils.findAnnotation(className, Document.class);
     String collectionName;
@@ -402,7 +402,7 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider, I
     COUNT2("$count", Count2.class),
     SKIP("$skip", Skip.class),
     SKIP2("$skip", Skip2.class),
-    OUT("$out", Match.class);
+    OUT("$out", Out.class);
 
     private final String representation;
 

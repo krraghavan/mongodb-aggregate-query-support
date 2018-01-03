@@ -23,6 +23,7 @@ import com.cisco.mongodb.aggregate.support.test.config.conditions.NotUseRealMong
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import de.flapdoodle.embed.process.config.store.IDownloadConfig;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -56,8 +57,6 @@ public class MongoClientTestConfiguration {
   private static final Logger LOGGER = LoggerFactory.getLogger(MongoClientTestConfiguration.class);
 
   private static final String LOCALHOST = "localhost";
-
-  private static final String DB_NAME = "candid";
 
   private final MongodExecutable mongodExecutable;
 
@@ -106,7 +105,7 @@ public class MongoClientTestConfiguration {
 
   @Bean
   public String mongoDbName() {
-    return DB_NAME;
+    return RandomStringUtils.randomAlphabetic(7);
   }
 
   @PreDestroy
