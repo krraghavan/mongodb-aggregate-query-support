@@ -22,7 +22,7 @@ import com.mongodb.AggregationOptions;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.jongo.Aggregate;
-import org.jongo.Aggregate.ResultsIterator;
+import org.jongo.Command;
 import org.jongo.Jongo;
 import org.jongo.bson.Bson;
 import org.jongo.bson.BsonDocument;
@@ -50,10 +50,14 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
   private static final String QUERY_RETURN_ERROR_STR = "Query is expecting a single object to be returned but the result set had multiple rows";
 
   private final Jongo jongo;
+  private final boolean isMongo36OrLater;
 
   @Autowired
   public JongoQueryExecutor(Jongo jongo) {
     this.jongo = jongo;
+    Command command = this.jongo.runCommand("{buildinfo:1}");
+    HashMap dbVersion = command.as(HashMap.class);
+    isMongo36OrLater = ((String)dbVersion.get("version")).startsWith("3.6");
   }
 
   @Override
@@ -73,11 +77,17 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
       }
     }
     Assert.notNull(aggregate, UNEXPECTED_NULL_AGGREGATE_QUERY);
-    aggregate.options(AggregationOptions.builder()
-                                        .allowDiskUse(queryProvider.isAllowDiskUse())
-                                        .maxTime(queryProvider.getMaxTimeMS(), TimeUnit.MILLISECONDS)
-                                        .build());
-    ResultsIterator resultsIterator = aggregate.as(HashMap.class);
+    AggregationOptions.Builder aggregationOptionsBuilder = AggregationOptions.builder()
+                                                                             .allowDiskUse(queryProvider.isAllowDiskUse())
+                                                                             .maxTime(queryProvider.getMaxTimeMS(),
+                                                                       TimeUnit.MILLISECONDS);
+    if(isMongo36OrLater) {
+      // after 3.6 CURSOR MODE is mandatory
+      aggregationOptionsBuilder.outputMode(AggregationOptions.OutputMode.CURSOR);
+      LOGGER.debug("Mongo 3.6 detected - will use cursor mode for aggregate output");
+    }
+    aggregate.options(aggregationOptionsBuilder.build());
+    Aggregate.ResultsIterator resultsIterator = aggregate.as(HashMap.class);
     if (resultsIterator == null || !resultsIterator.hasNext() || Void.TYPE
         .equals(queryProvider.getMethodReturnType())) {
       return null;
@@ -100,7 +110,7 @@ public class JongoQueryExecutor implements MongoQueryExecutor {
     return Page.class.isAssignableFrom(queryProvider.getMethodReturnType());
   }
 
-  private Object getPageableResults(QueryProvider queryProvider, ResultsIterator resultsIterator) {
+  private Object getPageableResults(QueryProvider queryProvider, Aggregate.ResultsIterator resultsIterator) {
     // for pageable we get one entry always - which is a DBObject
     Map<String, Object> valueMap = (Map) resultsIterator.next();
 
