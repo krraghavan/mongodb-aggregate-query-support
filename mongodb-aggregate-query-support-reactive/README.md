@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.27-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
+[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.26-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -7,13 +7,6 @@ Spring Data module.
 The @Query annotation provided by Spring Data MongoDb allows queries to be executed with minimum code being written.  
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
-
-## New in 0.7.27 version
-Added support for the Reactive Mongo Java driver using the io-reactor implementation.  All the aggregate query annotations now have 
-a reactive counterpart in the mongodb-aggregate-query-support-reactive module.  In doing this change we use the native 
-Bson POJO support to serialize/deserialize the query response.  With this, jongo is no longer required as a dependency.
-Jongo dependency in the non-reactive version will also be removed in an upcoming release.  The reactive module does not
-support the old aggregate annotations. 
 
 ## New in 0.7.26 version
 Added a new annotation CollectionName that can be used on one parameter of an Aggregate2 annotated method to specify the name of the collection on which the aggregate query will be executed.  This allows the aggregate query to be specified on the interface method while allowing the collection name to be dynamically specified at runtime.  The parameter annotated with CollectionName can be of any type and the toString() method of that parameter will be called to derive the name of the collection. One use case where this could be useful is when a documents of a certain type are stored in multiple different collections (perhaps for performance reasons).
@@ -279,7 +272,7 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Inte
     return CollectionUtils.isNotEmpty(getPossessions( "cars"));
   }
   
-  default boolean hasHomes(String _id) {
+  default boolean hasHomes(String id) {
     return CollectionUtils.isNotEmpty(getPossessions( "homes"));
   }
 
