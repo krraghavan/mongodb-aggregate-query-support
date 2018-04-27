@@ -19,7 +19,7 @@
 
 package com.github.krr.mongodb.aggregate.support.condition;
 
-import com.github.krr.mongodb.aggregate.support.annotation.Conditional;
+import com.github.krr.mongodb.aggregate.support.annotations.Conditional;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
@@ -34,7 +34,7 @@ import java.util.Map;
  */
 
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "Duplicates"})
 public abstract class AbstractCondition implements Condition {
 
   protected Object getParameterByIndex(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {

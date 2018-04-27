@@ -23,17 +23,29 @@
 
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.krraghavan</groupId>
-  <artifactId>mongodb-aggregate-query-support-parent</artifactId>
-  <version>0.8.0-SNAPSHOT</version>
+  <artifactId>mongodb-aggregate-query-support</artifactId>
+  <version>0.8.0</version>
 
   <packaging>pom</packaging>
 
   <modules>
-    <module>mongodb-aggregate-query-support</module>
+    <module>mongodb-aggregate-query-support-core</module>
+    <module>mongodb-aggregate-query-support-spring4-parent</module>
+    <module>mongodb-aggregate-query-support-reactive-parent</module>
+    <module>mongodb-aggregate-query-support-spring4</module>
     <module>mongodb-aggregate-query-support-reactive</module>
   </modules>
 
-  <name>Annotation based Mongo DB Aggregation Query Support Parent POM</name>
+  <properties>
+    <maqs.version>0.8.0</maqs.version>
+    <mongodb.driver.version>3.6.3</mongodb.driver.version>
+    <embedded-mongo-version>2.0.3</embedded-mongo-version>
+    <mongo-reactive-java-driver.version>1.7.1</mongo-reactive-java-driver.version>
+    <spring4-platform-bom.version>Brussels-SR9</spring4-platform-bom.version>
+    <spring5-platform-bom.version>Cairo-RELEASE</spring5-platform-bom.version>
+  </properties>
+
+  <name>Mongo DB Aggregation Query Support</name>
   <description>Spring Data @Query like support for Mongo Aggregation queries</description>
   <url>https://github.com/krraghavan/mongodb-aggregate-query-support</url>
 
@@ -86,6 +98,11 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.25</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
@@ -93,12 +110,17 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-slf4j-impl</artifactId>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
-      <scope>test</scope>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 

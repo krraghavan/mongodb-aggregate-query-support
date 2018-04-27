@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.7.27-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
+[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.8.0-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -7,6 +7,54 @@ Spring Data module.
 The @Query annotation provided by Spring Data MongoDb allows queries to be executed with minimum code being written.  
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
+
+## New in 0.8.0 version
+This is a completely refactored version which is incompatible with the 0.7.x family of releases.  The following changes 
+have been made
+1. Removed Jongo as a dependency completely.  Use native Mongo Java driver POJO support for serialization
+and deserialization.
+1. Removed support for the deprecated Aggregate annotation and renamed Aggregate2 to Aggregate.  Functionality
+of this renamed Aggregate annotation is identical to the Aggregate2 annotation in 0.7.
+1. The Spring4 module is built with Spring Brussels-SR9 Spring platform release train.  All Spring and Spring Data
+dependencies are marked optional so nothing will be transitively inherited from this module.  Users
+of this module will need to make sure that compatible Spring releases are used.  The reactive support is built with
+Spring Cairo.RELEASE release train for Spring 5.x and Spring Data MongoDb 2.x support.
+1. Mongo Java driver 3.6.3 for non-reactive and 1.7.1 reactive streams Java driver are supported/tested
+
+### Reactive and Non-Reactive Usage
+When the reactive module is used, both reactive and non-reactive queries can be performed by using the appropriate
+Factory and query executor classes.  For Reactive Aggregation queries use the 
+```ReactiveAggregateQuerySupportingRepositoryFactoryBean``` and the ```ReactiveMongoNativeJavaDriverExecutor```.  The 
+Spring configuration class to enable this support looks like this
+```
+@Configuration
+@EnableReactiveMongoRepositories(basePackageClasses = ReactiveTestAggregateRepositoryMarker.class,
+                                 repositoryFactoryBeanClass = ReactiveAggregateQuerySupportingRepositoryFactoryBean.class,
+                                 reactiveMongoTemplateRef = "reactiveMongoOperations")
+public class ReactiveTestMongoRepositoryConfiguration {
+
+}
+
+```
+Check the unit tests for more examples of how to use both reactive and non-reactive repositories with the reactive module. 
+
+To include the reactive aggregate query support with Maven use
+```
+<dependency>
+  <groupId>com.github.krraghavan</groupId>
+  <artifactId>mongodb-aggregate-query-support-reactive</artifactId>
+  <version>0.8.0-RELEASE</version>
+</dependency>
+```
+
+For Spring 4 use (no reactive support with Spring 4)
+```
+<dependency>
+  <groupId>com.github.krraghavan</groupId>
+  <artifactId>mongodb-aggregate-query-support-spring4</artifactId>
+  <version>0.8.0-RELEASE</version>
+</dependency>
+```
 
 ## New in 0.7.27 version
 Added support for the Reactive Mongo Java driver using the io-reactor implementation.  All the aggregate query annotations now have 
