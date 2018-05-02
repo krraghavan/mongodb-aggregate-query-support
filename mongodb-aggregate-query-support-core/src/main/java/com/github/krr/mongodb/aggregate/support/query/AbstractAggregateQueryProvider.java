@@ -71,9 +71,16 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
    * @param documentAnnotationNameSupplier - a supplier for the document annotation.
    *                                       Modeled as a supplier to avoid Spring version
    *                                       specific dependencies in this class.
+   *
+   * @param parameterValueSupplier - a supplier that returns the collection name from the @{@link CollectionName}
+   *                               annotated parameter
+   * @param expressionBasedNameSupplier - a function that takes a String input and processes it for SpEl expressions
+   *                                    if it contains any.
    * @return - the collection name
    * @throws IllegalArgumentException if the collection name is null at the end of
    *                                  the evaluation.
+   * @throws InvalidAggregationQueryException - if the collection name could not be derived (e.g. more than
+   * one parameter contains an @{@link CollectionName} annotation.
    */
   protected String deriveCollectionName(Class className,
                                         Function<Integer, String> parameterValueSupplier,

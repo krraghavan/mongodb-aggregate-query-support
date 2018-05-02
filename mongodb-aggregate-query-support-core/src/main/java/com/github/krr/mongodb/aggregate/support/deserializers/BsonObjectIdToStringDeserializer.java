@@ -15,9 +15,9 @@ import java.io.IOException;
  * This class intercepts all String conversions.  It therefore has to handle all
  * the conversion types:
  *
- * $numberLong -> String
+ * $numberLong to String
  *
- * as well as int -> string etc.
+ * as well as int to string etc.
  * Created by rkolliva
  * 4/30/18.
  */

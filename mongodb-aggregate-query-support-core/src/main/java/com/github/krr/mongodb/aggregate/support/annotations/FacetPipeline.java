@@ -38,6 +38,8 @@ public @interface FacetPipeline {
    * An array of pipeline stages - allows each stage of the pipeline in a facet
    * to be specified independently.  Promotes readability.  If query() is also
    * specified - this is ignored.
+   *
+   * @return array of {@link FacetPipelineStage} used in this facet pipelines
    */
   FacetPipelineStage [] stages() default {};
 

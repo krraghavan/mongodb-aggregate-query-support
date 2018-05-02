@@ -42,6 +42,8 @@ public abstract class ParameterBindingParser {
    * {@link Collections#emptyList()}.
    *
    * @param input - the string with parameter bindings
+   * @param <T> a subclass of {@link JsonParseable} that returns the parsed Json string.
+   * @param jsonParseable an implementation of the {@link JsonParseable} interface
    * @return - the list of parameters
    */
   public <T extends JsonParseable> List<AbstractAggregateQueryProvider.ParameterBinding> parseParameterBindingsFrom(String input,

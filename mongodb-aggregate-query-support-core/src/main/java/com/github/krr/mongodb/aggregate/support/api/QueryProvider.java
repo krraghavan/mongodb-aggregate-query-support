@@ -88,7 +88,10 @@ public interface QueryProvider<T> {
   long getMaxTimeMS();
 
   /**
+   * @param newStage - modifies the stage at the index specified by the stage parameter.
+   * @param stage - the index of the stage
    * @return updated aggregate query with the new stage
+   *
    */
   List<String> modifyAggregateQueryPipeline(String newStage, int stage);
 
