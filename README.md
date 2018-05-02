@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.8.0-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
+[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.8.1-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -8,11 +8,13 @@ The @Query annotation provided by Spring Data MongoDb allows queries to be execu
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
 
-## New in 0.8.0 version
+## New in 0.8.1 version
 This is a completely refactored version which is incompatible with the 0.7.x family of releases.  The following changes 
 have been made
-1. Removed Jongo as a dependency completely.  Use native Mongo Java driver POJO support for serialization
-and deserialization.
+1. Removed Jongo as a dependency completely.  Even though the Mongo Java driver POJO has support for POJO serialization
+and deserialization it has some restrictions.  Accordingly Jackson is used to deserialize query responses into POJOs.
+Custom deserializers for the extended Json syntax of Mongo support this capability.  To handle generics, the outputClass
+annotation can be omitted (which returns a Document from the query) and it can be deserialized using the BsonDocumentObjectMapper. 
 1. Removed support for the deprecated Aggregate annotation and renamed Aggregate2 to Aggregate.  Functionality
 of this renamed Aggregate annotation is identical to the Aggregate2 annotation in 0.7.
 1. The Spring4 module is built with Spring Brussels-SR9 Spring platform release train.  All Spring and Spring Data
@@ -43,7 +45,7 @@ To include the reactive aggregate query support with Maven use
 <dependency>
   <groupId>com.github.krraghavan</groupId>
   <artifactId>mongodb-aggregate-query-support-reactive</artifactId>
-  <version>0.8.0-RELEASE</version>
+  <version>0.8.1</version>
 </dependency>
 ```
 
@@ -52,7 +54,7 @@ For Spring 4 use (no reactive support with Spring 4)
 <dependency>
   <groupId>com.github.krraghavan</groupId>
   <artifactId>mongodb-aggregate-query-support-spring4</artifactId>
-  <version>0.8.0-RELEASE</version>
+  <version>0.8.1</version>
 </dependency>
 ```
 
