@@ -1,21 +1,17 @@
 package com.github.krr.mongodb.aggregate.support.query;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.krr.mongodb.aggregate.support.api.MongoQueryExecutor;
 import com.github.krr.mongodb.aggregate.support.api.QueryProvider;
-import com.github.krr.mongodb.aggregate.support.bsoncodecs.ObjectIdAsStringCodecProvider;
+import com.github.krr.mongodb.aggregate.support.deserializers.BsonDocumentObjectMapper;
 import com.mongodb.reactivestreams.client.AggregatePublisher;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.*;
-import org.bson.codecs.*;
+import org.bson.BsonDocument;
+import org.bson.Document;
+import org.bson.codecs.DocumentCodec;
 import org.bson.codecs.configuration.CodecRegistries;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.ClassModel;
-import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
-import org.bson.io.BasicOutputBuffer;
-import org.bson.io.ByteBufferBsonInput;
-import org.bson.io.OutputBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -23,13 +19,11 @@ import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.nio.ByteBuffer;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 
 /**
  * Created by rkolliva
@@ -40,7 +34,7 @@ public class ReactiveMongoNativeJavaDriverQueryExecutor implements MongoQueryExe
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveMongoNativeJavaDriverQueryExecutor.class);
 
-  private static final Codec<BsonDocument> DOCUMENT_CODEC = new BsonDocumentCodec();
+  private static final ObjectMapper OBJECT_MAPPER = new BsonDocumentObjectMapper();
 
   private static final String MONGO_V3_6_VERSION = "3.6";
 
@@ -58,9 +52,7 @@ public class ReactiveMongoNativeJavaDriverQueryExecutor implements MongoQueryExe
   @Override
   public Object executeQuery(QueryProvider queryProvider) {
 
-//    // convert the pipelines by parsing the JSON strings
-//    Assert.isAssignable(Iterator.class, queryProvider.getClass(),
-//                        "Query Provider must implement the iterator interface");
+    // convert the pipelines by parsing the JSON strings
     Iterator iterator = queryProvider.getPipelines().iterator();
     int i = 0;
 
@@ -153,35 +145,11 @@ public class ReactiveMongoNativeJavaDriverQueryExecutor implements MongoQueryExe
 
   @SuppressWarnings("unchecked")
   private <T> T deserialize(Class<T> outputClass, BsonDocument d) {
-    // user wants to deserialize to a new class.
-    // this registers the codec.
-    ClassModel<T> classModel = ClassModel.builder(outputClass).build();
-    PojoCodecProvider.Builder builder = PojoCodecProvider.builder().register(classModel).automatic(true);
-    // ObjectIdAsString needs to be the first one so that we can use the ObjectIdAsString codec
-    // to deserialize @Id fields as strings.
-    CodecRegistry codecRegistry = fromProviders(new ObjectIdAsStringCodecProvider(),
-                                                new BsonValueCodecProvider(),
-                                                new ValueCodecProvider(),
-                                                new IterableCodecProvider(),
-                                                new UuidCodecProvider(UuidRepresentation.JAVA_LEGACY),
-                                                new DocumentCodecProvider(),
-                                                builder.build());
-    Codec codec = codecRegistry.get(outputClass);
-    OutputBuffer encoded = encode(DOCUMENT_CODEC, d);
-    return (T) decode(codec, encoded);
-  }
-
-  @SuppressWarnings("unchecked")
-  private <T> T decode(Codec codec, OutputBuffer buffer) {
-    BsonBinaryReader reader = new BsonBinaryReader(new ByteBufferBsonInput(new ByteBufNIO(
-        ByteBuffer.wrap(buffer.toByteArray()))));
-    return (T) codec.decode(reader, DecoderContext.builder().build());
-  }
-
-  private <T> OutputBuffer encode(final Codec<T> codec, final T value) {
-    OutputBuffer buffer = new BasicOutputBuffer();
-    BsonWriter writer = new BsonBinaryWriter(buffer);
-    codec.encode(writer, value, EncoderContext.builder().build());
-    return buffer;
+    try {
+      return OBJECT_MAPPER.readValue(d.toJson(), outputClass);
+    }
+    catch (IOException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 }

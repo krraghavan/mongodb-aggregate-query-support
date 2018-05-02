@@ -1,11 +1,9 @@
 package com.github.krr.mongodb.aggregate.support.tests;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.krr.mongodb.aggregate.support.beans.Score;
 import com.github.krr.mongodb.aggregate.support.config.AggregateTestConfiguration;
 import com.github.krr.mongodb.aggregate.support.repository.SkipRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -17,27 +15,24 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * camejavi 3/15/17
  */
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
 public class AggregateSkipTest extends AbstractTestNGSpringContextTests {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(AggregateSkipTest.class);
 
   @Autowired
   private SkipRepository skipRepository;
 
-  private final String[] SCORE_DOCS = {"{ \"id\" : 1, \"subject\" : \"History\", \"score\" : 88 }",
-                                       "{ \"id\" : 2, \"subject\" : \"History\", \"score\" : 92 }",
-                                       "{ \"id\" : 3, \"subject\" : \"History\", \"score\" : 97 }",
-                                       "{ \"id\" : 4, \"subject\" : \"History\", \"score\" : 71 }",
-                                       "{ \"id\" : 5, \"subject\" : \"History\", \"score\" : 79 }",
-                                       "{ \"id\" : 6, \"subject\" : \"History\", \"score\" : 83 }"};
+  private final String[] SCORE_DOCS = {"{ \"_id\" : 1, \"subject\" : \"History\", \"score\" : 88 }",
+                                       "{ \"_id\" : 2, \"subject\" : \"History\", \"score\" : 92 }",
+                                       "{ \"_id\" : 3, \"subject\" : \"History\", \"score\" : 97 }",
+                                       "{ \"_id\" : 4, \"subject\" : \"History\", \"score\" : 71 }",
+                                       "{ \"_id\" : 5, \"subject\" : \"History\", \"score\" : 79 }",
+                                       "{ \"_id\" : 6, \"subject\" : \"History\", \"score\" : 83 }"};
 
   @BeforeClass
   @SuppressWarnings("Duplicates")

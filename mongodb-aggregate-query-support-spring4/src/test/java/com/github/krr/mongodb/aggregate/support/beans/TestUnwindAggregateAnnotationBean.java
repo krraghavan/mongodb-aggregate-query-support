@@ -18,7 +18,7 @@
  */
 package com.github.krr.mongodb.aggregate.support.beans;
 
-import org.springframework.data.annotation.Id;
+import com.github.krr.mongodb.aggregate.support.nonreactive.annotations.MongoId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.List;
  */
 public class TestUnwindAggregateAnnotationBean extends AbstractTestAggregateBean {
 
-  @Id
+  @MongoId
   private String oid;
 
   private List<String> randomListOfStrings = new ArrayList<>();

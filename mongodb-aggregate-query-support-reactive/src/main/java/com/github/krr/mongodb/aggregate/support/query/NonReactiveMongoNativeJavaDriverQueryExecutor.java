@@ -1,23 +1,18 @@
 package com.github.krr.mongodb.aggregate.support.query;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.krr.mongodb.aggregate.support.api.MongoQueryExecutor;
 import com.github.krr.mongodb.aggregate.support.api.QueryProvider;
-import com.github.krr.mongodb.aggregate.support.bsoncodecs.ObjectIdAsStringCodecProvider;
+import com.github.krr.mongodb.aggregate.support.deserializers.BsonDocumentObjectMapper;
 import com.mongodb.AggregationOptions;
 import com.mongodb.DBObject;
 import com.mongodb.client.AggregateIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.*;
-import org.bson.codecs.*;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.ClassModel;
-import org.bson.codecs.pojo.PojoCodecProvider;
+import org.bson.BsonDocument;
+import org.bson.Document;
 import org.bson.conversions.Bson;
-import org.bson.io.BasicOutputBuffer;
-import org.bson.io.ByteBufferBsonInput;
-import org.bson.io.OutputBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -27,14 +22,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.util.Assert;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import static com.mongodb.AggregationOptions.builder;
-import static java.nio.ByteBuffer.wrap;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 
 /**
  * Created by rkolliva
@@ -46,7 +40,7 @@ public class NonReactiveMongoNativeJavaDriverQueryExecutor implements MongoQuery
 
   private static final Logger LOGGER = LoggerFactory.getLogger(NonReactiveMongoNativeJavaDriverQueryExecutor.class);
 
-  private static final MapCodec MAP_CODEC = new MapCodec();
+  private static final ObjectMapper OBJECT_MAPPER = new BsonDocumentObjectMapper();
 
   private static final String MONGO_V3_6_VERSION = "3.6";
 
@@ -95,6 +89,7 @@ public class NonReactiveMongoNativeJavaDriverQueryExecutor implements MongoQuery
       if (isVoidReturnType(queryProvider)) {
         return null;
       }
+      Class outputClass = queryProvider.getOutputClass();
       if (cursor.hasNext()) {
         if (!queryProvider.isPageable() || (queryProvider.isPageable() &&
                                             List.class.isAssignableFrom(queryProvider.getMethodReturnType()))) {
@@ -156,7 +151,7 @@ public class NonReactiveMongoNativeJavaDriverQueryExecutor implements MongoQuery
           // If the query has a pageable in it the results would be returned as a DBObject
           // but the actual results are in the "results" key.  In this case we're not returning
           // a page but a list so we'll just throw away the totals
-          Document dbObject = getDbObject(o);
+          Document dbObject = getDocument(o);
           Object results = dbObject.get(RESULTS);
           Assert.isAssignable(List.class, results.getClass(), "Expecting a list of results");
           extractDeserializedListFromResults(outputClass, pageContents, (List) results);
@@ -186,14 +181,14 @@ public class NonReactiveMongoNativeJavaDriverQueryExecutor implements MongoQuery
       if (isCollectionTypeReturn) {
         List retval = new ArrayList<>();
         while (cursor.hasNext()) {
-          cursor.forEachRemaining(d -> retval.add(getValueFromDbObject(resultKey, d)));
+          cursor.forEachRemaining(d -> retval.add(getValueFromDocument(resultKey, d)));
         }
         return retval;
       }
       else {
         if (cursor.hasNext()) {
           Document next = cursor.next();
-          return getValueFromDbObject(resultKey, next);
+          return getValueFromDocument(resultKey, next);
         }
       }
     }
@@ -209,18 +204,18 @@ public class NonReactiveMongoNativeJavaDriverQueryExecutor implements MongoQuery
           // If the query has a pageable in it the results would be returned as a DBObject
           // but the actual results are in the "results" key.  In this case we're not returning
           // a page but a list so we'll just throw away the totals
-          Document dbObject = getDbObject(o);
+          Document document = getDocument(o);
           if (queryProvider.isPageable()) {
             // even though we're not returning a Page, the query itself could involve a Pageable.
             // in this case we'll throw away the totalResultSetCount from the returned results.
-            Object results = dbObject.get(RESULTS);
+            Object results = document.get(RESULTS);
             Assert.isAssignable(List.class, results.getClass(), "Expecting a list of results");
             extractDeserializedListFromResults(outputClass, retval, (List) results);
             Assert.isTrue(!cursor.hasNext(), "For pageable type we only expect one record");
           }
           else {
             // returning a collection for non-paged complex objects.
-            retval.add(deserialize(outputClass, dbObject));
+            retval.add(deserialize(outputClass, document));
           }
         });
         return retval;
@@ -235,7 +230,7 @@ public class NonReactiveMongoNativeJavaDriverQueryExecutor implements MongoQuery
     return null;
   }
 
-  private Document getDbObject(Object o) {
+  private Document getDocument(Object o) {
     Assert.isAssignable(Document.class, o.getClass(), "Expecting DBObject type");
     return (org.bson.Document) o;
   }
@@ -249,7 +244,7 @@ public class NonReactiveMongoNativeJavaDriverQueryExecutor implements MongoQuery
     }
   }
 
-  private Object getValueFromDbObject(String resultKey, Document dbObject) {
+  private Object getValueFromDocument(String resultKey, Document dbObject) {
     Object retval;
     if (StringUtils.isNotEmpty(resultKey)) {
       retval = dbObject.get(resultKey);
@@ -266,35 +261,15 @@ public class NonReactiveMongoNativeJavaDriverQueryExecutor implements MongoQuery
 
   @SuppressWarnings("unchecked")
   private <T> T deserialize(Class<T> outputClass, Document d) {
-    // user wants to deserialize to a new class.
-    // this registers the codec.
-    ClassModel<T> classModel = ClassModel.builder(outputClass).build();
-    PojoCodecProvider.Builder builder = PojoCodecProvider.builder().register(classModel).automatic(true);
-    // ObjectIdAsString needs to be the first one so that we can use the ObjectIdAsString codec
-    // to deserialize @Id fields as strings.
-    CodecRegistry codecRegistry = fromProviders(new BsonValueCodecProvider(),
-                                                new ObjectIdAsStringCodecProvider(),
-                                                new ValueCodecProvider(),
-                                                new MapCodecProvider(),
-                                                new IterableCodecProvider(),
-                                                new UuidCodecProvider(UuidRepresentation.JAVA_LEGACY),
-                                                new DocumentCodecProvider(),
-                                                builder.build());
-    Codec codec = codecRegistry.get(outputClass);
-    OutputBuffer encoded = encode(MAP_CODEC, d);
-    return (T) decode(codec, encoded);
-  }
 
-  @SuppressWarnings("unchecked")
-  private <T> T decode(Codec codec, OutputBuffer buffer) {
-    BsonBinaryReader reader = new BsonBinaryReader(new ByteBufferBsonInput(new ByteBufNIO(wrap(buffer.toByteArray()))));
-    return (T) codec.decode(reader, DecoderContext.builder().build());
-  }
-
-  private <T> OutputBuffer encode(final Codec<T> codec, final T value) {
-    OutputBuffer buffer = new BasicOutputBuffer();
-    BsonWriter writer = new BsonBinaryWriter(buffer);
-    codec.encode(writer, value, EncoderContext.builder().build());
-    return buffer;
+    try {
+      if(outputClass != Document.class) {
+        return OBJECT_MAPPER.readValue(d.toJson(), outputClass);
+      }
+      return (T)d;
+    }
+    catch (IOException e) {
+      throw new IllegalArgumentException(e);
+    }
   }
 }

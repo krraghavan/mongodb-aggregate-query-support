@@ -19,8 +19,8 @@
 
 package com.github.krr.mongodb.aggregate.support.beans;
 
+import com.github.krr.mongodb.aggregate.support.nonreactive.annotations.MongoId;
 import com.github.krr.mongodb.aggregate.support.config.AggregateTestConfiguration;
-import org.springframework.data.annotation.Id;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
@@ -33,7 +33,7 @@ import java.util.List;
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
 public class Possessions {
 
-  @Id
+  @MongoId
   private String id;
 
   private List<Asset> assets;

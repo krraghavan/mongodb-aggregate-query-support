@@ -18,7 +18,7 @@
  */
 package com.github.krr.mongodb.aggregate.support.beans;
 
-import org.springframework.data.annotation.Id;
+import com.github.krr.mongodb.aggregate.support.nonreactive.annotations.MongoId;
 
 import java.util.Objects;
 
@@ -31,7 +31,7 @@ public class TestAggregateAnnotation2FieldsBean extends AbstractTestAggregateBea
 
   private int randomAttribute2;
 
-  @Id
+  @MongoId
   private String oid;
 
   public TestAggregateAnnotation2FieldsBean(String randomAttribute1, int randomAttribute2) {

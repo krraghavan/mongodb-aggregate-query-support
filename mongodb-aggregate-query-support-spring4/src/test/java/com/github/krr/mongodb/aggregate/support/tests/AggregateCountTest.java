@@ -45,12 +45,12 @@ import static org.testng.Assert.*;
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
 public class AggregateCountTest extends AbstractTestNGSpringContextTests {
 
-  final String[] COUNT_TEST_DOCS = {"{ \"id\" : 1, \"subject\" : \"History\", \"score\" : 88 }",
-                                    "{ \"id\" : 2, \"subject\" : \"History\", \"score\" : 92 }",
-                                    "{ \"id\" : 3, \"subject\" : \"History\", \"score\" : 97 }",
-                                    "{ \"id\" : 4, \"subject\" : \"History\", \"score\" : 71 }",
-                                    "{ \"id\" : 5, \"subject\" : \"History\", \"score\" : 79 }",
-                                    "{ \"id\" : 6, \"subject\" : \"History\", \"score\" : 83 }"};
+  final String[] COUNT_TEST_DOCS = {"{ \"_id\" : 1, \"subject\" : \"History\", \"score\" : 88 }",
+                                    "{ \"_id\" : 2, \"subject\" : \"History\", \"score\" : 92 }",
+                                    "{ \"_id\" : 3, \"subject\" : \"History\", \"score\" : 97 }",
+                                    "{ \"_id\" : 4, \"subject\" : \"History\", \"score\" : 71 }",
+                                    "{ \"_id\" : 5, \"subject\" : \"History\", \"score\" : 79 }",
+                                    "{ \"_id\" : 6, \"subject\" : \"History\", \"score\" : 83 }"};
   @Autowired
   private CountRepository countRepository;
 

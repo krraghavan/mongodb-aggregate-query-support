@@ -78,7 +78,7 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
   protected String deriveCollectionName(Class className,
                                         Function<Integer, String> parameterValueSupplier,
                                         Supplier<String> documentAnnotationNameSupplier,
-                                        Supplier<String> expressionBasedNameSupplier) throws
+                                        Function<String, String> expressionBasedNameSupplier) throws
                                                                                       InvalidAggregationQueryException {
     LOGGER.trace(">>>> AbstractAggregateQueryProvider::deriveCollectionName for {}", className);
 
@@ -102,7 +102,7 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
     }
     // @Document present but may be an expression.
     // if the collection name is an expression process it here.
-    collectionName = expressionBasedNameSupplier.get();
+    collectionName = expressionBasedNameSupplier.apply(collectionName);
     Assert.notNull(collectionName, "Collection name must not be null");
     LOGGER.trace("<<<< AbstractAggregateQueryProvider::deriveCollectionName: class{}, collectionName:{}",
                  className, collectionName);

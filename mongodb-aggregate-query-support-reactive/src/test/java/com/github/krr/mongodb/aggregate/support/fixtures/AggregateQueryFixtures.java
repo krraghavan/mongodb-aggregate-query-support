@@ -36,7 +36,7 @@ import java.util.List;
 public class AggregateQueryFixtures {
 
   private static final String REPLACE_ROOT_DOCS = "[{ \n" +
-                                                  "    \"id\" : 1, \n" +
+                                                  "    \"_id\" : 1, \n" +
                                                   "    \"fruit\" : [\n" +
                                                   "        \"apples\", \n" +
                                                   "        \"oranges\"\n" +
@@ -51,7 +51,7 @@ public class AggregateQueryFixtures {
                                                   "    }\n" +
                                                   "},\n" +
                                                   "{ \n" +
-                                                  "    \"id\" : 2, \n" +
+                                                  "    \"_id\" : 2, \n" +
                                                   "    \"vegetables\" : [\n" +
                                                   "        \"beets\", \n" +
                                                   "        \"yams\"\n" +
@@ -66,7 +66,7 @@ public class AggregateQueryFixtures {
                                                   "    }\n" +
                                                   "},\n" +
                                                   "{ \n" +
-                                                  "    \"id\" : 3, \n" +
+                                                  "    \"_id\" : 3, \n" +
                                                   "    \"name\" : \"Arlene\", \n" +
                                                   "    \"age\" : 34, \n" +
                                                   "    \"pets\" : {\n" +
@@ -75,7 +75,7 @@ public class AggregateQueryFixtures {
                                                   "    }\n" +
                                                   "},\n" +
                                                   "{ \n" +
-                                                  "    \"id\" : 4, \n" +
+                                                  "    \"_id\" : 4, \n" +
                                                   "    \"name\" : \"Sam\", \n" +
                                                   "    \"age\" : 41, \n" +
                                                   "    \"pets\" : {\n" +
@@ -84,30 +84,30 @@ public class AggregateQueryFixtures {
                                                   "    }\n" +
                                                   "},\n" +
                                                   "{ \n" +
-                                                  "    \"id\" : 5, \n" +
+                                                  "    \"_id\" : 5, \n" +
                                                   "    \"name\" : \"Maria\", \n" +
                                                   "    \"age\" : 25\n" +
                                                   "},\n" +
                                                   "{ \n" +
-                                                  "    \"id\" : 6, \n" +
+                                                  "    \"_id\" : 6, \n" +
                                                   "    \"first_name\" : \"Gary\", \n" +
                                                   "    \"last_name\" : \"Sheffield\", \n" +
                                                   "    \"city\" : \"New York\"\n" +
                                                   "},\n" +
                                                   "{ \n" +
-                                                  "    \"id\" : 7, \n" +
+                                                  "    \"_id\" : 7, \n" +
                                                   "    \"first_name\" : \"Nancy\", \n" +
                                                   "    \"last_name\" : \"Walker\", \n" +
                                                   "    \"city\" : \"Anaheim\"\n" +
                                                   "},\n" +
                                                   "{ \n" +
-                                                  "    \"id\" : 8, \n" +
+                                                  "    \"_id\" : 8, \n" +
                                                   "    \"first_name\" : \"Peter\", \n" +
                                                   "    \"last_name\" : \"Sumner\", \n" +
                                                   "    \"city\" : \"Toledo\"\n" +
                                                   "},\n" +
                                                   "{ \n" +
-                                                  "    \"id\" : 10, \n" +
+                                                  "    \"_id\" : 10, \n" +
                                                   "    \"aname\" : \"Susan\", \n" +
                                                   "    \"phones\" : [\n" +
                                                   "        {\n" +
@@ -119,7 +119,7 @@ public class AggregateQueryFixtures {
                                                   "    ]\n" +
                                                   "},\n" +
                                                   "{ \n" +
-                                                  "    \"id\" : 11, \n" +
+                                                  "    \"_id\" : 11, \n" +
                                                   "    \"aname\" : \"Mark\", \n" +
                                                   "    \"phones\" : [\n" +
                                                   "        {\n" +
@@ -132,53 +132,53 @@ public class AggregateQueryFixtures {
                                                   "}]\n";
 
   private static final String TEST_SCORES_DOCUMENTS = "[{\n" +
-                                                      "  \"id\": 1,\n" +
+                                                      "  \"_id\": 1,\n" +
                                                       "  \"student\": \"Maya\",\n" +
                                                       "  \"homework\": [ 10, 5, 10 ],\n" +
                                                       "  \"quiz\": [ 10, 8 ],\n" +
                                                       "  \"extraCredit\": 0\n" +
                                                       "},\n" +
                                                       "{\n" +
-                                                      "  \"id\": 2,\n" +
+                                                      "  \"_id\": 2,\n" +
                                                       "  \"student\": \"Ryan\",\n" +
                                                       "  \"homework\": [ 5, 6, 5 ],\n" +
                                                       "  \"quiz\": [ 8, 8 ],\n" +
                                                       "  \"extraCredit\": 8\n" +
                                                       "}]";
 
-  private static final String TEST_ARTWORK_DOCUMENTS = "[{ \"id\" : 1, \"title\" : \"The Pillars of Society\", " +
+  private static final String TEST_ARTWORK_DOCUMENTS = "[{ \"_id\" : 1, \"title\" : \"The Pillars of Society\", " +
                                                        "    \"artist\" : \"Grosz\", \"year\" : 1926,\n" +
                                                        "    \"price\" : 199.99 },\n" +
-                                                       "{ \"id\" : 2, \"title\" : \"Melancholy III\", " +
+                                                       "{ \"_id\" : 2, \"title\" : \"Melancholy III\", " +
                                                        "  \"artist\" : \"Munch\", \"year\" : 1902,\n" +
                                                        "  \"price\" : 280.00 },\n" +
-                                                       "{ \"id\" : 3, \"title\" : \"Dancer\", " +
+                                                       "{ \"_id\" : 3, \"title\" : \"Dancer\", " +
                                                        "   \"artist\" : \"Miro\", \"year\" : 1925,\n" +
                                                        "   \"price\" : 76.04 },\n" +
-                                                       "{ \"id\" : 4, \"title\" : \"The Great Wave off Kanagawa\"," +
+                                                       "{ \"_id\" : 4, \"title\" : \"The Great Wave off Kanagawa\"," +
                                                        "  \"artist\" : \"Hokusai\",\n" +
                                                        "  \"price\" : 167.30 },\n" +
-                                                       "{ \"id\" : 5, \"title\" : \"The Persistence of Memory\", " +
+                                                       "{ \"_id\" : 5, \"title\" : \"The Persistence of Memory\", " +
                                                        "  \"artist\" : \"Dali\", \"year\" : 1931,\n" +
                                                        "  \"price\" : 483.00 },\n" +
-                                                       "{ \"id\" : 6, \"title\" : \"Composition VII\", " +
+                                                       "{ \"_id\" : 6, \"title\" : \"Composition VII\", " +
                                                        "  \"artist\" : \"Kandinsky\", \"year\" : 1913,\n" +
                                                        "  \"price\" : 385.00 },\n" +
-                                                       "{ \"id\" : 7, \"title\" : \"The Scream\", " +
+                                                       "{ \"_id\" : 7, \"title\" : \"The Scream\", " +
                                                        "  \"artist\" : \"Munch\", \"year\" : 1893,  \"price\" : 480.00\n" +
                                                        " },\n" +
-                                                       "{ \"id\" : 8, \"title\" : \"Blue Flower\", " +
+                                                       "{ \"_id\" : 8, \"title\" : \"Blue Flower\", " +
                                                        "  \"artist\" : \"O'Keefe\", \"year\" : 1918,\n" +
                                                        "    \"price\" : 118.42 }]";
 
-  private static final String TEST_ARTWORK_WITH_TAGS_DOCUMENT = "[{ \"id\" : 1, \"title\" : \"The Pillars of Society\", \"price\" : 199.99, \"artist\" : \"Grosz\", \"year\" : 1926, \"tags\" : [ \"painting\", \"satire\", \"Expressionism\", \"caricature\" ] },\n" +
-                                                                "{ \"id\" : 2, \"title\" : \"Melancholy III\", \"price\" : 280.00, \"artist\" : \"Munch\", \"year\" : 1902, \"tags\" : [ \"woodcut\", \"Expressionism\" ] },\n" +
-                                                                "{ \"id\" : 3, \"title\" : \"Dancer\", \"price\" : 76.04, \"artist\" : \"Miro\", \"year\" : 1925, \"tags\" : [ \"oil\", \"Surrealism\", \"painting\" ] },\n" +
-                                                                "{ \"id\" : 4, \"title\" : \"The Great Wave off Kanagawa\", \"price\" : 167.30, \"artist\" : \"Hokusai\", \"tags\" : [ \"woodblock\", \"ukiyo-e\" ] },\n" +
-                                                                "{ \"id\" : 5, \"title\" : \"The Persistence of Memory\", \"price\" : 483.00, \"artist\" : \"Dali\", \"year\" : 1931, \"tags\" : [ \"Surrealism\", \"painting\", \"oil\" ] },\n" +
-                                                                "{ \"id\" : 6, \"title\" : \"Composition VII\", \"price\" : 385.00, \"artist\" : \"Kandinsky\", \"year\" : 1913, \"tags\" : [ \"oil\", \"painting\", \"abstract\" ] },\n" +
-                                                                "{ \"id\" : 7, \"title\" : \"The Scream\", \"price\" : 480.00, \"artist\" : \"Munch\", \"year\" : 1893, \"tags\" : [ \"Expressionism\", \"painting\", \"oil\" ] },\n" +
-                                                                "{ \"id\" : 8, \"title\" : \"Blue Flower\", \"price\" : 118.42, \"artist\" : \"O'Keefe\", \"year\" : 1918, \"tags\" : [ \"abstract\", \"painting\" ] }]";
+  private static final String TEST_ARTWORK_WITH_TAGS_DOCUMENT = "[{ \"_id\" : 1, \"title\" : \"The Pillars of Society\", \"price\" : 199.99, \"artist\" : \"Grosz\", \"year\" : 1926, \"tags\" : [ \"painting\", \"satire\", \"Expressionism\", \"caricature\" ] },\n" +
+                                                                "{ \"_id\" : 2, \"title\" : \"Melancholy III\", \"price\" : 280.00, \"artist\" : \"Munch\", \"year\" : 1902, \"tags\" : [ \"woodcut\", \"Expressionism\" ] },\n" +
+                                                                "{ \"_id\" : 3, \"title\" : \"Dancer\", \"price\" : 76.04, \"artist\" : \"Miro\", \"year\" : 1925, \"tags\" : [ \"oil\", \"Surrealism\", \"painting\" ] },\n" +
+                                                                "{ \"_id\" : 4, \"title\" : \"The Great Wave off Kanagawa\", \"price\" : 167.30, \"artist\" : \"Hokusai\", \"tags\" : [ \"woodblock\", \"ukiyo-e\" ] },\n" +
+                                                                "{ \"_id\" : 5, \"title\" : \"The Persistence of Memory\", \"price\" : 483.00, \"artist\" : \"Dali\", \"year\" : 1931, \"tags\" : [ \"Surrealism\", \"painting\", \"oil\" ] },\n" +
+                                                                "{ \"_id\" : 6, \"title\" : \"Composition VII\", \"price\" : 385.00, \"artist\" : \"Kandinsky\", \"year\" : 1913, \"tags\" : [ \"oil\", \"painting\", \"abstract\" ] },\n" +
+                                                                "{ \"_id\" : 7, \"title\" : \"The Scream\", \"price\" : 480.00, \"artist\" : \"Munch\", \"year\" : 1893, \"tags\" : [ \"Expressionism\", \"painting\", \"oil\" ] },\n" +
+                                                                "{ \"_id\" : 8, \"title\" : \"Blue Flower\", \"price\" : 118.42, \"artist\" : \"O'Keefe\", \"year\" : 1918, \"tags\" : [ \"abstract\", \"painting\" ] }]";
 
   public static List<TestReplaceRootBean> newReplaceRootFixture() throws IOException {
     ObjectMapper mapper = new ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);

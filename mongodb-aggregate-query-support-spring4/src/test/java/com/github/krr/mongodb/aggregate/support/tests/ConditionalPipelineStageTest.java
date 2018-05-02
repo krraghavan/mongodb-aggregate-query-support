@@ -45,7 +45,8 @@ import static org.testng.Assert.assertTrue;
  * 3/8/17.
  */
 
-@SuppressWarnings("SpringJavaAutowiredMembersInspection")
+@SuppressWarnings(
+    {"SpringJavaAutowiredMembersInspection", "SpringJavaInjectionPointsAutowiringInspection", "Duplicates"})
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
 public class ConditionalPipelineStageTest extends AbstractTestNGSpringContextTests {
 

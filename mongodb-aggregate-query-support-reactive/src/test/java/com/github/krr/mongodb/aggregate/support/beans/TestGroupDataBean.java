@@ -18,7 +18,7 @@
  */
 package com.github.krr.mongodb.aggregate.support.beans;
 
-import org.springframework.data.annotation.Id;
+import com.github.krr.mongodb.aggregate.support.reactive.annotations.MongoId;
 
 import java.util.Date;
 
@@ -38,8 +38,8 @@ import java.util.Date;
 
 public class TestGroupDataBean extends AbstractTestAggregateBean {
 
-  @Id
-  private String _id;
+  @MongoId
+  private String id;
 
   private String item;
 
@@ -81,11 +81,11 @@ public class TestGroupDataBean extends AbstractTestAggregateBean {
     this.date = date;
   }
 
-  public String get_id() {
-    return _id;
+  public String getId() {
+    return id;
   }
 
-  public void set_id(String _id) {
-    this._id = _id;
+  public void setId(String id) {
+    this.id = id;
   }
 }

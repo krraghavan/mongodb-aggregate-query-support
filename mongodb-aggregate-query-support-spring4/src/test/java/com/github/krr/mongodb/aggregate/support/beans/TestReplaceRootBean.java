@@ -19,7 +19,7 @@
 
 package com.github.krr.mongodb.aggregate.support.beans;
 
-import org.springframework.data.annotation.Id;
+import com.github.krr.mongodb.aggregate.support.nonreactive.annotations.MongoId;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ import java.util.Map;
 
 public class TestReplaceRootBean extends AbstractTestAggregateBean {
 
-  @Id
+  @MongoId
   private int id;
 
   private List<String> fruit;

@@ -25,7 +25,7 @@ import static org.testng.Assert.*;
 /**
  * camejavi 3/15/17
  */
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "SpringJavaInjectionPointsAutowiringInspection"})
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
 public class AggregatePageableTest extends AbstractTestNGSpringContextTests {
 
@@ -37,12 +37,12 @@ public class AggregatePageableTest extends AbstractTestNGSpringContextTests {
 
   private int[] scoreArr = {70, 75, 80, 85, 90, 95};
 
-  private final String[] SCORE_DOCS = {"{ \"id\" : 1, \"subject\" : \"History\", \"score\" : " + scoreArr[0] + " }",
-                                       "{ \"id\" : 2, \"subject\" : \"History\", \"score\" : " + scoreArr[5] + " }",
-                                       "{ \"id\" : 3, \"subject\" : \"History\", \"score\" : " + scoreArr[3] + " }",
-                                       "{ \"id\" : 4, \"subject\" : \"History\", \"score\" : " + scoreArr[1] + " }",
-                                       "{ \"id\" : 5, \"subject\" : \"History\", \"score\" : " + scoreArr[2] + " }",
-                                       "{ \"id\" : 6, \"subject\" : \"History\", \"score\" : " + scoreArr[4] + " }",
+  private final String[] SCORE_DOCS = {"{ \"_id\" : 1, \"subject\" : \"History\", \"score\" : " + scoreArr[0] + " }",
+                                       "{ \"_id\" : 2, \"subject\" : \"History\", \"score\" : " + scoreArr[5] + " }",
+                                       "{ \"_id\" : 3, \"subject\" : \"History\", \"score\" : " + scoreArr[3] + " }",
+                                       "{ \"_id\" : 4, \"subject\" : \"History\", \"score\" : " + scoreArr[1] + " }",
+                                       "{ \"_id\" : 5, \"subject\" : \"History\", \"score\" : " + scoreArr[2] + " }",
+                                       "{ \"_id\" : 6, \"subject\" : \"History\", \"score\" : " + scoreArr[4] + " }",
                                        };
 
   @BeforeClass

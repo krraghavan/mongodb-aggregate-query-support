@@ -1,11 +1,11 @@
 package com.github.krr.mongodb.aggregate.support.beans;
 
+import com.github.krr.mongodb.aggregate.support.reactive.annotations.MongoId;
 import com.google.common.base.Objects;
-import org.springframework.data.annotation.Id;
 
 public class TestBinaryBean {
 
-  @Id
+  @MongoId
   private String id;
 
   private byte[] md5Hash;

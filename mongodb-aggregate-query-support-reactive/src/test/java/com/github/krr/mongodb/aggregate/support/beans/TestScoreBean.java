@@ -19,7 +19,7 @@
 
 package com.github.krr.mongodb.aggregate.support.beans;
 
-import org.springframework.data.annotation.Id;
+import com.github.krr.mongodb.aggregate.support.reactive.annotations.MongoId;
 
 import java.util.List;
 import java.util.Objects;
@@ -30,7 +30,7 @@ import java.util.Objects;
  */
 public class TestScoreBean extends AbstractTestAggregateBean {
 
-  @Id
+  @MongoId
   private int id;
 
   private String student;

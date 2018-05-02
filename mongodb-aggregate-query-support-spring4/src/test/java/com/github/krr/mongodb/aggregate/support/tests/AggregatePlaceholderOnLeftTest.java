@@ -31,8 +31,6 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static com.github.krr.mongodb.aggregate.support.utils.FixtureUtils.createPossessions;
-import static com.github.krr.mongodb.aggregate.support.utils.FixtureUtils.createPossessionsWithSortField;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertTrue;
 
@@ -41,7 +39,8 @@ import static org.testng.Assert.assertTrue;
  * 3/1/17.
  */
 
-@SuppressWarnings("SpringJavaAutowiredMembersInspection")
+@SuppressWarnings({"SpringJavaAutowiredMembersInspection", "SpringJavaInjectionPointsAutowiringInspection",
+                   "Duplicates"})
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
 public class AggregatePlaceholderOnLeftTest extends AbstractTestNGSpringContextTests {
 

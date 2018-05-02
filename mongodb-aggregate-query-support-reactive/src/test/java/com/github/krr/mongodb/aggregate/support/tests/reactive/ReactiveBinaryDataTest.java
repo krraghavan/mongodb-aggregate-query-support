@@ -10,6 +10,7 @@ import org.springframework.util.DigestUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @ContextConfiguration(classes = ReactiveAggregateTestConfiguration.class)
 public class ReactiveBinaryDataTest extends AbstractTestNGSpringContextTests {
 

@@ -10,6 +10,7 @@ import org.springframework.util.DigestUtils;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+@SuppressWarnings({"Duplicates", "SpringJavaInjectionPointsAutowiringInspection"})
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
 public class BinaryDataTest extends AbstractTestNGSpringContextTests {
 

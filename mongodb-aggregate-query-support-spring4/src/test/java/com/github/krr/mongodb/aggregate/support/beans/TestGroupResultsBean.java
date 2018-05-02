@@ -18,7 +18,7 @@
  */
 package com.github.krr.mongodb.aggregate.support.beans;
 
-import org.springframework.data.annotation.Id;
+import com.github.krr.mongodb.aggregate.support.nonreactive.annotations.MongoId;
 
 /**
  * Created by rkolliva on 10/19/2015.
@@ -60,7 +60,7 @@ public class TestGroupResultsBean {
     }
   }
 
-  @Id
+  @MongoId
   private SaleDate _id;
 
   private int totalPrice;

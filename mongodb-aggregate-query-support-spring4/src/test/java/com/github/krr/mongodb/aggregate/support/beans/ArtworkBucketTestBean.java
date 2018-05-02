@@ -19,8 +19,7 @@
 
 package com.github.krr.mongodb.aggregate.support.beans;
 
-import org.bson.codecs.pojo.annotations.BsonProperty;
-import org.springframework.data.annotation.Id;
+import com.github.krr.mongodb.aggregate.support.nonreactive.annotations.MongoId;
 
 import java.util.List;
 
@@ -32,8 +31,7 @@ import java.util.List;
 
 public class ArtworkBucketTestBean  extends AbstractTestAggregateBean {
 
-  @Id
-  @BsonProperty("_id")
+  @MongoId
   private Integer id;
 
   private String title;

@@ -21,8 +21,7 @@
 
 package com.github.krr.mongodb.aggregate.support.beans;
 
-import org.bson.codecs.pojo.annotations.BsonProperty;
-import org.springframework.data.annotation.Id;
+import com.github.krr.mongodb.aggregate.support.reactive.annotations.MongoId;
 import org.springframework.data.annotation.Transient;
 
 import java.util.List;
@@ -36,8 +35,7 @@ public class TestPrimaryKeyBean extends AbstractTestAggregateBean {
     //
   }
 
-  @Id
-  @BsonProperty("_id")
+  @MongoId
   private String randomPrimaryKey;
 
   @Transient

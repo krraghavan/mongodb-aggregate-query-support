@@ -19,7 +19,7 @@
 
 package com.github.krr.mongodb.aggregate.support.beans;
 
-import org.springframework.data.annotation.Id;
+import com.github.krr.mongodb.aggregate.support.nonreactive.annotations.MongoId;
 
 /**
  * Created by rkolliva
@@ -29,7 +29,7 @@ import org.springframework.data.annotation.Id;
 
 public class Score {
 
-  @Id
+  @MongoId
   private int id;
 
   private String subject;

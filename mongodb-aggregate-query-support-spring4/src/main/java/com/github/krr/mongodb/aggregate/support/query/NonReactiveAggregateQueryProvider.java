@@ -126,12 +126,12 @@ public class NonReactiveAggregateQueryProvider extends AbstractAggregateQueryPro
                                                                                                               Document.class);
                                                  return documentAnnotation != null ? documentAnnotation.collection() : null;
                                                },
-                                               () -> {
-                                                 Expression expression = detectExpression(this.collectionName);
+                                               (s) -> {
+                                                 Expression expression = detectExpression(s);
                                                  if (expression != null) {
                                                    return expression.getValue(context, String.class);
                                                  }
-                                                 return collectionName;
+                                                 return s;
                                                });
     this.placeholderRepFn = (q) -> replacePlaceholders((String) q);
     // set queryProcessorFactory here - the base class calls createQuery which needs the factory.

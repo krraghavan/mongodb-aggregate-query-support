@@ -19,7 +19,7 @@
 
 package com.github.krr.mongodb.aggregate.support.beans;
 
-import org.springframework.data.annotation.Id;
+import com.github.krr.mongodb.aggregate.support.reactive.annotations.MongoId;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class Possessions {
 
-  @Id
+  @MongoId
   private String id;
 
   private List<Asset> assets;

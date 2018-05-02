@@ -34,12 +34,12 @@ public class ReactiveAggregateSkipTest extends AbstractTestNGSpringContextTests 
   @Autowired
   private ReactiveSkipRepository skipRepository;
 
-  private final String[] SCORE_DOCS = {"{ \"id\" : 1, \"subject\" : \"History\", \"score\" : 88 }",
-                                       "{ \"id\" : 2, \"subject\" : \"History\", \"score\" : 92 }",
-                                       "{ \"id\" : 3, \"subject\" : \"History\", \"score\" : 97 }",
-                                       "{ \"id\" : 4, \"subject\" : \"History\", \"score\" : 71 }",
-                                       "{ \"id\" : 5, \"subject\" : \"History\", \"score\" : 79 }",
-                                       "{ \"id\" : 6, \"subject\" : \"History\", \"score\" : 83 }"};
+  private final String[] SCORE_DOCS = {"{ \"_id\" : 1, \"subject\" : \"History\", \"score\" : 88 }",
+                                       "{ \"_id\" : 2, \"subject\" : \"History\", \"score\" : 92 }",
+                                       "{ \"_id\" : 3, \"subject\" : \"History\", \"score\" : 97 }",
+                                       "{ \"_id\" : 4, \"subject\" : \"History\", \"score\" : 71 }",
+                                       "{ \"_id\" : 5, \"subject\" : \"History\", \"score\" : 79 }",
+                                       "{ \"_id\" : 6, \"subject\" : \"History\", \"score\" : 83 }"};
 
   @BeforeClass
   @SuppressWarnings("Duplicates")

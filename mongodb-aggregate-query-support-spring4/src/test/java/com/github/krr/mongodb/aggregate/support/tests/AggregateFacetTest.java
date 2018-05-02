@@ -39,7 +39,7 @@ import static org.testng.Assert.*;
  * 2/19/17.
  */
 
-@SuppressWarnings({"ConstantConditions", "Duplicates"})
+@SuppressWarnings({"ConstantConditions", "Duplicates", "SpringJavaInjectionPointsAutowiringInspection"})
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
 public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
 
