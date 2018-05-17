@@ -296,12 +296,12 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
 
   @Override
   public boolean isAllowDiskUse() {
-    return false;
+    return aggregateAnnotation.isAllowDiskUse();
   }
 
   @Override
   public long getMaxTimeMS() {
-    return 0;
+    return aggregateAnnotation.maxTimeMS();
   }
 
   @Override

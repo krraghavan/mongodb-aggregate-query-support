@@ -1,9 +1,7 @@
 package com.github.krr.mongodb.aggregate.support.query;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.krr.mongodb.aggregate.support.api.MongoQueryExecutor;
 import com.github.krr.mongodb.aggregate.support.api.QueryProvider;
-import com.github.krr.mongodb.aggregate.support.deserializers.BsonDocumentObjectMapper;
 import com.mongodb.reactivestreams.client.AggregatePublisher;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import org.apache.commons.lang3.StringUtils;
@@ -25,26 +23,34 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+
 /**
  * Created by rkolliva
  * 4/16/18.
  */
 
-public class ReactiveMongoNativeJavaDriverQueryExecutor implements MongoQueryExecutor {
+@SuppressWarnings("unused")
+public class ReactiveMongoNativeJavaDriverQueryExecutor extends AbstractQueryExecutor<ReactiveMongoOperations> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveMongoNativeJavaDriverQueryExecutor.class);
-
-  private static final ObjectMapper OBJECT_MAPPER = new BsonDocumentObjectMapper();
 
   private static final String MONGO_V3_6_VERSION = "3.6";
 
   @SuppressWarnings({"FieldCanBeLocal", "unused"})
-  private final boolean isMongo360OrLater;
-
-  private final ReactiveMongoOperations mongoOperations;
+  private boolean isMongo360OrLater;
 
   public ReactiveMongoNativeJavaDriverQueryExecutor(ReactiveMongoOperations mongoOperations) {
-    this.mongoOperations = mongoOperations;
+    super(mongoOperations);
+    initialize(mongoOperations);
+  }
+
+  public ReactiveMongoNativeJavaDriverQueryExecutor(ReactiveMongoOperations mongoOperations, ObjectMapper objectMapper) {
+    super(mongoOperations, objectMapper);
+    initialize(mongoOperations);
+  }
+
+  private void initialize(ReactiveMongoOperations mongoOperations) {
     Document result = mongoOperations.executeCommand("{buildinfo:1}").block();
     this.isMongo360OrLater = ((String)result.get("version")).startsWith(MONGO_V3_6_VERSION);
   }
@@ -66,7 +72,9 @@ public class ReactiveMongoNativeJavaDriverQueryExecutor implements MongoQueryExe
     }
     // run the pipeline and return a flux.
     MongoCollection<Document> collection = mongoOperations.getCollection(collectionName);
-    AggregatePublisher<Document> aggregatePublisher = collection.aggregate(pipelineStages);
+    AggregatePublisher<Document> aggregatePublisher = collection.aggregate(pipelineStages)
+                                                                .allowDiskUse(queryProvider.isAllowDiskUse())
+                                                                .maxTime(queryProvider.getMaxTimeMS(), MILLISECONDS);
     Class methodReturnType = queryProvider.getMethodReturnType();
     boolean isFlux = Flux.class.isAssignableFrom(methodReturnType);
     boolean isMono = Mono.class.isAssignableFrom(methodReturnType);
@@ -146,7 +154,7 @@ public class ReactiveMongoNativeJavaDriverQueryExecutor implements MongoQueryExe
   @SuppressWarnings("unchecked")
   private <T> T deserialize(Class<T> outputClass, BsonDocument d) {
     try {
-      return OBJECT_MAPPER.readValue(d.toJson(), outputClass);
+      return objectMapper.readValue(d.toJson(), outputClass);
     }
     catch (IOException e) {
       throw new IllegalArgumentException(e);

@@ -1,9 +1,7 @@
 package com.github.krr.mongodb.aggregate.support.query;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.krr.mongodb.aggregate.support.api.MongoQueryExecutor;
 import com.github.krr.mongodb.aggregate.support.api.QueryProvider;
-import com.github.krr.mongodb.aggregate.support.deserializers.BsonDocumentObjectMapper;
 import com.mongodb.*;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -20,33 +18,39 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import static com.mongodb.AggregationOptions.builder;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 /**
  * Created by rkolliva
  * 4/16/18.
  */
 
-@SuppressWarnings("Duplicates")
-public class MongoNativeJavaDriverQueryExecutor implements MongoQueryExecutor {
+@SuppressWarnings({"Duplicates", "unused"})
+public class MongoNativeJavaDriverQueryExecutor extends AbstractQueryExecutor<MongoOperations> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MongoNativeJavaDriverQueryExecutor.class);
 
   private static final String MONGO_V3_6_VERSION = "3.6";
 
-  private static final ObjectMapper OBJECT_MAPPER = new BsonDocumentObjectMapper();
-
   private static final String RESULTS = "results";
 
   @SuppressWarnings("FieldCanBeLocal")
-  private final boolean isMongo360OrLater;
-
-  private final MongoOperations mongoOperations;
+  private boolean isMongo360OrLater;
 
   public MongoNativeJavaDriverQueryExecutor(MongoOperations mongoOperations) {
-    this.mongoOperations = mongoOperations;
+    super(mongoOperations);
+    initialize(mongoOperations);
+  }
+
+  @SuppressWarnings("WeakerAccess")
+  public MongoNativeJavaDriverQueryExecutor(MongoOperations mongoOperations, ObjectMapper objectMapper) {
+    super(mongoOperations, objectMapper);
+    initialize(mongoOperations);
+  }
+
+  private void initialize(MongoOperations mongoOperations) {
     CommandResult result = mongoOperations.executeCommand("{buildinfo:1}");
     this.isMongo360OrLater = ((String) result.get("version")).startsWith(MONGO_V3_6_VERSION);
   }
@@ -68,8 +72,7 @@ public class MongoNativeJavaDriverQueryExecutor implements MongoQueryExecutor {
     }
 
     AggregationOptions.Builder aggregationOptionsBuilder = builder().allowDiskUse(queryProvider.isAllowDiskUse())
-                                                                    .maxTime(queryProvider.getMaxTimeMS(),
-                                                                             TimeUnit.MILLISECONDS);
+                                                                    .maxTime(queryProvider.getMaxTimeMS(), MILLISECONDS);
     if (isMongo360OrLater) {
       // after 3.6 CURSOR MODE is mandatory
       aggregationOptionsBuilder.outputMode(AggregationOptions.OutputMode.CURSOR);
@@ -263,7 +266,7 @@ public class MongoNativeJavaDriverQueryExecutor implements MongoQueryExecutor {
 
     try {
       Document document = new Document(d.toMap());
-      return OBJECT_MAPPER.readValue(document.toJson(), outputClass);
+      return objectMapper.readValue(document.toJson(), outputClass);
     }
     catch (IOException e) {
       throw new IllegalArgumentException(e);
