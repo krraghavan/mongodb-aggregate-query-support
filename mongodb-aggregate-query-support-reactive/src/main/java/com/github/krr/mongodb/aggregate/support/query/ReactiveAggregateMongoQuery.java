@@ -52,6 +52,8 @@ public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
 
   private final MongoQueryExecutor queryExecutor;
 
+  private String entityCollectionName;
+
   /**
    * Creates a new {@link AbstractMongoQuery} from the given {@link MongoQueryMethod} and {@link MongoOperations}.
    *
@@ -75,8 +77,10 @@ public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
     ConvertingParameterAccessor parameterAccessor = new ConvertingParameterAccessor(mongoOperations.getConverter(),
                                                                                     mongoParameterAccessor);
     try {
+      entityCollectionName = getQueryMethod().getEntityInformation().getCollectionName();
       AbstractAggregateQueryProvider aggregateQueryProvider = createAggregateQueryProvider(mongoParameterAccessor,
-                                                                                           parameterAccessor);
+                                                                                           parameterAccessor,
+                                                                                           entityCollectionName);
       return queryExecutor.executeQuery(aggregateQueryProvider);
     }
     catch (MongoQueryException e) {
@@ -98,12 +102,13 @@ public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
    * @throws InvalidAggregationQueryException - if there was an error creating the query provider
    */
   private AbstractAggregateQueryProvider createAggregateQueryProvider(MongoParameterAccessor mongoParameterAccessor,
-                                                                      ConvertingParameterAccessor parameterAccessor)
+                                                                      ConvertingParameterAccessor parameterAccessor,
+                                                                      String entityCollectionName)
       throws InvalidAggregationQueryException {
 
     Annotation annotation = method.getAnnotation(Aggregate.class);
     Assert.notNull(annotation, "Aggregate2 must be specified on the method");
-    return new AggregateQueryProvider(method, mongoParameterAccessor, parameterAccessor);
+    return new AggregateQueryProvider(method, mongoParameterAccessor, parameterAccessor, entityCollectionName);
   }
 
   @Override

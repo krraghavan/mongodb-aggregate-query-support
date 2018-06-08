@@ -53,6 +53,8 @@ public class NonReactiveAggregateMongoQuery extends AbstractMongoQuery {
 
   private final MongoQueryExecutor queryExecutor;
 
+  private String entityCollectionName;
+
   private QueryProvider<Pageable> queryProvider;
 
   /**
@@ -77,7 +79,8 @@ public class NonReactiveAggregateMongoQuery extends AbstractMongoQuery {
     ConvertingParameterAccessor parameterAccessor = new ConvertingParameterAccessor(mongoOperations.getConverter(),
                                                                                     mongoParameterAccessor);
     try {
-      queryProvider = createAggregateQueryProvider(mongoParameterAccessor, parameterAccessor);
+      entityCollectionName = getQueryMethod().getEntityInformation().getCollectionName();
+      queryProvider = createAggregateQueryProvider(mongoParameterAccessor, parameterAccessor, entityCollectionName);
       return queryExecutor.executeQuery(queryProvider);
     }
     catch (MongoQueryException e) {
@@ -99,12 +102,13 @@ public class NonReactiveAggregateMongoQuery extends AbstractMongoQuery {
    * @throws InvalidAggregationQueryException - if there was an error creating the query provider
    */
   private QueryProvider<Pageable> createAggregateQueryProvider(MongoParameterAccessor mongoParameterAccessor,
-                                                               ConvertingParameterAccessor parameterAccessor)
+                                                               ConvertingParameterAccessor parameterAccessor,
+                                                               String entityCollectionName)
       throws InvalidAggregationQueryException {
 
     Annotation annotation = method.getAnnotation(Aggregate.class);
     Assert.notNull(annotation, "Either Aggregate or Aggregate2 must be specified on the method");
-    return new AggregateQueryProvider(method, mongoParameterAccessor, parameterAccessor);
+    return new AggregateQueryProvider(method, mongoParameterAccessor, parameterAccessor, entityCollectionName);
   }
 
   @Override
