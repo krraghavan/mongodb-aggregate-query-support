@@ -24,8 +24,10 @@ package com.github.krr.mongodb.aggregate.support.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.repository.query.EvaluationContextProvider;
-import org.springframework.data.repository.query.ExtensionAwareEvaluationContextProvider;
+import org.springframework.data.repository.query.ExtensionAwareQueryMethodEvaluationContextProvider;
+import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
+
+import java.util.Collections;
 
 /**
  * @author rkolliva.
@@ -44,8 +46,8 @@ import org.springframework.data.repository.query.ExtensionAwareEvaluationContext
 public class ReactiveAggregateTestConfiguration {
 
   @Bean
-  public EvaluationContextProvider evaluationContextProvider() {
-    return new ExtensionAwareEvaluationContextProvider();
+  public QueryMethodEvaluationContextProvider evaluationContextProvider() {
+    return new ExtensionAwareQueryMethodEvaluationContextProvider(Collections.emptyList());
   }
 
 }

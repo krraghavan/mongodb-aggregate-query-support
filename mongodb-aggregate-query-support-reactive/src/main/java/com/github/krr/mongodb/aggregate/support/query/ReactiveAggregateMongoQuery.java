@@ -122,6 +122,11 @@ public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
   }
 
   @Override
+  protected boolean isExistsQuery() {
+    return false;
+  }
+
+  @Override
   protected boolean isLimiting() {
     // @todo change this to see if Pageable is specified or if limit stage exists in pipeline.
     return false;

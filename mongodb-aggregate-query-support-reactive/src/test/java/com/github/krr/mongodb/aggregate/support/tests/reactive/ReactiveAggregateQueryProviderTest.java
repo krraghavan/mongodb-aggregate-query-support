@@ -35,7 +35,7 @@ import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
-import org.springframework.data.repository.query.EvaluationContextProvider;
+import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
 import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.data.repository.query.RepositoryQuery;
 import org.springframework.test.context.ContextConfiguration;
@@ -67,7 +67,7 @@ public class ReactiveAggregateQueryProviderTest extends AbstractTestNGSpringCont
   private MongoQueryExecutor queryExecutor;
 
   @Autowired
-  private EvaluationContextProvider evaluationContextProvider;
+  private QueryMethodEvaluationContextProvider evaluationContextProvider;
 
   @Autowired
   private ReactiveTestValidDocumentAnnotationRepository testValidDocumentAnnotationRepository;
