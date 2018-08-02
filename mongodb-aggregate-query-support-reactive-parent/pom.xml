@@ -23,6 +23,14 @@
         <scope>import</scope>
         <exclusions>
           <exclusion>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-mongodb</artifactId>
+          </exclusion>
+          <exclusion>
             <groupId>org.mongodb</groupId>
             <artifactId>mongo-java-driver</artifactId>
           </exclusion>

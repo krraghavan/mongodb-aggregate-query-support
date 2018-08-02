@@ -28,8 +28,8 @@ import org.springframework.data.mongodb.repository.support.MongoRepositoryFactor
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.NamedQueries;
 import org.springframework.data.repository.core.RepositoryMetadata;
-import org.springframework.data.repository.query.EvaluationContextProvider;
 import org.springframework.data.repository.query.QueryLookupStrategy;
+import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
 import org.springframework.data.repository.query.RepositoryQuery;
 import org.springframework.util.Assert;
 
@@ -60,7 +60,7 @@ public class NonReactiveAggregateQuerySupportingRepositoryFactory extends MongoR
 
   @Override
   public Optional<QueryLookupStrategy> getQueryLookupStrategy(QueryLookupStrategy.Key key,
-                                                              EvaluationContextProvider evaluationContextProvider) {
+                                                              QueryMethodEvaluationContextProvider evaluationContextProvider) {
 
     Optional<QueryLookupStrategy> parentQueryLookupStrategy = super.getQueryLookupStrategy(key, evaluationContextProvider);
     Assert.isTrue(parentQueryLookupStrategy.isPresent(), "Expecting parent lookup strategy");
