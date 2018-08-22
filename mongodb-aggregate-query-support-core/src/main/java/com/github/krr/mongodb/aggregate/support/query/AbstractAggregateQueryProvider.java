@@ -306,7 +306,9 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
 
   @Override
   public List<String> modifyAggregateQueryPipeline(String newStage, int stage) {
-    return null;
+    LOGGER.debug("Adding stage {} to index {}", newStage, stage);
+    aggregateQueryPipeline.add(stage, newStage);
+    return aggregateQueryPipeline;
   }
 
   @Override
