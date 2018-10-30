@@ -125,3 +125,4 @@ buildNumber.properties
 
 .idea
 *.gz
+/.java-version
