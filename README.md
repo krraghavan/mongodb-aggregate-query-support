@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.8.2-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
+[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.8.3-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -7,6 +7,9 @@ Spring Data module.
 The @Query annotation provided by Spring Data MongoDb allows queries to be executed with minimum code being written.  
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
+
+## New in 0.8.3 version
+1. Addressed security vulnerability in Jackson libraries (upgraded to 2.9.7)
 
 ## New in 0.8.2 version
 1. Fixed issue where Query provider's _allowDisk_ and _maxTimeout_ parameters were not being considered in aggregate queries.

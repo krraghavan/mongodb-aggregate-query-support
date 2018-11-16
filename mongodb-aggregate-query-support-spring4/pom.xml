@@ -25,7 +25,7 @@
   <parent>
     <groupId>com.github.krraghavan</groupId>
     <artifactId>mongodb-aggregate-query-support-spring4-parent</artifactId>
-    <version>0.8.3-SNAPSHOT</version>
+    <version>0.8.3</version>
     <relativePath>../mongodb-aggregate-query-support-spring4-parent/pom.xml</relativePath>
   </parent>
 
