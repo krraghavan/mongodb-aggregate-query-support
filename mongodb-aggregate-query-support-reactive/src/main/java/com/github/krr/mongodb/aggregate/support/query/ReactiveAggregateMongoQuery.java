@@ -41,6 +41,7 @@ import java.lang.reflect.Method;
  * Created by rkolliva
  * 4/16/2018
  */
+@SuppressWarnings("NullableProblems")
 @Component
 public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
 
@@ -113,6 +114,11 @@ public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
 
   @Override
   protected boolean isCountQuery() {
+    return false;
+  }
+
+  @Override
+  protected boolean isExistsQuery() {
     return false;
   }
 

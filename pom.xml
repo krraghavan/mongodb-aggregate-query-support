@@ -38,12 +38,12 @@
 
   <properties>
     <maqs.version>0.8.5-SNAPSHOT</maqs.version>
-    <mongodb.driver.version>3.6.3</mongodb.driver.version>
+    <mongodb.driver.version>3.8.1</mongodb.driver.version>
     <embedded-mongo-version>2.0.3</embedded-mongo-version>
-    <mongo-reactive-java-driver.version>1.7.1</mongo-reactive-java-driver.version>
-    <spring4-platform-bom.version>Brussels-SR9</spring4-platform-bom.version>
-    <spring5-platform-bom.version>Cairo-RELEASE</spring5-platform-bom.version>
     <jackson.version>2.9.7</jackson.version>
+    <commons-lang3.version>3.8.1</commons-lang3.version>
+    <commons-collections.version>3.2.2</commons-collections.version>
+    <guava.version>27.0-jre</guava.version>
   </properties>
 
   <name>Mongo DB Aggregation Query Support</name>
@@ -110,7 +110,38 @@
         <artifactId>jackson-annotations</artifactId>
         <version>${jackson.version}</version>
       </dependency>
-
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>${commons-lang3.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-collections</groupId>
+        <artifactId>commons-collections</artifactId>
+        <version>${commons-collections.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>27.0-jre</version>
+      </dependency>
+      <dependency>
+        <groupId>de.flapdoodle.embed</groupId>
+        <artifactId>de.flapdoodle.embed.mongo</artifactId>
+        <version>2.1.1</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>io.projectreactor</groupId>
+        <artifactId>reactor-core</artifactId>
+        <version>3.2.2.RELEASE</version>
+      </dependency>
+      <dependency>
+        <groupId>org.testng</groupId>
+        <artifactId>testng</artifactId>
+        <version>6.14.3</version>
+        <scope>test</scope>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 

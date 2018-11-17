@@ -70,7 +70,6 @@
       <artifactId>mongodb-aggregate-query-support-core</artifactId>
       <version>${maqs.version}</version>
     </dependency>
-    <!-- TEST DEPENDENCIES -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
@@ -79,6 +78,8 @@
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
     </dependency>
+
+    <!-- TEST DEPENDENCIES -->
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>

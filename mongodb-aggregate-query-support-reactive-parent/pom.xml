@@ -12,25 +12,38 @@
   <artifactId>mongodb-aggregate-query-support-reactive-parent</artifactId>
   <name>Mongodb Aggregate Query Support (Reactive Parent)</name>
 
+  <properties>
+    <spring5-data-version>2.1.2.RELEASE</spring5-data-version>
+    <spring5-version>5.1.2.RELEASE</spring5-version>
+    <mongo-reactive-java-driver.version>1.10.0</mongo-reactive-java-driver.version>
+  </properties>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>io.spring.platform</groupId>
-        <artifactId>platform-bom</artifactId>
-        <version>${spring5-platform-bom.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.mongo</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-data-mongodb</artifactId>
+        <version>${spring5-data-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-data-commons</artifactId>
+        <version>${spring5-data-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>${spring5-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-test</artifactId>
+        <version>${spring5-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${spring5-version}</version>
       </dependency>
       <dependency>
         <groupId>org.mongodb</groupId>

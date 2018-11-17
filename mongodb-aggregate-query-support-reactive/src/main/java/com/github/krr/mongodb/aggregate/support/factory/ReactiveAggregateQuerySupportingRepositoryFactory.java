@@ -30,8 +30,8 @@ import org.springframework.data.mongodb.repository.support.ReactiveMongoReposito
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.NamedQueries;
 import org.springframework.data.repository.core.RepositoryMetadata;
-import org.springframework.data.repository.query.EvaluationContextProvider;
 import org.springframework.data.repository.query.QueryLookupStrategy;
+import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
 import org.springframework.data.repository.query.RepositoryQuery;
 import org.springframework.util.Assert;
 
@@ -42,6 +42,7 @@ import java.util.Optional;
  * Created by rkolliva
  * 10/10/2015.
  */
+@SuppressWarnings("NullableProblems")
 public class ReactiveAggregateQuerySupportingRepositoryFactory extends ReactiveMongoRepositoryFactory {
 
   private final ReactiveMongoOperations mongoOperations;
@@ -63,7 +64,7 @@ public class ReactiveAggregateQuerySupportingRepositoryFactory extends ReactiveM
 
   @Override
   public Optional<QueryLookupStrategy> getQueryLookupStrategy(QueryLookupStrategy.Key key,
-                                                              EvaluationContextProvider evaluationContextProvider) {
+                                                              QueryMethodEvaluationContextProvider evaluationContextProvider) {
 
     Optional<QueryLookupStrategy> parentQueryLookupStrategy = super.getQueryLookupStrategy(key, evaluationContextProvider);
     Assert.isTrue(parentQueryLookupStrategy.isPresent(), "Expecting parent query lookup strategy to be present");
@@ -74,6 +75,7 @@ public class ReactiveAggregateQuerySupportingRepositoryFactory extends ReactiveM
     return (method.getAnnotation(Aggregate.class) != null);
   }
 
+  @SuppressWarnings("NullableProblems")
   private class AggregateQueryLookupStrategy implements QueryLookupStrategy {
 
     private final QueryLookupStrategy parentQueryLookupStrategy;

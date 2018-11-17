@@ -33,8 +33,8 @@ import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
-import org.springframework.data.repository.query.EvaluationContextProvider;
 import org.springframework.data.repository.query.QueryLookupStrategy;
+import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
 import org.springframework.data.repository.query.RepositoryQuery;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -62,7 +62,7 @@ public class AggregateQueryProvider2Test extends AbstractTestNGSpringContextTest
   private MongoQueryExecutor queryExecutor;
 
   @Autowired
-  private EvaluationContextProvider evaluationContextProvider;
+  private QueryMethodEvaluationContextProvider evaluationContextProvider;
 
   @DataProvider
   private Object[][] queryMethods() {
@@ -95,7 +95,7 @@ public class AggregateQueryProvider2Test extends AbstractTestNGSpringContextTest
     //Valid Spring Expression Document name validation
     String validCollectionName = mongoOperations.getCollectionName(TestValidDocumentAnnotationBean.class);
     assertNotNull(validCollectionName);
-    assertTrue(DocumentAnnotationFixture.RANDOM_COLLECTION.equals(validCollectionName));
+    assertEquals(DocumentAnnotationFixture.RANDOM_COLLECTION, validCollectionName);
   }
 
   @Test

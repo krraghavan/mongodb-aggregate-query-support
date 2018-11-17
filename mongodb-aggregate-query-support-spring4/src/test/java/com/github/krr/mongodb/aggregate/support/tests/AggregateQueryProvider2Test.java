@@ -62,9 +62,6 @@ public class AggregateQueryProvider2Test extends AbstractTestNGSpringContextTest
   @Autowired
   private EvaluationContextProvider evaluationContextProvider;
 
-  @Autowired
-  private TestAggregateRepository22 aggregateRepository22;
-
   @DataProvider
   private Object[][] queryMethods() {
     return new Object[][] {
@@ -96,7 +93,7 @@ public class AggregateQueryProvider2Test extends AbstractTestNGSpringContextTest
     //Valid Spring Expression Document name validation
     String validCollectionName = mongoOperations.getCollectionName(TestValidDocumentAnnotationBean.class);
     assertNotNull(validCollectionName);
-    assertTrue(DocumentAnnotationFixture.RANDOM_COLLECTION.equals(validCollectionName));
+    assertEquals(DocumentAnnotationFixture.RANDOM_COLLECTION, validCollectionName);
   }
 
   @Test

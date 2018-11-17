@@ -12,24 +12,32 @@
   <artifactId>mongodb-aggregate-query-support-spring4-parent</artifactId>
   <name>Mongodb Aggregate Query Support (Spring 4 Parent)</name>
 
+  <properties>
+    <spring4-data-version>1.10.16.RELEASE</spring4-data-version>
+    <spring4-version>4.3.20.RELEASE</spring4-version>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>io.spring.platform</groupId>
-        <artifactId>platform-bom</artifactId>
-        <version>${spring4-platform-bom.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-        <exclusions>
-          <exclusion>
-            <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.mongo</artifactId>
-          </exclusion>
-        </exclusions>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-data-mongodb</artifactId>
+        <version>${spring4-data-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>${spring4-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-test</artifactId>
+        <version>${spring4-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${spring4-version}</version>
       </dependency>
       <dependency>
         <groupId>org.mongodb</groupId>

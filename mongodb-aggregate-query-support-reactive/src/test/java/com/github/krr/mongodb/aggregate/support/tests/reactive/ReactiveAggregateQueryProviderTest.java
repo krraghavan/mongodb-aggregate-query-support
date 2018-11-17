@@ -35,8 +35,8 @@ import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
-import org.springframework.data.repository.query.EvaluationContextProvider;
 import org.springframework.data.repository.query.QueryLookupStrategy;
+import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
 import org.springframework.data.repository.query.RepositoryQuery;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -56,7 +56,7 @@ import static org.testng.Assert.*;
  * Created by rkolliva
  * 4/2/17.
  */
-@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
+@SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection", "ConstantConditions"})
 @ContextConfiguration(classes = ReactiveAggregateTestConfiguration.class)
 public class ReactiveAggregateQueryProviderTest extends AbstractTestNGSpringContextTests {
 
@@ -67,7 +67,7 @@ public class ReactiveAggregateQueryProviderTest extends AbstractTestNGSpringCont
   private MongoQueryExecutor queryExecutor;
 
   @Autowired
-  private EvaluationContextProvider evaluationContextProvider;
+  private QueryMethodEvaluationContextProvider evaluationContextProvider;
 
   @Autowired
   private ReactiveTestValidDocumentAnnotationRepository testValidDocumentAnnotationRepository;
@@ -119,7 +119,7 @@ public class ReactiveAggregateQueryProviderTest extends AbstractTestNGSpringCont
     mongoOperations.insert(bean).block();
     //No Spring Expression Document annotation specified
     //Since the expression is invalid it should pick up the class name as collection name
-    Boolean noAnnotationCollectionNameExists = mongoOperations.collectionExists(TestNoDocumentAnnotationBean.class).block();
+    boolean noAnnotationCollectionNameExists = mongoOperations.collectionExists(TestNoDocumentAnnotationBean.class).block();
     assertTrue(noAnnotationCollectionNameExists);
     List<String> collectionNames = mongoOperations.getCollectionNames().collectList().block();
     assertTrue(collectionNames.contains("testNoDocumentAnnotationBean"));
