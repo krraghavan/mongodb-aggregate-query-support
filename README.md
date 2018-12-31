@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.8.4-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
+[![Build Status](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support.svg)](https://travis-ci.org/krraghavan/mongodb-aggregate-query-support) [![Release Version](https://img.shields.io/badge/version-v0.8.5-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -8,8 +8,11 @@ The @Query annotation provided by Spring Data MongoDb allows queries to be execu
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
 
-## New in 0.8.4 version
+## New in 0.8.5 version
 1. Addressed security vulnerability in Jackson libraries (upgraded to 2.9.7)
+
+## New in 0.8.4 version
+***** DO NOT USE THIS VERSION.  IT WAS INCORRECTLY BUILT AND DEPLOYED.  USE 0.8.4 *****
 
 ## New in 0.8.3 version
 ***** DO NOT USE THIS VERSION.  IT WAS INCORRECTLY BUILT AND DEPLOYED.  USE 0.8.4 *****
@@ -55,7 +58,7 @@ To include the reactive aggregate query support with Maven use
 <dependency>
   <groupId>com.github.krraghavan</groupId>
   <artifactId>mongodb-aggregate-query-support-reactive</artifactId>
-  <version>0.8.1</version>
+  <version>0.8.5</version>
 </dependency>
 ```
 
@@ -64,7 +67,7 @@ For Spring 4 use (no reactive support with Spring 4)
 <dependency>
   <groupId>com.github.krraghavan</groupId>
   <artifactId>mongodb-aggregate-query-support-spring4</artifactId>
-  <version>0.8.1</version>
+  <version>0.8.5</version>
 </dependency>
 ```
 
