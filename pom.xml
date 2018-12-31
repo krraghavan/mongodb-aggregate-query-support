@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.krraghavan</groupId>
   <artifactId>mongodb-aggregate-query-support</artifactId>
-  <version>0.8.5</version>
+  <version>0.8.6-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
@@ -37,7 +37,7 @@
   </modules>
 
   <properties>
-    <maqs.version>0.8.5</maqs.version>
+    <maqs.version>0.8.6-SNAPSHOT</maqs.version>
     <mongodb.driver.version>3.8.1</mongodb.driver.version>
     <embedded-mongo-version>2.0.3</embedded-mongo-version>
     <jackson.version>2.9.7</jackson.version>
@@ -70,7 +70,7 @@
     <connection>scm:git:git://github.com/krraghavan/mongodb-aggregate-query-support.git</connection>
     <developerConnection>scm:git:ssh://github.com:krraghavan/mongodb-aggregate-query-support.git</developerConnection>
     <url>https://github.com/krraghavan/mongodb-aggregate-query-support/tree/master</url>
-    <tag>v0.8.5</tag>
+    <tag>v0.8.6</tag>
   </scm>
 
   <distributionManagement>
