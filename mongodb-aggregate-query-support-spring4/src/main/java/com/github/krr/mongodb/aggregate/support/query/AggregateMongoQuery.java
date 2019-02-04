@@ -52,6 +52,8 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
 
   private final MongoQueryExecutor queryExecutor;
 
+  private String entityCollectionName;
+
   /**
    * Creates a new {@link AbstractMongoQuery} from the given {@link MongoQueryMethod} and {@link MongoOperations}.
    *
@@ -74,7 +76,10 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
     ConvertingParameterAccessor parameterAccessor = new ConvertingParameterAccessor(mongoOperations.getConverter(),
                                                                                     mongoParameterAccessor);
     try {
-      QueryProvider aggregateQueryProvider = createAggregateQueryProvider(mongoParameterAccessor, parameterAccessor);
+      entityCollectionName = getQueryMethod().getEntityInformation().getCollectionName();
+      QueryProvider aggregateQueryProvider = createAggregateQueryProvider(mongoParameterAccessor,
+                                                                          parameterAccessor,
+                                                                          entityCollectionName);
       return queryExecutor.executeQuery(aggregateQueryProvider);
     }
     catch (MongoQueryException e) {
@@ -96,12 +101,13 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
    * @throws InvalidAggregationQueryException - if there was an error creating the query provider
    */
   private AbstractAggregateQueryProvider createAggregateQueryProvider(MongoParameterAccessor mongoParameterAccessor,
-                                                                      ConvertingParameterAccessor parameterAccessor)
+                                                                      ConvertingParameterAccessor parameterAccessor,
+                                                                      String entityCollectionName)
       throws InvalidAggregationQueryException {
 
     Annotation annotation = method.getAnnotation(Aggregate.class);
     Assert.notNull(annotation, "Either Aggregate or Aggregate2 must be specified on the method");
-    return new NonReactiveAggregateQueryProvider(method, mongoParameterAccessor, parameterAccessor);
+    return new NonReactiveAggregateQueryProvider(method, mongoParameterAccessor, parameterAccessor, entityCollectionName);
   }
 
   @Override

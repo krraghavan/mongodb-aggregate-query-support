@@ -83,6 +83,7 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
    * one parameter contains an @{@link CollectionName} annotation.
    */
   protected String deriveCollectionName(Class className,
+                                        String entityCollectionName,
                                         Function<Integer, String> parameterValueSupplier,
                                         Supplier<String> documentAnnotationNameSupplier,
                                         Function<String, String> expressionBasedNameSupplier) throws
@@ -99,6 +100,11 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
     }
     // check if document annotation is present on bean.
     collectionName = documentAnnotationNameSupplier.get();
+
+    // if the entityCollectionName is present use that.
+    if(!StringUtils.isEmpty(entityCollectionName)) {
+      collectionName = entityCollectionName;
+    }
 
     // if @Document annoation is present
     if (StringUtils.isEmpty(collectionName)) {

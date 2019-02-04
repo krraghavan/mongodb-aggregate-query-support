@@ -88,6 +88,8 @@ public class NonReactiveAggregateQueryProvider extends AbstractAggregateQueryPro
 
   private DefaultPipelineStageQueryProcessorFactory queryProcessorFactory;
 
+  private final String entityCollectionName;
+
   private final ArrayUtils arrayUtils = new ArrayUtils();
 
   private final ProcessorUtils processorUtils = new ProcessorUtils();
@@ -100,11 +102,13 @@ public class NonReactiveAggregateQueryProvider extends AbstractAggregateQueryPro
 
   @SuppressWarnings("WeakerAccess")
   public NonReactiveAggregateQueryProvider(Method method, MongoParameterAccessor mongoParameterAccessor,
-                                           ConvertingParameterAccessor convertingParameterAccessor) throws
+                                           ConvertingParameterAccessor convertingParameterAccessor,
+                                           String entityCollectionName) throws
                                                                                           InvalidAggregationQueryException {
     super(method);
     this.mongoParameterAccessor = mongoParameterAccessor;
     this.convertingParameterAccessor = convertingParameterAccessor;
+    this.entityCollectionName = entityCollectionName;
     initializeAnnotation(method);
     createAggregateQuery();
   }
@@ -120,6 +124,7 @@ public class NonReactiveAggregateQueryProvider extends AbstractAggregateQueryPro
     this.aggregateAnnotation = method.getAnnotation(Aggregate.class);
     Class inputType = aggregateAnnotation.inputType();
     this.collectionName = deriveCollectionName(aggregateAnnotation.inputType(),
+                                               entityCollectionName,
                                                (idx) -> mongoParameterAccessor.getValues()[idx].toString(),
                                                () -> {
                                                  Document documentAnnotation = AnnotationUtils.findAnnotation(inputType,

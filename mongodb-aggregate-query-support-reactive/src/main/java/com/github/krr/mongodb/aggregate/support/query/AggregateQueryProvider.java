@@ -87,6 +87,8 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider<Pagea
 
   private DefaultPipelineStageQueryProcessorFactory queryProcessorFactory;
 
+  private final String entityCollectionName;
+
   private final ArrayUtils arrayUtils = new ArrayUtils();
 
   private final ReactiveProcessorUtils processorUtils = new ReactiveProcessorUtils();
@@ -100,11 +102,13 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider<Pagea
 
   @SuppressWarnings("WeakerAccess")
   public AggregateQueryProvider(Method method, MongoParameterAccessor mongoParameterAccessor,
-                                ConvertingParameterAccessor convertingParameterAccessor) throws
+                                ConvertingParameterAccessor convertingParameterAccessor,
+                                String entityCollectionName) throws
                                                                                           InvalidAggregationQueryException {
     super(method);
     this.mongoParameterAccessor = mongoParameterAccessor;
     this.convertingParameterAccessor = convertingParameterAccessor;
+    this.entityCollectionName = entityCollectionName;
     initializeAnnotation(method);
     createAggregateQuery();
   }
@@ -120,6 +124,7 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider<Pagea
     this.aggregateAnnotation = method.getAnnotation(Aggregate.class);
     Class inputType = aggregateAnnotation.inputType();
     this.collectionName = deriveCollectionName(aggregateAnnotation.inputType(),
+                                               entityCollectionName,
                                                (idx) -> mongoParameterAccessor.getValues()[idx].toString(),
                                                () -> {
                                                  Document documentAnnotation = AnnotationUtils.findAnnotation(inputType,
