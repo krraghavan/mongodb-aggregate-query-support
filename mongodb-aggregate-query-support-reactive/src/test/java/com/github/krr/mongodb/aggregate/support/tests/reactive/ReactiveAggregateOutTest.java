@@ -21,6 +21,7 @@ package com.github.krr.mongodb.aggregate.support.tests.reactive;
 import com.github.krr.mongodb.aggregate.support.beans.TestAggregateAnnotation2FieldsBean;
 import com.github.krr.mongodb.aggregate.support.config.ReactiveAggregateTestConfiguration;
 import com.github.krr.mongodb.aggregate.support.repository.reactive.ReactiveTestAggregateRepository2;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.ContextConfiguration;
@@ -33,14 +34,13 @@ import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomUtils.nextInt;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * Created by camejavi on 6/9/2016.
  *
  */
-@SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection", "Duplicates"})
+@SuppressWarnings({"Duplicates"})
 @ContextConfiguration(classes = {ReactiveAggregateTestConfiguration.class})
 public class ReactiveAggregateOutTest extends AbstractTestNGSpringContextTests {
 
@@ -58,20 +58,25 @@ public class ReactiveAggregateOutTest extends AbstractTestNGSpringContextTests {
                                                                                      nextInt(1, 10000));
     obj2.setOid(UUID.randomUUID().toString());
 
-    testAggregateRepository2.save(obj1).block();
-    testAggregateRepository2.save(obj2).block();
-    String outputRepoName = "temp1";
-    testAggregateRepository2.aggregateQueryWithOut(outputRepoName).block();
-    assertTrue(reactiveMongoOperations.collectionExists(outputRepoName).block());
-    Flux<TestAggregateAnnotation2FieldsBean> copiedObjsFlux = reactiveMongoOperations
-        .findAll(TestAggregateAnnotation2FieldsBean.class,
-                 outputRepoName);
+    String srcRepo = RandomStringUtils.randomAlphabetic(12);
+    assertNotNull(reactiveMongoOperations);
+    reactiveMongoOperations.save(obj1, srcRepo).block();
+    reactiveMongoOperations.save(obj2, srcRepo).block();
+    String outputRepoName = RandomStringUtils.randomAlphabetic(10);
+    testAggregateRepository2.aggregateQueryWithOut(outputRepoName, srcRepo).block();
+    assertNotNull(reactiveMongoOperations.collectionExists(outputRepoName));
+    Boolean collectionExists = reactiveMongoOperations.collectionExists(outputRepoName).block();
+    assertNotNull(collectionExists);
+    assertTrue(collectionExists);
+    Flux<TestAggregateAnnotation2FieldsBean> copiedObjsFlux = reactiveMongoOperations.findAll(TestAggregateAnnotation2FieldsBean.class,
+                                                                                              outputRepoName);
     List<TestAggregateAnnotation2FieldsBean> copiedObjs = copiedObjsFlux.collectList().block();
+    assertNotNull(copiedObjs);
     //clear testAggregateAnnotationFieldsBean repo before running this test
-    assertSame(copiedObjs.size(), 2);
+    assertEquals(copiedObjs.size(), 2);
     if (copiedObjs.get(0).getRandomAttribute2() == 0) {
-      assertTrue(copiedObjs.get(0).equals(obj1));
-      assertTrue(copiedObjs.get(1).equals(obj2));
+      assertEquals(obj1, copiedObjs.get(0));
+      assertEquals(obj2, copiedObjs.get(1));
     }
     else {
       assertSame(copiedObjs.get(0), obj2);
@@ -86,16 +91,23 @@ public class ReactiveAggregateOutTest extends AbstractTestNGSpringContextTests {
     TestAggregateAnnotation2FieldsBean obj2 = new TestAggregateAnnotation2FieldsBean(randomAlphabetic(20),
                                                                                      nextInt(1, 10000));
     TestAggregateAnnotation2FieldsBean obj3 = new TestAggregateAnnotation2FieldsBean(randomStr, nextInt(1, 10000));
-    testAggregateRepository2.save(obj1).block();
-    testAggregateRepository2.save(obj2).block();
-    testAggregateRepository2.save(obj3).block();
-    String outputRepoName = "tempBroken";
-    testAggregateRepository2.aggregateQueryWithMatchAndOut(randomStr, outputRepoName).block();
-    assertTrue(reactiveMongoOperations.collectionExists(outputRepoName).block());
+    String srcRepo = RandomStringUtils.randomAlphabetic(12);
+
+    reactiveMongoOperations.save(obj1, srcRepo).block();
+    reactiveMongoOperations.save(obj2, srcRepo).block();
+    reactiveMongoOperations.save(obj3, srcRepo).block();
+
+    String outputRepoName = RandomStringUtils.randomAlphabetic(10);
+    testAggregateRepository2.aggregateQueryWithMatchAndOut(randomStr, srcRepo, outputRepoName).block();
+
+    Boolean collectionExists = reactiveMongoOperations.collectionExists(outputRepoName).block();
+    assertNotNull(collectionExists);
+    assertTrue(collectionExists);
     List<TestAggregateAnnotation2FieldsBean> copiedObjs = reactiveMongoOperations.findAll(TestAggregateAnnotation2FieldsBean.class,
                                                                                           outputRepoName)
                                                                                 .collectList().block();
     //clear testAggregateAnnotationFieldsBean repo before running this test
+    assertNotNull(copiedObjs);
     assertSame(copiedObjs.size(), 2);
   }
 }

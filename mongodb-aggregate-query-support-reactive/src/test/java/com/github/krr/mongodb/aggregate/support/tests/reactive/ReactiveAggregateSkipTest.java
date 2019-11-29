@@ -30,7 +30,6 @@ public class ReactiveAggregateSkipTest extends AbstractTestNGSpringContextTests 
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveAggregateSkipTest.class);
 
-  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private ReactiveSkipRepository skipRepository;
 
@@ -58,7 +57,7 @@ public class ReactiveAggregateSkipTest extends AbstractTestNGSpringContextTests 
         cnt.getAndIncrement();
       }
       catch (IOException e) {
-        assertTrue(false, e.getMessage());
+        fail(e.getMessage());
       }
     });
     LOGGER.error("Skip repository contains {} scores before adding {}", skipRepository.count().block(), cnt.get());

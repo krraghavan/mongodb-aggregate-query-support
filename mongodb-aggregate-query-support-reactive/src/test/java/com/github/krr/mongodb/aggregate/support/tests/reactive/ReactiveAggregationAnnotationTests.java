@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.testng.annotations.Test;
+import reactor.core.publisher.Flux;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ import static org.testng.Assert.*;
  * Created by rkolliva
  * 10/10/2015.
  */
-@SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection", "Duplicates"})
+@SuppressWarnings({"Duplicates"})
 @ContextConfiguration(classes = {ReactiveAggregateTestConfiguration.class})
 public class ReactiveAggregationAnnotationTests extends AbstractTestNGSpringContextTests {
 
@@ -71,11 +72,13 @@ public class ReactiveAggregationAnnotationTests extends AbstractTestNGSpringCont
     String oid = UUID.randomUUID().toString();
     TestAggregateAnnotationBean bean = new TestAggregateAnnotationBean(value);
     bean.setOid(oid);
-    testAggregateRepository.save(bean);
+    testAggregateRepository.save(bean).block();
     TestAggregateAnnotationBean result = testAggregateRepository.aggregateQueryMatchAnnotation(value).block();
     assertNotNull(result);
+    assertEquals(result, bean);
   }
 
+  @SuppressWarnings("unchecked")
   @Test
   public void mustReturnCorrectValuesForMatchWithProjectionOperation() {
     assertNotNull(testAggregateRepository2);
@@ -85,21 +88,21 @@ public class ReactiveAggregationAnnotationTests extends AbstractTestNGSpringCont
     bean.setOid(oid);
     int intValue1 = nextInt(10000, 100000);
     bean.setRandomAttribute2(intValue1);
-    testAggregateRepository2.save(bean);
+    testAggregateRepository2.save(bean).block();
     String oid2 = UUID.randomUUID().toString();
     String value2 = randomAlphabetic(10);
     TestAggregateAnnotation2FieldsBean bean2 = new TestAggregateAnnotation2FieldsBean(value2);
-    int intValue2 = nextInt(10000, 100000);
     bean.setOid(oid2);
-    testAggregateRepository2.save(bean2);
+    testAggregateRepository2.save(bean2).block();
     Object result = testAggregateRepository2.aggregateQueryWithMatchAndProjection(intValue1);
     assertNotNull(result);
-    assertTrue(List.class.isAssignableFrom(result.getClass()));
-    List resultList = (List) result;
-    assertTrue(resultList.size() == 1);
+    assertTrue(Flux.class.isAssignableFrom(result.getClass()));
+    List resultList = (List) ((Flux) result).collectList().block();
+    assertNotNull(resultList);
+    assertEquals(resultList.size(), 1);
     assertTrue(Map.class.isAssignableFrom(resultList.get(0).getClass()));
     Map<String, String> values = (Map<String, String>) resultList.get(0);
-    assertTrue(values.get("randomAttribute").equals(value));
+    assertEquals(value, values.get("randomAttribute"));
   }
 
   @Test
@@ -113,7 +116,7 @@ public class ReactiveAggregationAnnotationTests extends AbstractTestNGSpringCont
     bean0.setOid(oid0);
     int intValue0 = nextInt(10000, 100000);
     bean0.setRandomAttribute2(intValue0);
-    testAggregateRepository2.save(bean0);
+    testAggregateRepository2.save(bean0).block();
 
     //create bean 1
     String value1 = randomAlphabetic(10);
@@ -122,7 +125,7 @@ public class ReactiveAggregationAnnotationTests extends AbstractTestNGSpringCont
     bean1.setOid(oid1);
     int intValue = nextInt(10000, 100000);
     bean1.setRandomAttribute2(intValue);
-    testAggregateRepository2.save(bean1);
+    testAggregateRepository2.save(bean1).block();
 
     //create bean 2
     String oid2 = UUID.randomUUID().toString();
@@ -130,29 +133,28 @@ public class ReactiveAggregationAnnotationTests extends AbstractTestNGSpringCont
     TestAggregateAnnotation2FieldsBean bean2 = new TestAggregateAnnotation2FieldsBean(value2);
     bean2.setOid(oid2);
     bean2.setRandomAttribute2(intValue); //set same intValue
-    testAggregateRepository2.save(bean2);
+    testAggregateRepository2.save(bean2).block();
 
     //create bean 2
     String oid3 = UUID.randomUUID().toString();
-    String value3 = randomAlphabetic(10);
     TestAggregateAnnotation2FieldsBean bean3 = new TestAggregateAnnotation2FieldsBean(value2);
     bean2.setOid(oid3);
     bean2.setRandomAttribute2(intValue); //set same intValue
-    testAggregateRepository2.save(bean3);
+    testAggregateRepository2.save(bean3).block();
 
     //query by limit and attribute2
     Object result = testAggregateRepository2.aggregateQueryWithMatchAndLimit(intValue, 2);
     assertNotNull(result);
-    assertTrue(List.class.isAssignableFrom(result.getClass()));
-    List resultList = (List) result;
-    assertTrue(resultList.size() == 2);
+    assertTrue(Flux.class.isAssignableFrom(result.getClass()));
+    List resultList = (List) ((Flux) result).collectList().block();
+    assertNotNull(resultList);
+    assertEquals(resultList.size(), 2);
   }
 
   @Test
   public void mustProcessUnwindAnnotationCorrectly() {
     assertNotNull(testAggregateRepositoryForUnwind);
-    testAggregateRepositoryForUnwind.deleteAll();
-    String value = randomAlphabetic(10);
+    testAggregateRepositoryForUnwind.deleteAll().block();
     String oid = UUID.randomUUID().toString();
     TestUnwindAggregateAnnotationBean bean = new TestUnwindAggregateAnnotationBean();
     bean.setOid(oid);
@@ -165,11 +167,11 @@ public class ReactiveAggregationAnnotationTests extends AbstractTestNGSpringCont
       randomStringList.add(randomAlphabetic(10));
     }
     bean.setRandomListOfStrings(randomStringList);
-    testAggregateRepositoryForUnwind.save(bean);
+    testAggregateRepositoryForUnwind.save(bean).block();
     List<Document> result = testAggregateRepositoryForUnwind.aggregateQueryWithOnlyUnwind(intValue1).collectList().block();
     assertNotNull(result);
     assertTrue(List.class.isAssignableFrom(result.getClass()));
-    assertTrue(result.size() == randomListCount);
+    assertEquals(randomListCount, result.size());
     for (int i = 0; i < randomListCount; i++) {
       Map actualBean = result.get(i);
       assertTrue(actualBean.containsKey("randomListOfStrings"));
@@ -186,16 +188,19 @@ public class ReactiveAggregationAnnotationTests extends AbstractTestNGSpringCont
     assertNotNull(results);
 
     Document totalQuantity = testGroupRepository.getTotalQuantityForOneItem("abc").block();
+    assertNotNull(totalQuantity);
     assertEquals(12, totalQuantity.get("totalQuantity"));
 
     totalQuantity = testGroupRepository.getTotalQuantityForOneItem("xyz").block();
+    assertNotNull(totalQuantity);
     assertEquals(30, totalQuantity.get("totalQuantity"));
 
     totalQuantity = testGroupRepository.getTotalQuantityForOneItem("jkl").block();
+    assertNotNull(totalQuantity);
     assertEquals(1, totalQuantity.get("totalQuantity"));
 
     Document noQuantity = testGroupRepository.getTotalQuantityForOneItem(RandomStringUtils.random(10)).block();
-    assertNull(noQuantity.get("totalQuantity"));
+    assertNull(noQuantity);
   }
 
   private void populateGroupCollection() throws IOException {
@@ -213,6 +218,6 @@ public class ReactiveAggregationAnnotationTests extends AbstractTestNGSpringCont
     groupDataBeans.add(objectMapper.readValue(item3, TestGroupDataBean.class));
     groupDataBeans.add(objectMapper.readValue(item4, TestGroupDataBean.class));
     groupDataBeans.add(objectMapper.readValue(item5, TestGroupDataBean.class));
-    testGroupRepository.saveAll(groupDataBeans);
+    testGroupRepository.saveAll(groupDataBeans).blockLast();
   }
 }

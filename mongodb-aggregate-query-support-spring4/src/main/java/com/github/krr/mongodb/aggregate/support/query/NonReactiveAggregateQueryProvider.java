@@ -119,7 +119,7 @@ public class NonReactiveAggregateQueryProvider extends AbstractAggregateQueryPro
   protected void initializeAnnotation(Method method) throws InvalidAggregationQueryException {
     this.aggregateAnnotation = method.getAnnotation(Aggregate.class);
     Class inputType = aggregateAnnotation.inputType();
-    this.collectionName = deriveCollectionName(aggregateAnnotation.inputType(),
+    this.collectionName = deriveCollectionName(aggregateAnnotation,
                                                (idx) -> mongoParameterAccessor.getValues()[idx].toString(),
                                                () -> {
                                                  Document documentAnnotation = AnnotationUtils.findAnnotation(inputType,
@@ -138,7 +138,7 @@ public class NonReactiveAggregateQueryProvider extends AbstractAggregateQueryPro
     this.queryProcessorFactory = new DefaultPipelineStageQueryProcessorFactory();
   }
 
-  @SuppressWarnings({"unchecked", "Duplicates"})
+  @SuppressWarnings({"Duplicates"})
   @Override
   protected void createAggregateQuery() {
     LOGGER.debug(">>>> createAggregateQuery:: Forming aggregation pipeline");
@@ -265,7 +265,6 @@ public class NonReactiveAggregateQueryProvider extends AbstractAggregateQueryPro
     return serialize(value);
   }
 
-  @SuppressWarnings("ConstantConditions")
   @Override
   public boolean isPageable() {
     return mongoParameterAccessor.getPageable() != null;
@@ -303,7 +302,7 @@ public class NonReactiveAggregateQueryProvider extends AbstractAggregateQueryPro
     }
   }
 
-  private class NonReactiveParameterBindingParser extends ParameterBindingParser  {
+  private static class NonReactiveParameterBindingParser extends ParameterBindingParser  {
 
     @SuppressWarnings("Duplicates")
     @Override

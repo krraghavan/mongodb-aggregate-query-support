@@ -33,8 +33,7 @@ public interface TestAggregateRepository extends TestMongoRepository<TestAggrega
   TestAggregateAnnotationBean mongoQueryAnnotation(String value);
 
   @Aggregate(inputType = TestAggregateAnnotationBean.class,
-             outputBeanType = TestAggregateAnnotationBean.class,
-             resultKey = "_id")
+             outputBeanType = TestAggregateAnnotationBean.class)
   @Match(query = "{'randomAttribute':?0}", order = 0)
   TestAggregateAnnotationBean aggregateQueryMatchAnnotation(String value);
 

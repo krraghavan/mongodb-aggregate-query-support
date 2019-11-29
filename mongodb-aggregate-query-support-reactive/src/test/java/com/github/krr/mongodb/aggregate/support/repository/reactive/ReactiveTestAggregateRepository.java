@@ -34,7 +34,7 @@ public interface ReactiveTestAggregateRepository extends
   @Query("{'randomAttribute': ?0}")
   TestAggregateAnnotationBean mongoQueryAnnotation(String value);
 
-  @Aggregate(inputType = TestAggregateAnnotationBean.class)
+  @Aggregate(inputType = TestAggregateAnnotationBean.class, outputBeanType = TestAggregateAnnotationBean.class)
   @Match(query = "{'randomAttribute':?0}", order = 0)
   Mono<TestAggregateAnnotationBean> aggregateQueryMatchAnnotation(String value);
 

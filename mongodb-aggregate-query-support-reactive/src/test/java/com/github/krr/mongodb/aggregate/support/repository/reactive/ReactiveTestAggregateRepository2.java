@@ -21,6 +21,7 @@ package com.github.krr.mongodb.aggregate.support.repository.reactive;
 
 import com.github.krr.mongodb.aggregate.support.annotations.*;
 import com.github.krr.mongodb.aggregate.support.beans.TestAggregateAnnotation2FieldsBean;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -37,19 +38,19 @@ public interface ReactiveTestAggregateRepository2 extends
   @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class)
   @Match(query = "{'randomAttribute2':?0}", order = 0)
   @Project(query = "{'randomAttribute' : '$randomAttribute1', '_id' : 0}", order = 1)
-  List<Map<String, String>> aggregateQueryWithMatchAndProjection(int value);
+  Flux<Map<String, String>> aggregateQueryWithMatchAndProjection(int value);
 
   @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class)
   @Match(query = "{'randomAttribute2':?0}", order = 0)
   @Limit(query = "?1", order = 1)
-  List<Map<String, String>> aggregateQueryWithMatchAndLimit(int value, int limit);
+  Flux<Map<String, String>> aggregateQueryWithMatchAndLimit(int value, int limit);
 
   @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class)
   @Out(query = "?0")
-  Mono<Void> aggregateQueryWithOut(String outputRepository);
+  Mono<Void> aggregateQueryWithOut(String outputRepository, @CollectionName String coll);
 
   @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class)
   @Match(query = "{'randomAttribute1':?0}", order = 0)
-  @Out(query = "?1")
-  Mono<Void> aggregateQueryWithMatchAndOut(String randomAttribute, String outputRepository);
+  @Out(query = "?2")
+  Mono<Void> aggregateQueryWithMatchAndOut(String randomAttribute, @CollectionName String srcRepo, String outputRepository);
 }

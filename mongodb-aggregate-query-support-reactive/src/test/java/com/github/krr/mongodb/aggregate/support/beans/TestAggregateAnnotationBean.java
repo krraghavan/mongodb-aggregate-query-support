@@ -33,6 +33,8 @@ public class TestAggregateAnnotationBean extends AbstractTestAggregateBean {
   @MongoId
   private String oid;
 
+  public TestAggregateAnnotationBean() {}
+
   public TestAggregateAnnotationBean(String randomAttribute) {
     this.randomAttribute = randomAttribute;
   }

@@ -97,8 +97,6 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider<Pagea
 
   private boolean isLimiting;
 
-
-  @SuppressWarnings("WeakerAccess")
   public AggregateQueryProvider(Method method, MongoParameterAccessor mongoParameterAccessor,
                                 ConvertingParameterAccessor convertingParameterAccessor) throws
                                                                                           InvalidAggregationQueryException {
@@ -114,12 +112,12 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider<Pagea
     return expression instanceof LiteralExpression ? null : expression;
   }
 
-  @SuppressWarnings({"ConstantConditions", "Duplicates"})
+  @SuppressWarnings({"Duplicates"})
   @Override
   protected void initializeAnnotation(Method method) throws InvalidAggregationQueryException {
     this.aggregateAnnotation = method.getAnnotation(Aggregate.class);
     Class inputType = aggregateAnnotation.inputType();
-    this.collectionName = deriveCollectionName(aggregateAnnotation.inputType(),
+    this.collectionName = deriveCollectionName(aggregateAnnotation,
                                                (idx) -> mongoParameterAccessor.getValues()[idx].toString(),
                                                () -> {
                                                  Document documentAnnotation = AnnotationUtils.findAnnotation(inputType,
@@ -138,7 +136,6 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider<Pagea
     this.queryProcessorFactory = new DefaultPipelineStageQueryProcessorFactory();
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   protected void createAggregateQuery() {
     LOGGER.debug(">>>> createAggregateQuery:: Forming aggregation pipeline");
@@ -274,7 +271,6 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider<Pagea
     return serialize(value);
   }
 
-  @SuppressWarnings("ConstantConditions")
   @Override
   public boolean isPageable() {
     return mongoParameterAccessor.getPageable().isPaged();
@@ -307,7 +303,7 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider<Pagea
     }
   }
 
-  private class NonReactiveParameterBindingParser extends ParameterBindingParser  {
+  private static class NonReactiveParameterBindingParser extends ParameterBindingParser  {
 
     @SuppressWarnings("Duplicates")
     @Override

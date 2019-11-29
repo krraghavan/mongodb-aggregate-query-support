@@ -45,7 +45,7 @@ import static org.testng.Assert.*;
  * Created by rkolliva
  * 10/10/2015.
  */
-@SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection", "Duplicates"})
+@SuppressWarnings({"Duplicates"})
 @ContextConfiguration(classes = {AggregateTestConfiguration.class})
 public class AggregationAnnotationTests extends AbstractTestNGSpringContextTests {
 

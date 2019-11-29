@@ -66,8 +66,8 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
   /**
    * Derives the collection name on which the aggregate query will be run.
    *
-   * @param className                      - the name of the bean class for which the collection name
-   *                                       is derived
+   * @param aggregateAnnotation          - the aggregate annotation on the query
+   *
    * @param documentAnnotationNameSupplier - a supplier for the document annotation.
    *                                       Modeled as a supplier to avoid Spring version
    *                                       specific dependencies in this class.
@@ -82,14 +82,18 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
    * @throws InvalidAggregationQueryException - if the collection name could not be derived (e.g. more than
    * one parameter contains an @{@link CollectionName} annotation.
    */
-  protected String deriveCollectionName(Class className,
+  protected String deriveCollectionName(Aggregate aggregateAnnotation,
                                         Function<Integer, String> parameterValueSupplier,
                                         Supplier<String> documentAnnotationNameSupplier,
                                         Function<String, String> expressionBasedNameSupplier) throws
                                                                                       InvalidAggregationQueryException {
-    LOGGER.trace(">>>> AbstractAggregateQueryProvider::deriveCollectionName for {}", className);
+    LOGGER.trace(">>>> AbstractAggregateQueryProvider::deriveCollectionName for {}", aggregateAnnotation.inputType());
 
-    String collectionName;
+    String collectionName = aggregateAnnotation.collectionName();
+    if(!StringUtils.isEmpty(collectionName.trim())) {
+      return collectionName;
+    }
+    Class className = aggregateAnnotation.inputType();
 
     // if the @CollectionName annotation is present use that.
     collectionName = deriveCollectionName(parameterValueSupplier);
@@ -104,7 +108,7 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
     if (StringUtils.isEmpty(collectionName)) {
       // Not present - derive it from class name.
       collectionName = getSimpleCollectionName(className);
-      LOGGER.debug("Returning collection name based on bean name", collectionName);
+      LOGGER.debug("Returning collection name based on bean name {}", collectionName);
       return collectionName;
     }
     // @Document present but may be an expression.
