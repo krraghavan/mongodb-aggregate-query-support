@@ -23,7 +23,7 @@
   <parent>
     <groupId>com.github.krraghavan</groupId>
     <artifactId>mongodb-aggregate-query-support-reactive-parent</artifactId>
-    <version>0.8.6-SNAPSHOT</version>
+    <version>0.8.6</version>
     <relativePath>../mongodb-aggregate-query-support-reactive-parent/pom.xml</relativePath>
   </parent>
 
