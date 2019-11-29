@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.krraghavan</groupId>
   <artifactId>mongodb-aggregate-query-support</artifactId>
-  <version>0.8.6</version>
+  <version>0.8.7-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
@@ -37,9 +37,9 @@
   </modules>
 
   <properties>
-    <maqs.version>0.8.6</maqs.version>
+    <maqs.version>0.8.7-SNAPSHOT</maqs.version>
     <mongodb.driver.version>3.11.2</mongodb.driver.version>
-    <embedded-mongo-version>2.0.3</embedded-mongo-version>
+    <embedded-mongo-version>2.2.0</embedded-mongo-version>
     <jackson.version>2.10.1</jackson.version>
     <commons-lang3.version>3.8.1</commons-lang3.version>
     <commons-collections.version>3.2.2</commons-collections.version>
@@ -128,7 +128,7 @@
       <dependency>
         <groupId>de.flapdoodle.embed</groupId>
         <artifactId>de.flapdoodle.embed.mongo</artifactId>
-        <version>2.2.0</version>
+        <version>${embedded-mongo-version}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
