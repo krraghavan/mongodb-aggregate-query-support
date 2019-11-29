@@ -9,6 +9,11 @@ It is highly desirable to have a similar mechanism for MongoDB aggregate queries
 queries with practically no code being written.
 
 ## New in 0.8.5 version
+1. Addressed security vulnerability in Jackson libraries (upgraded to 2.10.1)
+1. Upgraded spring-mongo version to 2.2.1
+1. Upgraded to Mongo Java driver version 3.8 and 4.2 Mongo DB
+
+## New in 0.8.5 version
 1. Addressed security vulnerability in Jackson libraries (upgraded to 2.9.7)
 
 ## New in 0.8.4 version
