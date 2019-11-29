@@ -19,7 +19,6 @@ import static org.testng.Assert.assertNotNull;
 /**
  * camejavi 3/31/17
  */
-@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 @ContextConfiguration(classes = NonReactiveAggregateTestConfiguration.class)
 public class UnbindableParametersTest extends AbstractTestNGSpringContextTests {
 
@@ -33,7 +32,7 @@ public class UnbindableParametersTest extends AbstractTestNGSpringContextTests {
     Possessions expectedHomePossessions = FixtureUtils.createPossessions(false, true, tag);
     possessionsRepository.saveAll(Arrays.asList(expectedCarPossessions, expectedHomePossessions));
     List<Possessions> carsOnlyPossessions = possessionsRepository.mutuallyExclusiveStagesPageable(
-        tag, true, null, new PageRequest(0, 10));
+        tag, true, null, PageRequest.of(0, 10));
     //this query must not throw error when accessing pageable in AggregateQueryProvider::getParameterValues
     assertNotNull(carsOnlyPossessions);
   }

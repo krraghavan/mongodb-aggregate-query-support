@@ -20,7 +20,9 @@
 package com.github.krr.mongodb.aggregate.support.condition;
 
 import com.github.krr.mongodb.aggregate.support.annotations.Conditional;
+import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.core.type.AnnotatedTypeMetadata;
+import org.springframework.lang.NonNull;
 import org.springframework.util.MultiValueMap;
 
 import java.util.HashMap;
@@ -32,6 +34,7 @@ import java.util.Map;
  */
 
 
+@SuppressWarnings("WeakerAccess")
 public class ConditionalAnnotationMetadata implements AnnotatedTypeMetadata {
 
   public static final String PARAMETER_INDEX = "parameterIndex";
@@ -43,13 +46,19 @@ public class ConditionalAnnotationMetadata implements AnnotatedTypeMetadata {
   }
 
   @Override
+  @NonNull
+  public MergedAnnotations getAnnotations() {
+    throw new UnsupportedOperationException("Not yet supported");
+  }
+
+  @Override
   @SuppressWarnings("squid:S1872")
-  public boolean isAnnotated(String annotationName) {
+  public boolean isAnnotated(@NonNull  String annotationName) {
     return Conditional.class.getName().equals(annotationName);
   }
 
   @Override
-  public Map<String, Object> getAnnotationAttributes(String annotationName) {
+  public Map<String, Object> getAnnotationAttributes(@NonNull String annotationName) {
     if(isAnnotated(annotationName)) {
       Map<String, Object> retval = new HashMap<>();
       retval.put(PARAMETER_INDEX, conditional.parameterIndex());
@@ -59,17 +68,18 @@ public class ConditionalAnnotationMetadata implements AnnotatedTypeMetadata {
   }
 
   @Override
-  public Map<String, Object> getAnnotationAttributes(String annotationName, boolean classValuesAsString) {
+  public Map<String, Object> getAnnotationAttributes(@NonNull String annotationName, boolean classValuesAsString) {
     return getAnnotationAttributes(annotationName);
   }
 
   @Override
-  public MultiValueMap<String, Object> getAllAnnotationAttributes(String annotationName) {
+  public MultiValueMap<String, Object> getAllAnnotationAttributes(@NonNull String annotationName) {
     return null;
   }
 
   @Override
-  public MultiValueMap<String, Object> getAllAnnotationAttributes(String annotationName, boolean classValuesAsString) {
+  public MultiValueMap<String, Object> getAllAnnotationAttributes(@NonNull String annotationName,
+                                                                  boolean classValuesAsString) {
     return null;
   }
 }

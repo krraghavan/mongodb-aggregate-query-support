@@ -24,13 +24,21 @@ import com.github.krr.mongodb.aggregate.support.exceptions.InvalidAggregationQue
 import com.github.krr.mongodb.aggregate.support.exceptions.MongoQueryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.query.*;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
+import org.springframework.data.repository.query.ExtensionAwareQueryMethodEvaluationContextProvider;
+import org.springframework.data.repository.query.Parameters;
+import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -53,6 +61,9 @@ public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
 
   private final MongoQueryExecutor queryExecutor;
 
+  private static final QueryMethodEvaluationContextProvider CONTEXT_PROVIDER =
+      new ApplicationContextQueryMethodEvaluationContextProvider();
+
   /**
    * Creates a new {@link AbstractMongoQuery} from the given {@link MongoQueryMethod} and {@link MongoOperations}.
    *
@@ -64,7 +75,9 @@ public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
                                      ProjectionFactory projectionFactory, MongoQueryExecutor queryExecutor) {
     super(new ReactiveMongoQueryMethod(method, metadata, projectionFactory,
                                        mongoOperations.getConverter().getMappingContext()),
-          mongoOperations);
+          mongoOperations,
+          new SpelExpressionParser(),
+          CONTEXT_PROVIDER);
     this.mongoOperations = mongoOperations;
     this.method = method;
     this.queryExecutor = queryExecutor;

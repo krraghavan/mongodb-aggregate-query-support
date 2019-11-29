@@ -24,7 +24,7 @@ import static org.testng.Assert.*;
 /**
  * camejavi 3/15/17
  */
-@SuppressWarnings({"ConstantConditions", "SpringJavaInjectionPointsAutowiringInspection", "Duplicates", "deprecation"})
+@SuppressWarnings({"Duplicates"})
 @ContextConfiguration(classes = NonReactiveAggregateTestConfiguration.class)
 public class AggregatePageableTest extends AbstractTestNGSpringContextTests {
 
@@ -52,7 +52,7 @@ public class AggregatePageableTest extends AbstractTestNGSpringContextTests {
         scores.add(mapper.readValue(s, Score.class));
       }
       catch (IOException e) {
-        assertTrue(false, e.getMessage());
+        fail(e.getMessage());
       }
     });
     pageableRepository.insert(scores);
@@ -79,7 +79,7 @@ public class AggregatePageableTest extends AbstractTestNGSpringContextTests {
 
   @Test(dataProvider = "pagingFixture")
   public void mustReturnCorrectPagesFromQueryWithPageable(int page, int size) {
-    Pageable pageable = new PageRequest(page, size);
+    Pageable pageable = PageRequest.of(page, size);
     List scoresAfterSkip = pageableRepository.getPageableScores(pageable);
 
     assertNotNull(scoresAfterSkip);
@@ -93,7 +93,7 @@ public class AggregatePageableTest extends AbstractTestNGSpringContextTests {
 
   @Test(dataProvider = "pagingFixture")
   public void mustReturnCorrectPagesFromQueryWithPageable2(int page, int size) {
-    Pageable pageable = new PageRequest(page, size);
+    Pageable pageable = PageRequest.of(page, size);
     Page<Score> scoresAfterSkip = pageableRepository.getPageableScores2(pageable);
 
     validateResults(page, size, pageable, scoresAfterSkip);
@@ -102,7 +102,7 @@ public class AggregatePageableTest extends AbstractTestNGSpringContextTests {
   @Test
   public void mustNotThrowErrorWhenPageIsOutOfBounds() {
     int scoresLen = SCORE_DOCS.length;
-    Pageable pageable = new PageRequest(2, scoresLen / 2);
+    Pageable pageable = PageRequest.of(2, scoresLen / 2);
     List scoresAfterSkip = pageableRepository.getPageableScores(pageable);
     assertNotNull(scoresAfterSkip);
     assertEquals(scoresAfterSkip.size(), 0);
@@ -110,7 +110,7 @@ public class AggregatePageableTest extends AbstractTestNGSpringContextTests {
 
   @Test(dataProvider = "pagingFixture")
   public void mustReturnPageEvenIfQueryHasAFacet(int page, int size) {
-    Pageable pageable = new PageRequest(page, size);
+    Pageable pageable = PageRequest.of(page, size);
     Page<Score> scoresAfterSkip = pageableRepository.getPageableWithFacet(pageable);
     validateResults(page, size, pageable, scoresAfterSkip);
   }

@@ -32,6 +32,8 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.query.*;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
+import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
@@ -55,6 +57,10 @@ public class NonReactiveAggregateMongoQuery extends AbstractMongoQuery {
 
   private QueryProvider<Pageable> queryProvider;
 
+  private static final QueryMethodEvaluationContextProvider CONTEXT_PROVIDER =
+      new ApplicationContextQueryMethodEvaluationContextProvider();
+
+
   /**
    * Creates a new {@link AbstractMongoQuery} from the given {@link MongoQueryMethod} and {@link MongoOperations}.
    *
@@ -65,7 +71,9 @@ public class NonReactiveAggregateMongoQuery extends AbstractMongoQuery {
   public NonReactiveAggregateMongoQuery(Method method, RepositoryMetadata metadata, MongoOperations mongoOperations,
                                         ProjectionFactory projectionFactory, MongoQueryExecutor queryExecutor) {
     super(new MongoQueryMethod(method, metadata, projectionFactory, mongoOperations.getConverter().getMappingContext()),
-          mongoOperations);
+          mongoOperations,
+          new SpelExpressionParser(),
+          CONTEXT_PROVIDER);
     this.mongoOperations = mongoOperations;
     this.method = method;
     this.queryExecutor = queryExecutor;
