@@ -26,7 +26,10 @@ public enum AggregationType {
   FACET("$facet", Facet.class),
   COUNT("$count", Count.class),
   SKIP("$skip", Skip.class),
-  OUT("$out", Out.class);
+  OUT("$out", Out.class),
+  MERGE("$merge", Merge.class)
+
+  ;
 
   private final String representation;
 

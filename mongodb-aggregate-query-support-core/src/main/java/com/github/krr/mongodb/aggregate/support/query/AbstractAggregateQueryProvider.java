@@ -194,7 +194,8 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
     int index = 0;
     for (Annotation annotation : annotations) {
       Class<? extends Annotation> annotationType = annotation.annotationType();
-      if (annotationType == Out.class) {
+      // out and merge are terminal steps
+      if (annotationType == Out.class || annotationType == Merge.class) {
         return index;
       }
       ++index;
@@ -252,7 +253,8 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
            annotationType == Skip.class ||
            annotationType == Unwind.class ||
            annotationType == Group.class ||
-           annotationType == Out.class
+           annotationType == Out.class ||
+           annotationType == Merge.class
         ;
   }
 

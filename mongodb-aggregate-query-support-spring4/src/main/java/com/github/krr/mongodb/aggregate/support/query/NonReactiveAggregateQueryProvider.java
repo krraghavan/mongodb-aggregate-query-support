@@ -19,11 +19,8 @@
 
 package com.github.krr.mongodb.aggregate.support.query;
 
-import com.github.krr.mongodb.aggregate.support.annotations.Aggregate;
-import com.github.krr.mongodb.aggregate.support.annotations.Conditional;
+import com.github.krr.mongodb.aggregate.support.annotations.*;
 import com.github.krr.mongodb.aggregate.support.annotations.Conditional.ConditionalMatchType;
-import com.github.krr.mongodb.aggregate.support.annotations.Limit;
-import com.github.krr.mongodb.aggregate.support.annotations.Out;
 import com.github.krr.mongodb.aggregate.support.enums.AggregationType;
 import com.github.krr.mongodb.aggregate.support.exceptions.InvalidAggregationQueryException;
 import com.github.krr.mongodb.aggregate.support.pageable.PageableFacet;
@@ -169,7 +166,7 @@ public class NonReactiveAggregateQueryProvider extends AbstractAggregateQueryPro
         }
         queries[index] = query;
       }
-      else if (query != null && index == -1 && annotationType == Out.class) {
+      else if (query != null && index == -1 && (annotationType == Out.class || annotationType == Merge.class)) {
         // out stage only - add to end.
         queries[pipelineCount - 1] = query;
       }

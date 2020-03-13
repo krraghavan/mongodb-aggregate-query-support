@@ -22,6 +22,7 @@ package com.github.krr.mongodb.aggregate.support.query;
 import com.github.krr.mongodb.aggregate.support.annotations.Aggregate;
 import com.github.krr.mongodb.aggregate.support.annotations.Conditional;
 import com.github.krr.mongodb.aggregate.support.annotations.Conditional.ConditionalMatchType;
+import com.github.krr.mongodb.aggregate.support.annotations.Merge;
 import com.github.krr.mongodb.aggregate.support.annotations.Out;
 import com.github.krr.mongodb.aggregate.support.enums.AggregationType;
 import com.github.krr.mongodb.aggregate.support.exceptions.InvalidAggregationQueryException;
@@ -168,8 +169,8 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider<Pagea
         }
         queries[index] = query;
       }
-      else if (query != null && index == -1 && annotationType == Out.class) {
         // out stage only - add to end.
+      else if (query != null && index == -1 && (annotationType == Out.class || annotationType == Merge.class)) {
         queries[pipelineCount - 1] = query;
       }
       else if (index == -1) {

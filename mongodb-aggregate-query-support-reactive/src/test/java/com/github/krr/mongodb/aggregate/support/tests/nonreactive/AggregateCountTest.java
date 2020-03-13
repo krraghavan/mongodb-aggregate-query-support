@@ -41,7 +41,6 @@ import static org.testng.Assert.*;
  * 2/20/17.
  */
 
-@SuppressWarnings({"ConstantConditions", "SpringJavaInjectionPointsAutowiringInspection"})
 @ContextConfiguration(classes = NonReactiveAggregateTestConfiguration.class)
 public class AggregateCountTest extends AbstractTestNGSpringContextTests {
 
@@ -70,7 +69,7 @@ public class AggregateCountTest extends AbstractTestNGSpringContextTests {
         scores.add(mapper.readValue(s, Score.class));
       }
       catch (IOException e) {
-        assertTrue(false, e.getMessage());
+        fail(e.getMessage());
       }
     });
     return scores;

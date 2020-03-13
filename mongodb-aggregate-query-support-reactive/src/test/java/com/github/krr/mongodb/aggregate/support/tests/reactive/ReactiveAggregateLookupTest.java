@@ -76,20 +76,17 @@ public class ReactiveAggregateLookupTest extends AbstractTestNGSpringContextTest
       foreignKeyBeans.add(testForeignKeyBean);
     }
     testForeignKeyRepository.saveAll(foreignKeyBeans).collectList().block();
-
   }
 
   private void validateResults(List<TestPrimaryKeyBean> actualPrimaryKeyBean) {
     assertNotNull(actualPrimaryKeyBean);
-    assertTrue(actualPrimaryKeyBean.size() == 1);
+    assertEquals(actualPrimaryKeyBean.size(), 1);
     List<TestForeignKeyBean> actualFKeyBeanList = actualPrimaryKeyBean.get(0).getForeignKeyBeanList();
     assertTrue(actualFKeyBeanList != null && actualFKeyBeanList.size() == foreignKeyItemsCount);
     Set<TestForeignKeyBean> setOfFKeys = Sets.newHashSet(actualFKeyBeanList);
     // make sure there are no dups in the fkeys
     assertEquals(setOfFKeys.size(), foreignKeyItemsCount);
-    actualFKeyBeanList.forEach(fkey -> {
-      assertTrue(foreignKeys.contains(fkey.getRandomAttribute()));
-    });
+    actualFKeyBeanList.forEach(fkey -> assertTrue(foreignKeys.contains(fkey.getRandomAttribute())));
   }
 
   @Test

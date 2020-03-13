@@ -34,8 +34,7 @@ import java.util.UUID;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.apache.commons.lang3.RandomUtils.nextInt;
-import static org.testng.Assert.assertSame;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.*;
 
 /**
  * Created by camejavi on 6/9/2016.
@@ -69,8 +68,8 @@ public class AggregateOutTest extends AbstractTestNGSpringContextTests {
     //clear testAggregateAnnotationFieldsBean repo before running this test
     assertSame(copiedObjs.size(), 2);
     if (copiedObjs.get(0).getRandomAttribute2() == 0) {
-      assertTrue(copiedObjs.get(0).equals(obj1));
-      assertTrue(copiedObjs.get(1).equals(obj2));
+      assertEquals(obj1, copiedObjs.get(0));
+      assertEquals(obj2, copiedObjs.get(1));
     }
     else {
       assertSame(copiedObjs.get(0), obj2);

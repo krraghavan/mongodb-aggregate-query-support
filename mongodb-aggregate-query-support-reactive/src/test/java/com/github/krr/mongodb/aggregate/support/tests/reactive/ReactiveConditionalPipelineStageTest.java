@@ -43,7 +43,7 @@ import static org.testng.Assert.*;
  * 3/8/17.
  */
 
-@SuppressWarnings({"SpringJavaAutowiredMembersInspection", "SpringJavaInjectionPointsAutowiringInspection"})
+@SuppressWarnings("ConstantConditions")
 @ContextConfiguration(classes = ReactiveAggregateTestConfiguration.class)
 public class ReactiveConditionalPipelineStageTest extends AbstractTestNGSpringContextTests {
 
@@ -61,18 +61,19 @@ public class ReactiveConditionalPipelineStageTest extends AbstractTestNGSpringCo
     List<Possessions> carsOnlyPossessions = possessionsRepository.mutuallyExclusiveStages(tag, true,
                                                                                           null)
                                                                  .collectList().block();
-    assertTrue(carsOnlyPossessions.get(0).getAssets().get(0).getCars() != null);
-    assertTrue(carsOnlyPossessions.get(0).getAssets().get(0).getHomes() == null);
+    assertNotNull(carsOnlyPossessions.get(0).getAssets().get(0).getCars());
+    assertNull(carsOnlyPossessions.get(0).getAssets().get(0).getHomes());
     assertEquals(carsOnlyPossessions.get(0).getId(), expectedCarPossessions.getId());
 
     List<Possessions> homesOnlyPossessions = possessionsRepository.mutuallyExclusiveStages(tag, null,
                                                                                            true)
                                                                   .collectList().block();
-    assertTrue(homesOnlyPossessions.get(0).getAssets().get(0).getCars() == null);
-    assertTrue(homesOnlyPossessions.get(0).getAssets().get(0).getHomes() != null);
+    assertNull(homesOnlyPossessions.get(0).getAssets().get(0).getCars());
+    assertNotNull(homesOnlyPossessions.get(0).getAssets().get(0).getHomes());
     assertEquals(homesOnlyPossessions.get(0).getId(), expectedHomePossessions.getId());
   }
 
+  @SuppressWarnings("UnassignedFluxMonoInstance")
   @Test
   public void mustReturnResultWithMixOfConditionalAndUnconditionalStages() {
     String tag = "mustReturnResultWithMixOfConditionalAndUnconditionalStages";
@@ -100,8 +101,8 @@ public class ReactiveConditionalPipelineStageTest extends AbstractTestNGSpringCo
     String tag = "mustReturnResultWithPotentiallyNullIdList";
     List<Possessions> expectedCarPossessions = createPossessionsWithSortField(tag, false, true);
     List<Possessions> expectedHomePossessions = createPossessionsWithSortField(tag, true, false);
-    possessionsRepository.saveAll(expectedCarPossessions);
-    possessionsRepository.saveAll(expectedHomePossessions);
+    possessionsRepository.saveAll(expectedCarPossessions).blockLast();
+    possessionsRepository.saveAll(expectedHomePossessions).blockLast();
 
     List<String> carIds = new ArrayList<>();
     expectedCarPossessions.forEach(expectedCarPossession -> carIds.add(expectedCarPossession.getId()));

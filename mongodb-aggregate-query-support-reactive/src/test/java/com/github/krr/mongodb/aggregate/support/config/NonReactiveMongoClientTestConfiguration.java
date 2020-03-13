@@ -19,6 +19,8 @@
 
 package com.github.krr.mongodb.aggregate.support.config;
 
+import com.github.krr.mongodb.embeddedmongo.config.Mongo42xDownloadConfigBuilder;
+import com.github.krr.mongodb.embeddedmongo.config.MongoDbVersion;
 import com.mongodb.MongoClient;
 import com.mongodb.ServerAddress;
 import de.flapdoodle.embed.mongo.Command;
@@ -27,7 +29,6 @@ import de.flapdoodle.embed.mongo.MongodProcess;
 import de.flapdoodle.embed.mongo.MongodStarter;
 import de.flapdoodle.embed.mongo.config.*;
 import de.flapdoodle.embed.mongo.distribution.IFeatureAwareVersion;
-import de.flapdoodle.embed.mongo.distribution.Version;
 import de.flapdoodle.embed.process.config.IRuntimeConfig;
 import de.flapdoodle.embed.process.config.store.IDownloadConfig;
 import de.flapdoodle.embed.process.io.progress.Slf4jProgressListener;
@@ -59,16 +60,16 @@ public class NonReactiveMongoClientTestConfiguration {
   public NonReactiveMongoClientTestConfiguration() throws IOException {
 
     Command command = Command.MongoD;
-    IDownloadConfig downloadConfig = new DownloadConfigBuilder().defaultsForCommand(command)
-                                                                .progressListener(new Slf4jProgressListener(LOGGER))
-                                                                .build();
+    IDownloadConfig downloadConfig = new Mongo42xDownloadConfigBuilder().defaultsForCommand(command)
+                                                                        .progressListener(new Slf4jProgressListener(LOGGER))
+                                                                        .build();
     IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(command)
                                                              .artifactStore(new ExtractedArtifactStoreBuilder()
                                                                                 .defaults(command)
                                                                                 .download(downloadConfig))
                                                              .build();
     final MongodStarter runtime = MongodStarter.getInstance(runtimeConfig);
-    mongodExecutable = runtime.prepare(newMongodConfig(Version.Main.PRODUCTION));
+    mongodExecutable = runtime.prepare(newMongodConfig(MongoDbVersion.V4_2_4));
     startMongodExecutable();
   }
 
@@ -77,8 +78,11 @@ public class NonReactiveMongoClientTestConfiguration {
   }
 
   private IMongodConfig newMongodConfig(final IFeatureAwareVersion version) throws IOException {
-    return new MongodConfigBuilder().version(version).net(new Net(LOCALHOST, Network.getFreeServerPort(),
-                                                                  Network.localhostIsIPv6())).build();
+    MongoCmdOptionsBuilder builder = new MongoCmdOptionsBuilder().useSmallFiles(false).useNoPrealloc(false);
+    return new MongodConfigBuilder().version(version)
+                                    .cmdOptions(builder.build())
+                                    .net(new Net(LOCALHOST, Network.getFreeServerPort(),
+                                                 Network.localhostIsIPv6())).build();
   }
 
   @Bean

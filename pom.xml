@@ -34,6 +34,7 @@
     <module>mongodb-aggregate-query-support-reactive-parent</module>
     <module>mongodb-aggregate-query-support-spring4</module>
     <module>mongodb-aggregate-query-support-reactive</module>
+    <module>mongodb-aggregate-query-support-test</module>
   </modules>
 
   <properties>
@@ -159,6 +160,12 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.12</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>

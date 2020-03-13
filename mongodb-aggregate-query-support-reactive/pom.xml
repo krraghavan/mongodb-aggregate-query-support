@@ -104,6 +104,12 @@
       <artifactId>commons-collections</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.github.krraghavan</groupId>
+      <artifactId>mongodb-aggregate-query-support-test</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
     <!-- TEST DEPENDENCIES -->
   </dependencies>
 
