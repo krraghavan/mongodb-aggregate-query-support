@@ -39,11 +39,24 @@ public class Mongo42xPaths extends Paths {
                    + versionStr;
     }
     if (distribution.getPlatform() == Platform.OS_X && withSsl(distribution) ) {
-      return platformStr + "/mongodb-" + platformStr + "-ssl-" + bitSizeStr + "-" + versionStr + "." + archiveTypeStr;
+      return platformStr + "/mongodb-macos" + "-ssl-" + bitSizeStr + "-" + versionStr + "." + archiveTypeStr;
     }
+    else if(distribution.getPlatform() == Platform.OS_X && !withSsl(distribution) ) {
+      return platformStr + "/mongodb-macos" + "-" + bitSizeStr + "-" + versionStr + "." + archiveTypeStr;
+    }
+    else {
+      String osDist = System.getenv("OS_DIST");
+      if(distribution.getPlatform() == Platform.Linux && "ubuntu1604".equalsIgnoreCase(osDist)) {
+        // right now build this for travisci
+        //http://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-4.2.4.tgz
+        log.error("Downloading Mongo 4.2.4 for Ubuntu 16.04");
+        return "linux/mongodb-linux-x86_64-ubuntu1604-4.2.4.tgz";
 
-    return platformStr + "/mongodb-macos" + "-" + bitSizeStr + "-" + versionStr + "." + archiveTypeStr;
+      }
+    }
+    return super.getPath(distribution);
   }
+  //
 
   @SuppressWarnings("SameParameterValue")
   private static boolean isFeatureEnabled(Distribution distribution, Feature feature) {

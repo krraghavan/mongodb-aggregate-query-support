@@ -1,3 +1,6 @@
 language: java
 jdk:
   - openjdk9
+env:
+  global:
+    - OS_DIST="ubuntu1604"
