@@ -49,14 +49,12 @@ public class Mongo42xPaths extends Paths {
       if(distribution.getPlatform() == Platform.Linux && "ubuntu1604".equalsIgnoreCase(osDist)) {
         // right now build this for travisci
         //http://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-4.2.4.tgz
-        log.error("Downloading Mongo 4.2.4 for Ubuntu 16.04");
-        return "linux/mongodb-linux-x86_64-ubuntu1604-4.2.4.tgz";
-
+        log.error("Downloading Mongo {} for Ubuntu 16.04", versionStr);
+        return "linux/mongodb-linux-x86_64-ubuntu1604-" + versionStr + "." + archiveTypeStr;
       }
     }
     return super.getPath(distribution);
   }
-  //
 
   @SuppressWarnings("SameParameterValue")
   private static boolean isFeatureEnabled(Distribution distribution, Feature feature) {

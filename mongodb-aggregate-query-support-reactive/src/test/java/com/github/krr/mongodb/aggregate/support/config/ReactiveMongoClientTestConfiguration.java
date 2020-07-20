@@ -58,6 +58,7 @@ public class ReactiveMongoClientTestConfiguration {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveMongoClientTestConfiguration.class);
 
   private static final String LOCALHOST = "localhost";
+  private static final String V4_2_5 = "4.2.5";
 
   private final MongodExecutable mongodExecutable;
 
@@ -75,7 +76,7 @@ public class ReactiveMongoClientTestConfiguration {
                                                                                 .download(downloadConfig))
                                                              .build();
     final MongodStarter runtime = MongodStarter.getInstance(runtimeConfig);
-    mongodExecutable = runtime.prepare(newMongodConfig(MongoDbVersion.V4_2_4));
+    mongodExecutable = runtime.prepare(newMongodConfig(new MongoDbVersion(V4_2_5)));
     startMongodExecutable();
   }
 
