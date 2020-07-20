@@ -45,11 +45,9 @@ public class Mongo42xPaths extends Paths {
       return platformStr + "/mongodb-macos" + "-" + bitSizeStr + "-" + versionStr + "." + archiveTypeStr;
     }
     else if (distribution.getPlatform() == Platform.Linux) {
-      String linuxVersion = LinuxDistributionReader.getLinuxVersion();
-      if (!linuxVersion.isEmpty()) {
-        return platformStr + "/mongodb-" + platformStr + "-" + bitSizeStr + "-" + linuxVersion + "-" + versionStr +
-               "." + archiveTypeStr;
-      }
+      String linuxVersion = new LinuxDistributionReader().getLinuxVersion();
+      return platformStr + "/mongodb-" + platformStr + "-" + bitSizeStr + "-" + linuxVersion + "-" + versionStr + "." +
+             archiveTypeStr;
     }
     return super.getPath(distribution);
   }
