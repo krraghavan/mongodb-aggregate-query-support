@@ -34,23 +34,21 @@ public class Mongo42xPaths extends Paths {
     String bitSizeStr = getBitSize(distribution);
 
     if ((distribution.getBitsize() == BitSize.B64) && (distribution.getPlatform() == Platform.Windows)) {
-      versionStr = (useWindows2008PlusVersion(distribution) ? "2008plus-": "")
-                   + (withSsl(distribution) ? "ssl-": "")
+      versionStr = (useWindows2008PlusVersion(distribution) ? "2008plus-" : "") + (withSsl(distribution) ? "ssl-" : "")
                    + versionStr;
     }
-    if (distribution.getPlatform() == Platform.OS_X && withSsl(distribution) ) {
+    if (distribution.getPlatform() == Platform.OS_X && withSsl(distribution)) {
       return platformStr + "/mongodb-macos" + "-ssl-" + bitSizeStr + "-" + versionStr + "." + archiveTypeStr;
     }
-    else if(distribution.getPlatform() == Platform.OS_X && !withSsl(distribution) ) {
+    else if (distribution.getPlatform() == Platform.OS_X) {
+      // withSsl(distribution) = false
       return platformStr + "/mongodb-macos" + "-" + bitSizeStr + "-" + versionStr + "." + archiveTypeStr;
     }
-    else {
-      String osDist = System.getenv("OS_DIST");
-      if(distribution.getPlatform() == Platform.Linux && "ubuntu1604".equalsIgnoreCase(osDist)) {
-        // right now build this for travisci
-        //http://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-4.2.4.tgz
-        log.error("Downloading Mongo {} for Ubuntu 16.04", versionStr);
-        return "linux/mongodb-linux-x86_64-ubuntu1604-" + versionStr + "." + archiveTypeStr;
+    else if (distribution.getPlatform() == Platform.Linux) {
+      String linuxVersion = LinuxDistributionReader.getLinuxVersion();
+      if (!linuxVersion.isEmpty()) {
+        return platformStr + "/mongodb-" + platformStr + "-" + bitSizeStr + "-" + linuxVersion + "-" + versionStr +
+               "." + archiveTypeStr;
       }
     }
     return super.getPath(distribution);
@@ -59,7 +57,7 @@ public class Mongo42xPaths extends Paths {
   @SuppressWarnings("SameParameterValue")
   private static boolean isFeatureEnabled(Distribution distribution, Feature feature) {
     return (distribution.getVersion() instanceof IFeatureAwareVersion
-            &&  ((IFeatureAwareVersion) distribution.getVersion()).enabled(feature));
+            && ((IFeatureAwareVersion) distribution.getVersion()).enabled(feature));
   }
 
   private String getArchiveString(ArchiveType archiveType) {
@@ -108,7 +106,7 @@ public class Mongo42xPaths extends Paths {
         if (distribution.getVersion() instanceof IFeatureAwareVersion) {
           IFeatureAwareVersion featuredVersion = (IFeatureAwareVersion) distribution.getVersion();
           if (featuredVersion.enabled(Feature.ONLY_64BIT)) {
-            throw new IllegalArgumentException("this version does not support 32Bit: "+distribution);
+            throw new IllegalArgumentException("this version does not support 32Bit: " + distribution);
           }
         }
 
@@ -121,7 +119,8 @@ public class Mongo42xPaths extends Paths {
             sbitSize = "i386";
             break;
           default:
-            throw new IllegalArgumentException("Platform " + distribution.getPlatform() + " not supported yet on 32Bit Platform");
+            throw new IllegalArgumentException(
+                "Platform " + distribution.getPlatform() + " not supported yet on 32Bit Platform");
         }
         break;
       case B64:
