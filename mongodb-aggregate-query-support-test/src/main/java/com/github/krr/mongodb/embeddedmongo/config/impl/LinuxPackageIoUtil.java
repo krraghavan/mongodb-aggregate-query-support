@@ -1,10 +1,10 @@
 package com.github.krr.mongodb.embeddedmongo.config.impl;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.util.List;
 
 public interface LinuxPackageIoUtil {
   boolean isExists(File file);
-  ArrayList<String> readFile(File file);
+  List<String> readFile(File file);
   String getEnv(String property);
 }

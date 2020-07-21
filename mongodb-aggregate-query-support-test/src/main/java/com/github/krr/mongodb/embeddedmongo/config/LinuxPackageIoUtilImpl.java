@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class LinuxPackageIoUtilImpl implements LinuxPackageIoUtil {
@@ -17,8 +18,8 @@ public class LinuxPackageIoUtilImpl implements LinuxPackageIoUtil {
   }
 
   @Override
-  public ArrayList<String> readFile(File file) {
-    ArrayList<String> fileContents = new ArrayList<>();
+  public List<String> readFile(File file) {
+    List<String> fileContents = new ArrayList<>();
     try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
       while (bufferedReader.ready()) {
         fileContents.add(bufferedReader.readLine());

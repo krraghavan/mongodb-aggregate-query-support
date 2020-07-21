@@ -4,10 +4,7 @@ import com.github.krr.mongodb.embeddedmongo.config.impl.LinuxPackageIoUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
-import java.util.AbstractMap;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 @Slf4j
 public class LinuxDistributionReader {
@@ -24,6 +21,9 @@ public class LinuxDistributionReader {
   public static final String RHEL_80 = "rhel80";
   public static final String OS_DIST = "OS_DIST";
   public static final String V16_04 = "16.04";
+  public static final String ETC_OS_RELEASE = "/etc/os-release";
+  public static final String ETC_REDHAT_RELEASE = "/etc/redhat-release";
+  public static final String ETC_CENTOS_RELEASE = "/etc/centos-release";
 
   private final LinuxPackageIoUtil linuxPackageIoUtil;
 
@@ -93,15 +93,15 @@ public class LinuxDistributionReader {
     if (UBUNTU_1604.equals(linuxPackageIoUtil.getEnv(OS_DIST))) {
       return new AbstractMap.SimpleEntry<>(UBUNTU, V16_04);
     }
-    File fileVersion = new File("/etc/os-release");
+    File fileVersion = new File(ETC_OS_RELEASE);
     if (linuxPackageIoUtil.isExists(fileVersion)) {
       return getOsRelease(fileVersion);
     }
-    fileVersion = new File("/etc/redhat-release");
+    fileVersion = new File(ETC_REDHAT_RELEASE);
     if (linuxPackageIoUtil.isExists(fileVersion)) {
       return getRedHatRelease(fileVersion);
     }
-    fileVersion = new File("/etc/centos-release");
+    fileVersion = new File(ETC_CENTOS_RELEASE);
     if (linuxPackageIoUtil.isExists(fileVersion)) {
       return getRedHatRelease(fileVersion);
     }
@@ -110,9 +110,9 @@ public class LinuxDistributionReader {
                                " You might need to consider upgrading your linux distribution.");
   }
 
-  private AbstractMap.SimpleEntry<String, String> getRedHatRelease(File fileVersion) {
+  private Map.Entry<String, String> getRedHatRelease(File fileVersion) {
     String distribution = "", version = "";
-    ArrayList<String> fileContents = linuxPackageIoUtil.readFile(fileVersion);
+    List<String> fileContents = linuxPackageIoUtil.readFile(fileVersion);
     for (String line : fileContents) {
       if (!line.isEmpty() && (line.toLowerCase().contains(CENTOS) || line.toLowerCase().contains(RED_HAT))) {
         distribution = RHEL;
@@ -134,7 +134,7 @@ public class LinuxDistributionReader {
 
   private Map.Entry<String, String> getOsRelease(File fileVersion) {
     String distribution = "", version = "";
-    ArrayList<String> fileContents = linuxPackageIoUtil.readFile(fileVersion);
+    List<String> fileContents = linuxPackageIoUtil.readFile(fileVersion);
     for (String line : fileContents) {
       String[] properties = line.split("=");
       if (ID.equals(properties[0])) {
