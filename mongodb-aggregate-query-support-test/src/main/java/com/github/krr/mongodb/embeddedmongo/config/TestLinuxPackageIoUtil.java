@@ -1,7 +1,10 @@
 package com.github.krr.mongodb.embeddedmongo.config;
 
 import com.github.krr.mongodb.embeddedmongo.config.impl.LinuxPackageIoUtil;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -10,6 +13,9 @@ import java.util.List;
 import static com.github.krr.mongodb.embeddedmongo.config.LinuxDistributionReader.*;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class TestLinuxPackageIoUtil implements LinuxPackageIoUtil {
   private boolean isOsRelease;
   private boolean isOsRedHatRelease;

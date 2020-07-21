@@ -4,3 +4,5 @@ jdk:
 env:
   global:
     - OS_DIST="ubuntu1604"
+script:
+  - mkdir -p /home/travis/.embedmongo/linux

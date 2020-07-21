@@ -4,23 +4,26 @@ import de.flapdoodle.embed.mongo.distribution.Feature;
 import de.flapdoodle.embed.mongo.distribution.IFeatureAwareVersion;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
 import java.util.EnumSet;
 
 @Slf4j
 public class MongoDbVersion implements IFeatureAwareVersion {
+
   private final String specificVersion;
+
   private final EnumSet<Feature> features;
-  private static final Feature[] DEFAULT_42x_FEATURES = (Feature[]) Arrays.asList(Feature.SYNC_DELAY,
-                                                                                  Feature.STORAGE_ENGINE,
-                                                                                  Feature.ONLY_64BIT,
-                                                                                  Feature.NO_CHUNKSIZE_ARG,
-                                                                                  Feature.MONGOS_CONFIGDB_SET_STYLE,
-                                                                                  Feature.NO_HTTP_INTERFACE_ARG,
-                                                                                  Feature.ONLY_WINDOWS_2008_SERVER,
-                                                                                  Feature.NO_SOLARIS_SUPPORT,
-                                                                                  Feature.NO_BIND_IP_TO_LOCALHOST)
-                                                                          .toArray();
+
+  private static final Feature[] DEFAULT_42x_FEATURES = new Feature[] {
+      Feature.SYNC_DELAY,
+      Feature.STORAGE_ENGINE,
+      Feature.ONLY_64BIT,
+      Feature.NO_CHUNKSIZE_ARG,
+      Feature.MONGOS_CONFIGDB_SET_STYLE,
+      Feature.NO_HTTP_INTERFACE_ARG,
+      Feature.ONLY_WINDOWS_2008_SERVER,
+      Feature.NO_SOLARIS_SUPPORT,
+      Feature.NO_BIND_IP_TO_LOCALHOST
+  };
 
   public MongoDbVersion(String vName, Feature... features) {
     this.specificVersion = vName;
