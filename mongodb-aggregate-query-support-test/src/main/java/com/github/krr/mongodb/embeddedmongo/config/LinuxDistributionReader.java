@@ -1,11 +1,9 @@
 package com.github.krr.mongodb.embeddedmongo.config;
 
+import com.github.krr.mongodb.embeddedmongo.config.impl.LinuxPackageIoUtil;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Map;
@@ -13,11 +11,10 @@ import java.util.Scanner;
 
 @Slf4j
 public class LinuxDistributionReader {
-  private static final String CENTOS = "centos";
-  private static final String RHEL = "rhel";
-  private static final String REDHAT = "redhat";
-  private static final String RED_HAT = "red hat";
-  private static final String UBUNTU = "ubuntu";
+  public static final String CENTOS = "centos";
+  public static final String RHEL = "rhel";
+  public static final String RED_HAT = "red hat";
+  public static final String UBUNTU = "ubuntu";
   public static final String VERSION_ID = "VERSION_ID";
   public static final String ID = "ID";
   public static final String UBUNTU_1604 = "ubuntu1604";
@@ -25,6 +22,14 @@ public class LinuxDistributionReader {
   public static final String RHEL_62 = "rhel62";
   public static final String RHEL_70 = "rhel70";
   public static final String RHEL_80 = "rhel80";
+  public static final String OS_DIST = "OS_DIST";
+  public static final String V16_04 = "16.04";
+
+  private final LinuxPackageIoUtil linuxPackageIoUtil;
+
+  public LinuxDistributionReader(LinuxPackageIoUtil linuxPackageIoUtil) {
+    this.linuxPackageIoUtil = linuxPackageIoUtil;
+  }
 
   public String getLinuxVersion() {
     Map.Entry<String, String> distro = getLinuxDistro();
@@ -85,19 +90,19 @@ public class LinuxDistributionReader {
   }
 
   private Map.Entry<String, String> getLinuxDistro() {
-    if (UBUNTU_1604.equals(System.getenv("OS_DIST"))) {
-      return new AbstractMap.SimpleEntry<>(UBUNTU, "16.04");
+    if (UBUNTU_1604.equals(linuxPackageIoUtil.getEnv(OS_DIST))) {
+      return new AbstractMap.SimpleEntry<>(UBUNTU, V16_04);
     }
     File fileVersion = new File("/etc/os-release");
-    if (fileVersion.exists()) {
+    if (linuxPackageIoUtil.isExists(fileVersion)) {
       return getOsRelease(fileVersion);
     }
     fileVersion = new File("/etc/redhat-release");
-    if (fileVersion.exists()) {
+    if (linuxPackageIoUtil.isExists(fileVersion)) {
       return getRedHatRelease(fileVersion);
     }
     fileVersion = new File("/etc/centos-release");
-    if (fileVersion.exists()) {
+    if (linuxPackageIoUtil.isExists(fileVersion)) {
       return getRedHatRelease(fileVersion);
     }
     log.error("Failed to fetch linux distribution information");
@@ -107,10 +112,9 @@ public class LinuxDistributionReader {
 
   private AbstractMap.SimpleEntry<String, String> getRedHatRelease(File fileVersion) {
     String distribution = "", version = "";
-    ArrayList<String> fileContents = readFile(fileVersion);
+    ArrayList<String> fileContents = linuxPackageIoUtil.readFile(fileVersion);
     for (String line : fileContents) {
-      if (!line.isEmpty() && (line.toLowerCase().contains(CENTOS) || line.toLowerCase().contains(REDHAT)
-                              || line.toLowerCase().contains(RED_HAT))) {
+      if (!line.isEmpty() && (line.toLowerCase().contains(CENTOS) || line.toLowerCase().contains(RED_HAT))) {
         distribution = RHEL;
         Scanner scan = new Scanner(line);
         while (scan.hasNext()) {
@@ -130,7 +134,7 @@ public class LinuxDistributionReader {
 
   private Map.Entry<String, String> getOsRelease(File fileVersion) {
     String distribution = "", version = "";
-    ArrayList<String> fileContents = readFile(fileVersion);
+    ArrayList<String> fileContents = linuxPackageIoUtil.readFile(fileVersion);
     for (String line : fileContents) {
       String[] properties = line.split("=");
       if (ID.equals(properties[0])) {
@@ -141,18 +145,5 @@ public class LinuxDistributionReader {
       }
     }
     return new AbstractMap.SimpleEntry<>(distribution, version);
-  }
-
-  private ArrayList<String> readFile(File file) {
-    ArrayList<String> fileContents = new ArrayList<>();
-    try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
-      while (bufferedReader.ready()) {
-        fileContents.add(bufferedReader.readLine());
-      }
-    }
-    catch (IOException e) {
-      log.error("Error reading the file {}", file.getName(), e);
-    }
-    return fileContents;
   }
 }

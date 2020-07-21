@@ -14,8 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Mongo42xPaths extends Paths {
 
+  private final LinuxPackageIoUtilImpl linuxPackageIoUtil;
+
   public Mongo42xPaths(Command command) {
     super(command);
+    this.linuxPackageIoUtil = new LinuxPackageIoUtilImpl();
   }
 
   @Override
@@ -45,7 +48,7 @@ public class Mongo42xPaths extends Paths {
       return platformStr + "/mongodb-macos" + "-" + bitSizeStr + "-" + versionStr + "." + archiveTypeStr;
     }
     else if (distribution.getPlatform() == Platform.Linux) {
-      String linuxVersion = new LinuxDistributionReader().getLinuxVersion();
+      String linuxVersion = new LinuxDistributionReader(linuxPackageIoUtil).getLinuxVersion();
       return platformStr + "/mongodb-" + platformStr + "-" + bitSizeStr + "-" + linuxVersion + "-" + versionStr + "." +
              archiveTypeStr;
     }
