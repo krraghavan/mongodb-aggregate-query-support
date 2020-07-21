@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.github.krr.mongodb.embeddedmongo.config.LinuxDistributionReader.*;
 
@@ -21,29 +22,29 @@ public class TestLinuxPackageIoUtil implements LinuxPackageIoUtil {
 
   @Override
   public boolean isExists(File file) {
-    if("/etc/os-release".equals(file.getAbsolutePath())) {
+    if(ETC_OS_RELEASE.equals(file.getAbsolutePath())) {
       return isOsRelease;
     }
-    else if ("/etc/redhat-release".equals(file.getAbsolutePath())){
+    else if (ETC_REDHAT_RELEASE.equals(file.getAbsolutePath())){
       return isOsRedHatRelease;
     }
-    else if ("/etc/centos-release".equals(file.getAbsolutePath())){
+    else if (ETC_CENTOS_RELEASE.equals(file.getAbsolutePath())){
       return isOsCentOsRelease;
     }
     return false;
   }
 
   @Override
-  public ArrayList<String> readFile(File file) {
-    ArrayList<String> result = new ArrayList<>();
-    if("/etc/os-release".equals(file.getAbsolutePath())) {
+  public List<String> readFile(File file) {
+    List<String> result = new ArrayList<>();
+    if(ETC_OS_RELEASE.equals(file.getAbsolutePath())) {
       result.add(ID.concat("=").concat(osReleaseId));
       result.add(VERSION_ID.concat("=").concat(osReleaseVersionId));
     }
-    else if ("/etc/redhat-release".equals(file.getAbsolutePath())){
+    else if (ETC_REDHAT_RELEASE.equals(file.getAbsolutePath())){
       result.add(osRedHatReleaseContent);
     }
-    else if ("/etc/centos-release".equals(file.getAbsolutePath())){
+    else if (ETC_CENTOS_RELEASE.equals(file.getAbsolutePath())){
       result.add(osCentOsReleaseContent);
     }
     return result;
