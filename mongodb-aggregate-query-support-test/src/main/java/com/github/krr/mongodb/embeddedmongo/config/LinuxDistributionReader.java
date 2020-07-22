@@ -19,8 +19,6 @@ public class LinuxDistributionReader {
   public static final String RHEL_62 = "rhel62";
   public static final String RHEL_70 = "rhel70";
   public static final String RHEL_80 = "rhel80";
-  public static final String OS_DIST = "OS_DIST";
-  public static final String V16_04 = "16.04";
   public static final String ETC_OS_RELEASE = "/etc/os-release";
   public static final String ETC_REDHAT_RELEASE = "/etc/redhat-release";
   public static final String ETC_CENTOS_RELEASE = "/etc/centos-release";
@@ -90,9 +88,6 @@ public class LinuxDistributionReader {
   }
 
   private Map.Entry<String, String> getLinuxDistro() {
-    if (UBUNTU_1604.equals(linuxPackageIoUtil.getEnv(OS_DIST))) {
-      return new AbstractMap.SimpleEntry<>(UBUNTU, V16_04);
-    }
     File fileVersion = new File(ETC_OS_RELEASE);
     if (linuxPackageIoUtil.isExists(fileVersion)) {
       return getOsRelease(fileVersion);

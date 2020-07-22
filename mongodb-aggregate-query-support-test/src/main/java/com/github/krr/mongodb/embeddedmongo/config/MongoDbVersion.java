@@ -10,7 +10,7 @@ import java.util.EnumSet;
 public class MongoDbVersion implements IFeatureAwareVersion {
   private final String specificVersion;
   private final EnumSet<Feature> features;
-  private static final Feature[] DEFAULT_42x_FEATURES = new Feature[] {
+  private static final Feature[] DEFAULT_42x_FEATURES = new Feature[]{
       Feature.SYNC_DELAY,
       Feature.STORAGE_ENGINE,
       Feature.ONLY_64BIT,
