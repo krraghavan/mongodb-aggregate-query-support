@@ -31,8 +31,4 @@ public class LinuxPackageIoUtilImpl implements LinuxPackageIoUtil {
     return fileContents;
   }
 
-  @Override
-  public String getEnv(String property) {
-    return System.getenv(property);
-  }
 }

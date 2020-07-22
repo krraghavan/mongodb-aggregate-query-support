@@ -14,7 +14,6 @@ public class TestLinuxPackageIoUtil implements LinuxPackageIoUtil {
   private boolean isOsRelease;
   private boolean isOsRedHatRelease;
   private boolean isOsCentOsRelease;
-  private String osDistEnv;
   private String osReleaseId;
   private String osReleaseVersionId;
   private String osRedHatReleaseContent;
@@ -50,8 +49,4 @@ public class TestLinuxPackageIoUtil implements LinuxPackageIoUtil {
     return result;
   }
 
-  @Override
-  public String getEnv(String property) {
-    return osDistEnv;
-  }
 }

@@ -90,9 +90,6 @@ public class LinuxDistributionReader {
   }
 
   private Map.Entry<String, String> getLinuxDistro() {
-    if (UBUNTU_1604.equals(linuxPackageIoUtil.getEnv(OS_DIST))) {
-      return new AbstractMap.SimpleEntry<>(UBUNTU, V16_04);
-    }
     File fileVersion = new File(ETC_OS_RELEASE);
     if (linuxPackageIoUtil.isExists(fileVersion)) {
       return getOsRelease(fileVersion);
