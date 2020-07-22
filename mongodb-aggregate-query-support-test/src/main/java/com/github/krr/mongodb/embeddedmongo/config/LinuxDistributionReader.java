@@ -141,7 +141,7 @@ public class LinuxDistributionReader {
         distribution = properties[1];
       }
       else if (VERSION_ID.equals(properties[0])) {
-        version = properties[1];
+        version = properties[1].replaceAll("\"", "");
       }
     }
     return new AbstractMap.SimpleEntry<>(distribution, version);

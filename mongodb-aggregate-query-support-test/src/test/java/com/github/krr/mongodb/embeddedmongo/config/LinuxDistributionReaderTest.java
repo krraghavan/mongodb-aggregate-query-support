@@ -144,11 +144,11 @@ public class LinuxDistributionReaderTest {
         distribution = UBUNTU;
         versionLink.append(UBUNTU);
         if (RandomUtils.nextBoolean()) {
-          version = "16.04";
+          version = "\"16.04\"";
           versionLink.append("1604");
         }
         else {
-          version = "18.04";
+          version = "\"18.04\"";
           versionLink.append("1804");
         }
         break;
@@ -162,15 +162,15 @@ public class LinuxDistributionReaderTest {
         }
         switch (RandomUtils.nextInt(0, 3)) {
           case 0:
-            version = "6.2";
+            version = "\"6.2\"";
             versionLink.append("62");
             break;
           case 1:
-            version = "7.0";
+            version = "\"7.0\"";
             versionLink.append("70");
             break;
           default:
-            version = "8.0";
+            version = "\"8.0\"";
             versionLink.append("80");
         }
     }
@@ -185,7 +185,7 @@ public class LinuxDistributionReaderTest {
     switch (RandomUtils.nextInt(0, 3)) {
       case 0:
         distribution = UBUNTU;
-        version = "20.04";
+        version = "\"20.04\"";
         break;
       case 1:
         distribution = RHEL;
@@ -193,7 +193,7 @@ public class LinuxDistributionReaderTest {
         if (distribution.isEmpty()) {
           distribution = CENTOS;
         }
-        version = "9.0";
+        version = "\"9.0\"";
     }
     return new Object[][]{
         new Object[]{distribution, version}
