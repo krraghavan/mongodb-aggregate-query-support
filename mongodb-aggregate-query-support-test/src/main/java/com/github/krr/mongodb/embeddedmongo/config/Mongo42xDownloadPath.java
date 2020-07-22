@@ -5,7 +5,7 @@ import de.flapdoodle.embed.process.distribution.Distribution;
 import de.flapdoodle.embed.process.distribution.Platform;
 
 /**
- * <Description>
+ * Overrides the download path where Linux distributions of MongoDB community server can be found.
  *
  * @author raghavan
  */

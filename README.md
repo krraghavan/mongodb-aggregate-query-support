@@ -8,6 +8,10 @@ The @Query annotation provided by Spring Data MongoDb allows queries to be execu
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
 
+
+## New in 0.8.8 version
+1. Fixed Mongo distribution for all Linux distributions (Thanks Siddharth Agrawal)
+
 ## New in 0.8.7 version
 1. Add support for Merge annotation introduced in 4.2
 1. Extend Embedded Mongo to be able to use 4.2 Mongo (original Embedded Mongo no longer supports it)
@@ -377,4 +381,5 @@ pipeline on a MongoDB client (like RoboMongo or MongoChef) and then copy the pip
 * Anusha Kasa
 * Dulanjalie Ganegedara
 * Chetan Narsude
+* Siddharth Agrawal
 
