@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.krraghavan</groupId>
   <artifactId>mongodb-aggregate-query-support</artifactId>
-  <version>0.8.9-SNAPSHOT</version>
+  <version>0.8.9</version>
 
   <packaging>pom</packaging>
 
@@ -38,7 +38,7 @@
   </modules>
 
   <properties>
-    <maqs.version>0.8.8</maqs.version>
+    <maqs.version>0.8.9</maqs.version>
     <mongodb.driver.version>3.11.2</mongodb.driver.version>
     <embedded-mongo-version>2.2.0</embedded-mongo-version>
     <jackson.version>2.10.1</jackson.version>
