@@ -21,12 +21,6 @@ public class LinuxDistributionReaderTest {
 
   ///////TESTS///////
 
-  @Test
-  public void testTravisCiVersion() {
-    linuxPackageIoUtil.setOsDistEnv(UBUNTU_1604);
-    Assert.assertEquals(UBUNTU_1604, linuxDistributionReader.getLinuxVersion());
-  }
-
   @Test(dataProvider = "testOsReleaseFixture", invocationCount = 5)
   public void testOsRelease(String distribution, String version, String versionLink) {
     linuxPackageIoUtil.setOsReleaseId(distribution);

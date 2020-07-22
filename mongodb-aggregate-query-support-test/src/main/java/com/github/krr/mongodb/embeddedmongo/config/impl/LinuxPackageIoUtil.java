@@ -5,6 +5,6 @@ import java.util.List;
 
 public interface LinuxPackageIoUtil {
   boolean isExists(File file);
+
   List<String> readFile(File file);
-  String getEnv(String property);
 }

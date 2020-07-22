@@ -14,7 +14,6 @@ public class TestLinuxPackageIoUtil implements LinuxPackageIoUtil {
   private boolean isOsRelease;
   private boolean isOsRedHatRelease;
   private boolean isOsCentOsRelease;
-  private String osDistEnv;
   private String osReleaseId;
   private String osReleaseVersionId;
   private String osRedHatReleaseContent;
@@ -22,13 +21,13 @@ public class TestLinuxPackageIoUtil implements LinuxPackageIoUtil {
 
   @Override
   public boolean isExists(File file) {
-    if(ETC_OS_RELEASE.equals(file.getAbsolutePath())) {
+    if (ETC_OS_RELEASE.equals(file.getAbsolutePath())) {
       return isOsRelease;
     }
-    else if (ETC_REDHAT_RELEASE.equals(file.getAbsolutePath())){
+    else if (ETC_REDHAT_RELEASE.equals(file.getAbsolutePath())) {
       return isOsRedHatRelease;
     }
-    else if (ETC_CENTOS_RELEASE.equals(file.getAbsolutePath())){
+    else if (ETC_CENTOS_RELEASE.equals(file.getAbsolutePath())) {
       return isOsCentOsRelease;
     }
     return false;
@@ -37,21 +36,17 @@ public class TestLinuxPackageIoUtil implements LinuxPackageIoUtil {
   @Override
   public List<String> readFile(File file) {
     List<String> result = new ArrayList<>();
-    if(ETC_OS_RELEASE.equals(file.getAbsolutePath())) {
+    if (ETC_OS_RELEASE.equals(file.getAbsolutePath())) {
       result.add(ID.concat("=").concat(osReleaseId));
       result.add(VERSION_ID.concat("=").concat(osReleaseVersionId));
     }
-    else if (ETC_REDHAT_RELEASE.equals(file.getAbsolutePath())){
+    else if (ETC_REDHAT_RELEASE.equals(file.getAbsolutePath())) {
       result.add(osRedHatReleaseContent);
     }
-    else if (ETC_CENTOS_RELEASE.equals(file.getAbsolutePath())){
+    else if (ETC_CENTOS_RELEASE.equals(file.getAbsolutePath())) {
       result.add(osCentOsReleaseContent);
     }
     return result;
   }
 
-  @Override
-  public String getEnv(String property) {
-    return osDistEnv;
-  }
 }
