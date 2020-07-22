@@ -8,11 +8,8 @@ import java.util.EnumSet;
 
 @Slf4j
 public class MongoDbVersion implements IFeatureAwareVersion {
-
   private final String specificVersion;
-
   private final EnumSet<Feature> features;
-
   private static final Feature[] DEFAULT_42x_FEATURES = new Feature[] {
       Feature.SYNC_DELAY,
       Feature.STORAGE_ENGINE,

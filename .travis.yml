@@ -6,3 +6,4 @@ env:
     - OS_DIST="ubuntu1604"
 script:
   - mkdir -p /home/travis/.embedmongo/linux
+  - mvn clean install

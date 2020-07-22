@@ -1,6 +1,5 @@
 package com.github.krr.mongodb.embeddedmongo.config;
 
-import com.github.krr.mongodb.embeddedmongo.config.impl.LinuxPackageIoUtil;
 import de.flapdoodle.embed.mongo.Command;
 import de.flapdoodle.embed.mongo.Paths;
 import de.flapdoodle.embed.mongo.distribution.Feature;
@@ -15,20 +14,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class Mongo42xPaths extends Paths {
 
-  private final LinuxPackageIoUtil linuxPackageIoUtil;
-
-  public Mongo42xPaths(Command command, LinuxPackageIoUtil linuxPackageIoUtil) {
-    super(command);
-    if(linuxPackageIoUtil == null) {
-      this.linuxPackageIoUtil = new LinuxPackageIoUtilImpl();
-    }
-    else {
-      this.linuxPackageIoUtil = linuxPackageIoUtil;
-    }
-  }
+  private final LinuxPackageIoUtilImpl linuxPackageIoUtil;
 
   public Mongo42xPaths(Command command) {
-    this(command, new LinuxPackageIoUtilImpl());
+    super(command);
+    this.linuxPackageIoUtil = new LinuxPackageIoUtilImpl();
   }
 
   @Override

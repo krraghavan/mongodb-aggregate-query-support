@@ -1,6 +1,5 @@
 package com.github.krr.mongodb.embeddedmongo.config;
 
-import com.github.krr.mongodb.embeddedmongo.config.impl.LinuxPackageIoUtil;
 import de.flapdoodle.embed.mongo.Command;
 import de.flapdoodle.embed.mongo.config.DownloadConfigBuilder;
 import de.flapdoodle.embed.process.extract.UUIDTempNaming;
@@ -12,26 +11,17 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
 
-@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"})
-@Slf4j
+@SuppressWarnings({"OptionalUsedAsFieldOrParameterType", "WeakerAccess"}) @Slf4j
 public class Mongo42xDownloadConfigBuilder extends DownloadConfigBuilder {
 
   private final Optional<String> artifactDownloadLocationEnvironmentVariable;
 
-  private final LinuxPackageIoUtil ioUtil;
-
   public Mongo42xDownloadConfigBuilder() {
-    this(new LinuxPackageIoUtilImpl());
+    this(Optional.ofNullable(System.getenv().get("EMBEDDED_MONGO_ARTIFACTS")));
   }
 
-  public Mongo42xDownloadConfigBuilder(LinuxPackageIoUtil ioUtil) {
-    this(Optional.ofNullable(System.getenv().get("EMBEDDED_MONGO_ARTIFACTS")), ioUtil);
-  }
-
-  protected Mongo42xDownloadConfigBuilder(Optional<String> artifactDownloadLocationEnvironmentVariable,
-                                          LinuxPackageIoUtil ioUtil) {
+  protected Mongo42xDownloadConfigBuilder(Optional<String> artifactDownloadLocationEnvironmentVariable) {
     this.artifactDownloadLocationEnvironmentVariable = artifactDownloadLocationEnvironmentVariable;
-    this.ioUtil = ioUtil;
   }
 
   public DownloadConfigBuilder defaults() {
@@ -45,7 +35,7 @@ public class Mongo42xDownloadConfigBuilder extends DownloadConfigBuilder {
   }
 
   public DownloadConfigBuilder packageResolverForCommand(Command command) {
-    packageResolver(new Mongo42xPaths(command, this.ioUtil));
+    packageResolver(new Mongo42xPaths(command));
     return this;
   }
 

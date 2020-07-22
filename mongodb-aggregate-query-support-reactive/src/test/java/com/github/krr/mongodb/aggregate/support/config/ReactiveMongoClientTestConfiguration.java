@@ -21,7 +21,6 @@ package com.github.krr.mongodb.aggregate.support.config;
 
 import com.github.krr.mongodb.embeddedmongo.config.Mongo42xDownloadConfigBuilder;
 import com.github.krr.mongodb.embeddedmongo.config.MongoDbVersion;
-import com.github.krr.mongodb.embeddedmongo.config.TestLinuxPackageIoUtil;
 import com.mongodb.ServerAddress;
 import com.mongodb.async.client.MongoClientSettings;
 import com.mongodb.connection.ClusterSettings;
@@ -46,7 +45,6 @@ import javax.annotation.PreDestroy;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import static com.github.krr.mongodb.embeddedmongo.config.LinuxDistributionReader.UBUNTU_1604;
 import static com.mongodb.connection.ClusterType.STANDALONE;
 import static java.util.Collections.singletonList;
 
@@ -69,11 +67,9 @@ public class ReactiveMongoClientTestConfiguration {
   public ReactiveMongoClientTestConfiguration() throws IOException {
 
     Command command = Command.MongoD;
-    TestLinuxPackageIoUtil ioUtil = TestLinuxPackageIoUtil.builder().osDistEnv(UBUNTU_1604)
-                                                          .isOsRelease(true).osReleaseVersionId("16.04").build();
-    IDownloadConfig downloadConfig = new Mongo42xDownloadConfigBuilder(ioUtil).defaultsForCommand(command)
-                                     .progressListener(new Slf4jProgressListener(LOGGER))
-                                     .build();
+    IDownloadConfig downloadConfig = new Mongo42xDownloadConfigBuilder().defaultsForCommand(command)
+                                                                        .progressListener(new Slf4jProgressListener(LOGGER))
+                                                                        .build();
     IRuntimeConfig runtimeConfig = new RuntimeConfigBuilder().defaults(command)
                                                              .artifactStore(new ExtractedArtifactStoreBuilder()
                                                                                 .defaults(command)
