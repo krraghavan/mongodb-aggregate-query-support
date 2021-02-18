@@ -41,7 +41,7 @@
     <maqs.version>0.8.9</maqs.version>
     <mongodb.driver.version>3.11.2</mongodb.driver.version>
     <embedded-mongo-version>2.2.0</embedded-mongo-version>
-    <jackson.version>2.10.1</jackson.version>
+    <jackson.version>2.12.1</jackson.version>
     <commons-lang3.version>3.8.1</commons-lang3.version>
     <commons-collections.version>3.2.2</commons-collections.version>
     <guava.version>27.0-jre</guava.version>
