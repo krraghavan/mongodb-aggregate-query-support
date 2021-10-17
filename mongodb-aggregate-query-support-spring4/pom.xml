@@ -33,6 +33,10 @@
   <artifactId>mongodb-aggregate-query-support-spring4</artifactId>
   <name>Mongo Aggregate Query support for Spring4</name>
 
+  <properties>
+    <mongodb.driver.version>3.11.2</mongodb.driver.version>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.springframework.data</groupId>
