@@ -38,8 +38,8 @@
   </modules>
 
   <properties>
-    <maqs.version>0.8.9</maqs.version>
-    <mongodb.driver.version>3.11.2</mongodb.driver.version>
+    <maqs.version>0.8.10-SNAPSHOT</maqs.version>
+    <mongodb.driver.version>4.3.2</mongodb.driver.version>
     <embedded-mongo-version>2.2.0</embedded-mongo-version>
     <jackson.version>2.10.1</jackson.version>
     <commons-lang3.version>3.8.1</commons-lang3.version>
@@ -140,7 +140,7 @@
       <dependency>
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
-        <version>6.14.3</version>
+        <version>7.4.0</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
