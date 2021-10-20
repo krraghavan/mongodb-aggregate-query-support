@@ -10,6 +10,7 @@ import org.bson.Document;
 import org.bson.codecs.DocumentCodec;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.conversions.Bson;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -70,11 +71,12 @@ public class ReactiveMongoNativeJavaDriverQueryExecutor extends AbstractQueryExe
       Bson document = BsonDocument.parse(query);
       pipelineStages.add(document);
     }
-    // run the pipeline and return a flux.
-    MongoCollection<Document> collection = mongoOperations.getCollection(collectionName);
+
+    MongoCollection<Document> collection = mongoOperations.getCollection(collectionName).block();
     AggregatePublisher<Document> aggregatePublisher = collection.aggregate(pipelineStages)
-                                                                .allowDiskUse(queryProvider.isAllowDiskUse())
-                                                                .maxTime(queryProvider.getMaxTimeMS(), MILLISECONDS);
+            .allowDiskUse(queryProvider.isAllowDiskUse())
+            .maxTime(queryProvider.getMaxTimeMS(), MILLISECONDS);
+
     Class methodReturnType = queryProvider.getMethodReturnType();
     boolean isFlux = Flux.class.isAssignableFrom(methodReturnType);
     boolean isMono = Mono.class.isAssignableFrom(methodReturnType);

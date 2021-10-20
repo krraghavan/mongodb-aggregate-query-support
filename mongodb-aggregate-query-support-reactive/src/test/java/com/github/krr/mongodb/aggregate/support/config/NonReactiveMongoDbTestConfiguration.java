@@ -2,7 +2,7 @@ package com.github.krr.mongodb.aggregate.support.config;
 
 import com.github.krr.mongodb.aggregate.support.api.MongoQueryExecutor;
 import com.github.krr.mongodb.aggregate.support.query.NonReactiveMongoNativeJavaDriverQueryExecutor;
-import com.mongodb.MongoClient;
+import com.mongodb.client.MongoClient;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

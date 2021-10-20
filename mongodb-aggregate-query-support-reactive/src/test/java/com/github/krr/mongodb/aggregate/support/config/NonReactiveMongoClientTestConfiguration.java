@@ -19,10 +19,15 @@
 
 package com.github.krr.mongodb.aggregate.support.config;
 
+import static com.mongodb.connection.ClusterType.STANDALONE;
+import static java.util.Collections.singletonList;
+
 import com.github.krr.mongodb.embeddedmongo.config.Mongo42xDownloadConfigBuilder;
 import com.github.krr.mongodb.embeddedmongo.config.MongoDbVersion;
-import com.mongodb.MongoClient;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.client.MongoClient;
 import com.mongodb.ServerAddress;
+import com.mongodb.client.MongoClients;
 import de.flapdoodle.embed.mongo.Command;
 import de.flapdoodle.embed.mongo.MongodExecutable;
 import de.flapdoodle.embed.mongo.MongodProcess;
@@ -89,7 +94,11 @@ public class NonReactiveMongoClientTestConfiguration {
   @Bean
   public MongoClient mongoClient() throws IOException {
     ServerAddress serverAddress = getServerAddress();
-    return new MongoClient(serverAddress);
+    MongoClientSettings.Builder builder = MongoClientSettings.builder();
+    builder.applyToClusterSettings(builder1 ->
+            builder1.hosts(singletonList(serverAddress))
+                    .build());
+    return MongoClients.create(builder.build());
   }
 
   private ServerAddress getServerAddress() throws UnknownHostException {

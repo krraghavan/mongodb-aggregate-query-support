@@ -200,10 +200,10 @@ public class ReactiveAggregateMergeTest extends AbstractTestNGSpringContextTests
     String employeeCollection = RandomStringUtils.randomAlphabetic(10);
     String orgArchiveColl = RandomStringUtils.randomAlphabetic(10);
     List<Employee> originalEmployees = addEmployeeDocuments(employeeCollection, EMPLOYEE_DOCS);
-    MongoCollection<Document> employeeColl = mongoTemplate.getCollection(employeeCollection);
+    MongoCollection<Document> employeeColl = mongoTemplate.getCollection(employeeCollection).block();
     validateCount(employeeCollection, originalEmployees.size());
     List<OrgArchiveEntry> orgArchiveEntries = addOrgArchiveEntries(orgArchiveColl, ORG_ARCHIVE_DOCS);
-    MongoCollection<Document> orgArchiveCollection = mongoTemplate.getCollection(orgArchiveColl);
+    MongoCollection<Document> orgArchiveCollection = mongoTemplate.getCollection(orgArchiveColl).block();
     validateCount(orgArchiveColl, orgArchiveEntries.size());
     Document index = Document.parse("{'fiscalYear': 1, 'dept': 1}");
     IndexDefinition def = new CompoundIndexDefinition(index).unique();

@@ -30,9 +30,7 @@
 
   <modules>
     <module>mongodb-aggregate-query-support-core</module>
-    <module>mongodb-aggregate-query-support-spring4-parent</module>
     <module>mongodb-aggregate-query-support-reactive-parent</module>
-    <module>mongodb-aggregate-query-support-spring4</module>
     <module>mongodb-aggregate-query-support-reactive</module>
     <module>mongodb-aggregate-query-support-test</module>
   </modules>

@@ -82,7 +82,7 @@ public class NonReactiveMongoNativeJavaDriverQueryExecutor extends AbstractQuery
                                                               .maxTime(queryProvider.getMaxTimeMS(), MILLISECONDS);
     if (isMongo360OrLater) {
       // after 3.6 CURSOR MODE is mandatory
-      aggregateIterable.useCursor(true);
+      //aggregateIterable.useCursor(true);
       LOGGER.debug("Mongo 3.6 detected - will use cursor mode for aggregate output");
     }
     try (MongoCursor<Document> cursor = aggregateIterable.iterator()) {
