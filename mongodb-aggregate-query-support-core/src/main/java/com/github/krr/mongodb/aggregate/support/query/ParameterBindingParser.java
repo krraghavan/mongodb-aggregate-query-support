@@ -1,5 +1,6 @@
 package com.github.krr.mongodb.aggregate.support.query;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.krr.mongodb.aggregate.support.api.JsonParseable;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.Binary;
@@ -63,6 +64,11 @@ public abstract class ParameterBindingParser {
       // the parseable input is not JSON - some stages like $unwind and $count only have strings.
       // nothing to do here. If the syntax is truly incorrect the query itself should indicate
       // that error.
+      if (parseableInput.startsWith("'") && parseableInput.endsWith("'")
+              || parseableInput.startsWith("\"") && parseableInput.endsWith("\"")) {
+        String finalInput = parseableInput.substring(1, parseableInput.length()-1);
+        collectParameterReferencesIntoBindings(bindings, finalInput);
+      }
       LOGGER.trace("Exception:", e);
     }
     return bindings;

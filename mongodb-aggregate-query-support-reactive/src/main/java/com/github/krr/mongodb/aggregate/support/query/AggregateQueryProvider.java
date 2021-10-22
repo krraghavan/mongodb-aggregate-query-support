@@ -19,6 +19,8 @@
 
 package com.github.krr.mongodb.aggregate.support.query;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.krr.mongodb.aggregate.support.annotations.Aggregate;
 import com.github.krr.mongodb.aggregate.support.annotations.Conditional;
 import com.github.krr.mongodb.aggregate.support.annotations.Conditional.ConditionalMatchType;
@@ -39,7 +41,6 @@ import com.mongodb.DBObject;
 import com.mongodb.DBRef;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.internal.Base64;
-import org.bson.json.JsonWriter;
 import org.slf4j.Logger;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Pageable;
@@ -270,8 +271,16 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider<Pagea
       return base64representation;
     }
 
-    return null;
-    //return serialize(value);
+    ObjectMapper mapper = new ObjectMapper();
+    String json = null;
+    try {
+      json = mapper.writeValueAsString(value);
+    } catch (JsonProcessingException e) {
+      LOGGER.error("Error serializing parameter value ", e);
+      throw new IllegalStateException(e);
+    }
+
+    return json;
   }
 
   @Override
