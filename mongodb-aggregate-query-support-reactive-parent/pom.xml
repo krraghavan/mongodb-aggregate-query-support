@@ -47,6 +47,11 @@
         <version>${spring5-version}</version>
       </dependency>
       <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-tx</artifactId>
+        <version>${spring5-version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.mongodb</groupId>
         <artifactId>mongodb-driver-reactivestreams</artifactId>
         <version>${mongo-reactive-java-driver.version}</version>
