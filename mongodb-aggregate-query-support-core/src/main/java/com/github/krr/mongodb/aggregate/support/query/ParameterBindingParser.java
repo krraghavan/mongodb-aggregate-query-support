@@ -1,6 +1,6 @@
 package com.github.krr.mongodb.aggregate.support.query;
 
-import com.github.krr.mongodb.aggregate.support.api.JsonParseable;
+import com.github.krr.mongodb.aggregate.support.query.AbstractAggregateQueryProvider.ParameterBinding;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.Binary;
 import org.slf4j.Logger;
@@ -23,61 +23,65 @@ public abstract class ParameterBindingParser {
   private static final Logger LOGGER = LoggerFactory.getLogger(ParameterBindingParser.class);
 
   private static final String PARAMETER_PREFIX = "_param_";
+  private static final String QUOTED_PARSEABLE_PARAMETER = "\"" + PARAMETER_PREFIX + "$2\"";
   private static final String PARSEABLE_PARAMETER = "\"" + PARAMETER_PREFIX + "$1\"";
-  private static final Pattern PARAMETER_BINDING_PATTERN = Pattern.compile("\\?(\\d+)");
-  private static final Pattern PARSEABLE_BINDING_PATTERN = Pattern.compile("\"?" + PARAMETER_PREFIX + "(\\d+)\"?");
+  private static final Pattern PARAMETER_BINDING_PATTERN = Pattern.compile("(?<beginQuote>[\"|'])?(?<prefix>[\\?|@])(?<index>\\d+)(?<endQuote>[\"|'])?");
+  private static final Pattern PARSEABLE_BINDING_PATTERN = Pattern.compile("(?<beginQuote>[\"|'])?" + PARAMETER_PREFIX + "(\\d+)(?<endQuote>[\"|'])?");
 
   private static final String LHS_PARAMETER_PREFIX = "@lhs@";
   private static final String LHS_PARSEABLE_PARAMETER = LHS_PARAMETER_PREFIX + "$1";
   private static final Pattern LHS_PARAMETER_BINDING_PATTERN = Pattern.compile("@(\\d+)");
   private static final Pattern LHS_PARSEABLE_BINDING_PATTERN = Pattern.compile(LHS_PARAMETER_PREFIX + "(\\d+)?");
 
-  private static final int PARAMETER_INDEX_GROUP = 1;
+  private static final int PARAMETER_INDEX_GROUP = 2;
 
   public ParameterBindingParser() {
   }
 
   /**
-   * Returns a list of {@link AbstractAggregateQueryProvider.ParameterBinding}s found in the given {@code input} or an
+   * Returns a list of {@link ParameterBinding}s found in the given {@code input} or an
    * {@link Collections#emptyList()}.
    *
    * @param input - the string with parameter bindings
-   * @param <T> a subclass of {@link JsonParseable} that returns the parsed Json string.
-   * @param jsonParseable an implementation of the {@link JsonParseable} interface
    * @return - the list of parameters
    */
-  public <T extends JsonParseable> List<AbstractAggregateQueryProvider.ParameterBinding> parseParameterBindingsFrom(String input,
-                                                                                                                    T jsonParseable) {
+  public List<ParameterBinding> parseParameterBindingsFrom(String input) {
 
     if (StringUtils.isEmpty(input)) {
       return Collections.emptyList();
     }
 
-    List<AbstractAggregateQueryProvider.ParameterBinding> bindings = new ArrayList<>();
+    List<ParameterBinding> bindings = new ArrayList<>();
 
-    String parseableInput = makeParameterReferencesParseable(input);
-    try {
-      collectParameterReferencesIntoBindings(bindings, jsonParseable.parse(parseableInput));
-    }
-    catch (Exception e) {
-      // the parseable input is not JSON - some stages like $unwind and $count only have strings.
-      // nothing to do here. If the syntax is truly incorrect the query itself should indicate
-      // that error.
-      LOGGER.trace("Exception:", e);
-    }
+    Matcher matcher = PARAMETER_BINDING_PATTERN.matcher(input);
+    String parseableInput = makeParameterReferencesParseable(matcher, bindings, input);
+    Matcher lhsMatcher = LHS_PARAMETER_BINDING_PATTERN.matcher(parseableInput);
+    makeParameterReferencesParseable(lhsMatcher, bindings, parseableInput);
     return bindings;
   }
 
-  private String makeParameterReferencesParseable(String input) {
-    Matcher matcher = PARAMETER_BINDING_PATTERN.matcher(input);
-    String retval = matcher.replaceAll(PARSEABLE_PARAMETER);
-
-    // now parse any LHS placeholders
-    Matcher lhsMatcher = LHS_PARAMETER_BINDING_PATTERN.matcher(retval);
-    return lhsMatcher.replaceAll(LHS_PARSEABLE_PARAMETER);
+  private String makeParameterReferencesParseable(Matcher matcher, List<ParameterBinding> bindings, String input) {
+    String parseableParameter = PARSEABLE_PARAMETER;
+    String retval = input;
+    while(matcher.find()) {
+      boolean beginQuote = matcher.group("beginQuote") != null;
+      boolean endQuote = matcher.group("endQuote") != null;
+      if(beginQuote != endQuote) {
+        LOGGER.error("Invalid syntax for {}}. Mismatched quotes", input);
+        throw new IllegalArgumentException("Invalid syntax for " + input + ". Mismatched quotes");
+      }
+      if(beginQuote) {
+        parseableParameter = QUOTED_PARSEABLE_PARAMETER;
+      }
+      String prefix = matcher.group("prefix");
+      ParameterBinding binding = new ParameterBinding(Integer.parseInt(matcher.group("index")), beginQuote, prefix);
+      bindings.add(binding);
+    }
+    retval = matcher.replaceAll(parseableParameter);
+    return retval;
   }
 
-  protected void collectParameterReferencesIntoBindings(List<AbstractAggregateQueryProvider.ParameterBinding> bindings,
+  protected void collectParameterReferencesIntoBindings(List<ParameterBinding> bindings,
                                                         Object value) {
 
     if (value instanceof String) {
@@ -99,7 +103,7 @@ public abstract class ParameterBindingParser {
          */
         boolean quoted = !string.equals(PARAMETER_PREFIX + paramIndex);
 
-        bindings.add(new AbstractAggregateQueryProvider.ParameterBinding(paramIndex, quoted));
+        bindings.add(new ParameterBinding(paramIndex, quoted));
       }
     }
     else if(value instanceof Binary) {
@@ -112,7 +116,7 @@ public abstract class ParameterBindingParser {
       // and use byte 7 to figure out which parameter value to substitute with if needed
       if(binaryValueNeedsReplacing((Binary) value)) {
         int index = determineBinaryParameterIndex((Binary) value);
-        bindings.add(new AbstractAggregateQueryProvider.ParameterBinding(index, true));
+        bindings.add(new ParameterBinding(index, true));
       }
     }
     else {
@@ -140,10 +144,10 @@ public abstract class ParameterBindingParser {
     return true;
   }
 
-  protected abstract void bindDriverSpecificTypes(List<AbstractAggregateQueryProvider.ParameterBinding> bindings,
+  protected abstract void bindDriverSpecificTypes(List<ParameterBinding> bindings,
                                              Object value);
 
-  protected void potentiallyAddBinding(String source, List<AbstractAggregateQueryProvider.ParameterBinding> bindings) {
+  protected void potentiallyAddBinding(String source, List<ParameterBinding> bindings) {
 
     Matcher valueMatcher = PARSEABLE_BINDING_PATTERN.matcher(source);
 
@@ -154,13 +158,13 @@ public abstract class ParameterBindingParser {
     replaceParameterBindings(bindings, lhsMatcher, "@", true);
   }
 
-  private void replaceParameterBindings(List<AbstractAggregateQueryProvider.ParameterBinding> bindings, Matcher valueMatcher, String prefix,
+  private void replaceParameterBindings(List<ParameterBinding> bindings, Matcher valueMatcher, String prefix,
                                         boolean quoted) {
     while (valueMatcher.find()) {
 
       int paramIndex = Integer.parseInt(valueMatcher.group(PARAMETER_INDEX_GROUP));
 
-      bindings.add(new AbstractAggregateQueryProvider.ParameterBinding(paramIndex, quoted, prefix));
+      bindings.add(new ParameterBinding(paramIndex, quoted, prefix));
     }
   }
 }

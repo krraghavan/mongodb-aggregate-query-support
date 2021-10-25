@@ -24,14 +24,59 @@
 
   <parent>
     <groupId>com.github.krraghavan</groupId>
-    <artifactId>mongodb-aggregate-query-support-spring4-parent</artifactId>
+    <artifactId>mongodb-aggregate-query-support</artifactId>
     <version>0.8.10-SNAPSHOT</version>
-    <relativePath>../mongodb-aggregate-query-support-spring4-parent/pom.xml</relativePath>
   </parent>
 
   <modelVersion>4.0.0</modelVersion>
   <artifactId>mongodb-aggregate-query-support-spring4</artifactId>
   <name>Mongo Aggregate Query support for Spring4</name>
+
+  <properties>
+    <spring4-data-version>1.10.16.RELEASE</spring4-data-version>
+    <spring4-version>4.3.20.RELEASE</spring4-version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-data-mongodb</artifactId>
+        <version>${spring4-data-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>${spring4-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-test</artifactId>
+        <version>${spring4-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${spring4-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.mongodb</groupId>
+        <artifactId>mongo-java-driver</artifactId>
+        <version>${mongodb.driver.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.krraghavan</groupId>
+        <artifactId>mongodb-aggregate-query-support-test</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.github.krraghavan</groupId>
+        <artifactId>mongo-aggregate-query-support-conditions</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -78,6 +123,15 @@
       <groupId>commons-collections</groupId>
       <artifactId>commons-collections</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.github.krraghavan</groupId>
+      <artifactId>mongo-aggregate-query-support-conditions</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>bson</artifactId>
+      <version>${mongodb.driver.version}</version>
+    </dependency>
 
     <!-- TEST DEPENDENCIES -->
     <dependency>
@@ -88,11 +142,6 @@
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

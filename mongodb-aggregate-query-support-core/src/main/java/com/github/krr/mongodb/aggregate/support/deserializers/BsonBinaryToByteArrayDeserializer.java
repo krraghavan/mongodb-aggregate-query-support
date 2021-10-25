@@ -17,6 +17,6 @@ public class BsonBinaryToByteArrayDeserializer extends GenericMongoExtendedJsonD
 
   @Override
   protected byte[] doDeserialize(JsonNode nodeValue) {
-    return Base64.decode(nodeValue.textValue());
+    return Base64.decode(nodeValue.get("base64").textValue());
   }
 }

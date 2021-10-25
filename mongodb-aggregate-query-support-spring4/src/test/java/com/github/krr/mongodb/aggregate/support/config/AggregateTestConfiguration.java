@@ -21,6 +21,7 @@
 
 package com.github.krr.mongodb.aggregate.support.config;
 
+import com.github.krr.mongodb.embeddedmongo.config.MongoTestServerConfiguration;
 import com.mongodb.MongoClient;
 import com.mongodb.WriteConcern;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -47,8 +48,8 @@ import org.springframework.data.repository.query.ExtensionAwareEvaluationContext
 @Configuration
 @Import({
    DocumentAnnotationTestConfiguration.class,
+   MongoTestServerConfiguration.class,
    MongoClientTestConfiguration.class,
-//   MongoDBTestConfiguration.class,
    TestMongoRepositoryConfiguration.class,
    MongoQueryExecutorConfiguration.class
 })

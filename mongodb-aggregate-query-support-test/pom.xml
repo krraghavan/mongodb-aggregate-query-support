@@ -23,5 +23,21 @@
       <version>6.14.3</version>
       <scope>test</scope>
     </dependency>
+    <!-- This dependency is added so we can get the Configuration classes.  This class will always be
+      available for any spring version.  Make it optional here so the code will compile but we won't transitively
+      inherit this dependency
+      -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+      <version>4.3.20.RELEASE</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.github.krraghavan</groupId>
+      <artifactId>mongo-aggregate-query-support-conditions</artifactId>
+      <version>${project.version}</version>
+      <optional>true</optional>
+    </dependency>
   </dependencies>
 </project>

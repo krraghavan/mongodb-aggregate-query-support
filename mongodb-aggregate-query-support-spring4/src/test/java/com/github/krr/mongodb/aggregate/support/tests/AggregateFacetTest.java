@@ -39,7 +39,7 @@ import static org.testng.Assert.*;
  * 2/19/17.
  */
 
-@SuppressWarnings({"ConstantConditions", "Duplicates", "SpringJavaInjectionPointsAutowiringInspection"})
+@SuppressWarnings({"Duplicates", "rawtypes"})
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
 public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
 
@@ -116,7 +116,7 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
     Object priceCategories = facets.get("categorizedByPrice");
     assertNotNull(priceCategories);
     List priceCategoryList = (List)priceCategories;
-    assertTrue(priceCategoryList.size() == 3);
+    assertEquals(priceCategoryList.size(), 3);
   }
 
   @Test
@@ -133,7 +133,7 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
     Object priceCategories = facets.get("categorizedByPrice");
     assertNotNull(priceCategories);
     List priceCategoryList = (List)priceCategories;
-    assertTrue(priceCategoryList.size() == 2);
+    assertEquals(priceCategoryList.size(), 2);
   }
 
   @Test

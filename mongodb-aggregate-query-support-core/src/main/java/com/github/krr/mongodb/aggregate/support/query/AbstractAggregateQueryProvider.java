@@ -330,6 +330,10 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
 
     private final int parameterIndex;
 
+    /**
+     * Indicates whether a string is already quoted (in the expression) or
+     * if quoting should be avoided (for JSON string expressions)
+     */
     private final boolean quoted;
 
     private final String prefix;
@@ -349,6 +353,10 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
       this.parameterIndex = parameterIndex;
       this.quoted = quoted;
       this.prefix = prefix;
+    }
+
+    public boolean stripQuotes() {
+      return "@".equals(prefix);
     }
 
     public boolean isQuoted() {

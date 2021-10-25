@@ -42,8 +42,7 @@ import static org.testng.Assert.assertNotNull;
  */
 
 
-@SuppressWarnings({"SpringJavaAutowiredMembersInspection", "Duplicates",
-                   "SpringJavaInjectionPointsAutowiringInspection"})
+@SuppressWarnings({"Duplicates"})
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
 public class AggregateAddFieldsTest extends AbstractTestNGSpringContextTests {
 

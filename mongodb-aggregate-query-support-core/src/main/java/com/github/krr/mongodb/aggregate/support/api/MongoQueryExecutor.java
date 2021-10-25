@@ -26,5 +26,6 @@ import com.github.krr.mongodb.aggregate.support.exceptions.MongoQueryException;
  */
 public interface MongoQueryExecutor {
 
+  @SuppressWarnings("rawtypes")
   Object executeQuery(QueryProvider queryProvider) throws MongoQueryException;
 }

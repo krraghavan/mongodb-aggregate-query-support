@@ -23,8 +23,6 @@ import com.github.krr.mongodb.aggregate.support.annotations.Conditional.Conditio
 import com.github.krr.mongodb.aggregate.support.condition.AggregateQueryMethodConditionContext;
 import com.github.krr.mongodb.aggregate.support.condition.ConditionalAnnotationMetadata;
 import org.apache.commons.lang3.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Condition;
 import org.springframework.data.mongodb.repository.query.ConvertingParameterAccessor;
 import org.springframework.data.mongodb.repository.query.MongoParameterAccessor;
@@ -40,8 +38,6 @@ import java.util.List;
  */
 public class ProcessorUtils {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ProcessorUtils.class);
-
   public boolean allowStage(Conditional[] conditionalClasses, ConditionalMatchType conditionalMatchType, Method method,
                             MongoParameterAccessor mongoParameterAccessor,
                             ConvertingParameterAccessor convertingParameterAccessor) {
@@ -51,7 +47,7 @@ public class ProcessorUtils {
         List<Object> parameterValues = getParameterValues(method, mongoParameterAccessor, convertingParameterAccessor);
         ConditionalAnnotationMetadata metadata = new ConditionalAnnotationMetadata(conditional);
         AggregateQueryMethodConditionContext context = new AggregateQueryMethodConditionContext(method,
-            parameterValues);
+                                                                                                parameterValues);
         Object object = conditional.condition().newInstance();
         Assert.isAssignable(Condition.class, object.getClass(), "Class must be a Condition");
         Condition condition = (Condition) object;
