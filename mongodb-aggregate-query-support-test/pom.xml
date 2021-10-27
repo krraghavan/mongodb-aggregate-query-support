@@ -5,7 +5,7 @@
   <parent>
     <artifactId>mongodb-aggregate-query-support</artifactId>
     <groupId>com.github.krraghavan</groupId>
-    <version>0.8.10-SNAPSHOT</version>
+    <version>0.8.10.1</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
 
@@ -35,7 +35,7 @@
     </dependency>
     <dependency>
       <groupId>com.github.krraghavan</groupId>
-      <artifactId>mongo-aggregate-query-support-conditions</artifactId>
+      <artifactId>mongodb-aggregate-query-support-conditions</artifactId>
       <version>${project.version}</version>
       <optional>true</optional>
     </dependency>
