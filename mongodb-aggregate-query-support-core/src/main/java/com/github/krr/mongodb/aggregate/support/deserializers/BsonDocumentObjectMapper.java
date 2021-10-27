@@ -25,8 +25,8 @@ public class BsonDocumentObjectMapper extends ObjectMapper {
     LOGGER.trace("Registering custom modules");
     SimpleModule module = new SimpleModule();
     module.addDeserializer(byte[].class, new BsonBinaryToByteArrayDeserializer());
-    module.addDeserializer(long.class, new BsonNumberLongToLongDeserializer());
-    module.addDeserializer(Long.class, new BsonNumberLongToLongDeserializer());
+    module.addDeserializer(long.class, new BsonLongValueDeserializer());
+    module.addDeserializer(Long.class, new BsonLongValueDeserializer());
     module.addDeserializer(String.class, new BsonObjectIdToStringDeserializer());
     module.addDeserializer(ObjectId.class, new BsonObjectIdDeserializer());
     module.addDeserializer(Date.class, new BsonDateToDateDeserializer());

@@ -1,9 +1,12 @@
 package com.github.krr.mongodb.aggregate.support.deserializers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
@@ -15,7 +18,7 @@ public class BsonDateToDateDeserializer extends GenericMongoExtendedJsonDeserial
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BsonDateToDateDeserializer.class);
 
-  private static final String NODE_KEY = "$date";
+  public static final String NODE_KEY = "$date";
 
   public BsonDateToDateDeserializer() {
     super(Date.class, NODE_KEY);
@@ -23,6 +26,13 @@ public class BsonDateToDateDeserializer extends GenericMongoExtendedJsonDeserial
 
   @Override
   protected Date doDeserialize(JsonNode s) {
-    return new Date(Long.parseLong(s.asText()));
+    JsonNodeType nodeType = s.getNodeType();
+    if(nodeType == JsonNodeType.NUMBER) {
+      return new Date(s.asLong());
+    }
+    else if(nodeType == JsonNodeType.STRING) {
+      return Date.from(Instant.from(DateTimeFormatter.ISO_DATE_TIME.parse(s.asText())));
+    }
+    throw new IllegalArgumentException("unrecognized node type " + nodeType + " with value " + s.asText());
   }
 }
