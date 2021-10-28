@@ -66,6 +66,12 @@ public class NonReactiveAggregateMongoQueryTest extends AbstractTestNGSpringCont
         new Object[]{"replaceSingleNestedJsonPlaceholderWithSuffix",
                      randomParamValue,
                      "{$match:{'randomAttribute1':foo.".concat(randomParamValue).concat("Id}}")},
+        new Object[]{"replaceSingleNestedJsonPlaceholderWithSuffixWithDlrOnField",
+                     randomParamValue,
+                     "{$match:{'randomAttribute1':$foo.".concat(randomParamValue).concat("Id}}")},
+        new Object[]{"replaceSingleNestedPlaceholderWithSuffixWithDlrOnField",
+                     randomParamValue,
+                     "{$match:{'randomAttribute1':\"$foo.".concat(randomParamValue).concat("Id\"}}")},
     };
   }
 
