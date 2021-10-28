@@ -28,7 +28,7 @@ import static com.github.krr.mongodb.aggregate.support.utils.ArrayUtils.NULL_STR
  * 4/25/18.
  */
 
-@SuppressWarnings("WeakerAccess")
+@SuppressWarnings({"WeakerAccess", "rawtypes"})
 public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider<T> {
 
   protected final Method method;

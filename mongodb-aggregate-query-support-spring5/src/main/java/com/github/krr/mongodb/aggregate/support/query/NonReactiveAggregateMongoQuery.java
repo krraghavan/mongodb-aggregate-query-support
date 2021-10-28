@@ -60,9 +60,10 @@ public class NonReactiveAggregateMongoQuery extends AbstractMongoQuery {
 
   /**
    * Creates a new {@link AbstractMongoQuery} from the given {@link MongoQueryMethod} and {@link MongoOperations}.
-   *  @param method must not be {@literal null}.
+   *
+   * @param method            must not be {@literal null}.
    * @param projectionFactory - the projection factory
-   * @param beanFactory
+   * @param beanFactory       - the bean factory (typically the application context)
    */
   @Autowired
   public NonReactiveAggregateMongoQuery(Method method, RepositoryMetadata metadata, MongoOperations mongoOperations,
@@ -104,8 +105,8 @@ public class NonReactiveAggregateMongoQuery extends AbstractMongoQuery {
    * @return - the query provider
    * @throws InvalidAggregationQueryException - if there was an error creating the query provider
    */
-  private QueryProvider<Pageable> createAggregateQueryProvider(MongoParameterAccessor mongoParameterAccessor,
-                                                               ConvertingParameterAccessor parameterAccessor)
+  QueryProvider<Pageable> createAggregateQueryProvider(MongoParameterAccessor mongoParameterAccessor,
+                                                       ConvertingParameterAccessor parameterAccessor)
       throws InvalidAggregationQueryException {
 
     Annotation annotation = method.getAnnotation(Aggregate.class);
@@ -135,7 +136,7 @@ public class NonReactiveAggregateMongoQuery extends AbstractMongoQuery {
 
   @Override
   protected boolean isLimiting() {
-    if(queryProvider != null) {
+    if (queryProvider != null) {
       return queryProvider.isLimiting() || queryProvider.isPageable();
     }
     return false;

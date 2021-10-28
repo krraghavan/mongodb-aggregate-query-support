@@ -1,7 +1,11 @@
 package com.github.krr.mongodb.aggregate.support.deserializers;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.testng.Assert;
 import org.testng.annotations.DataProvider;
@@ -86,5 +90,35 @@ public class BsonDocumentObjectMapperTest {
     BsonDocumentObjectMapper objectMapper = new BsonDocumentObjectMapper();
     String json = "{date:\"".concat(RandomStringUtils.randomAlphabetic(10)).concat("\"}");
     objectMapper.readValue(json, LongFromLong.class);
+  }
+
+  @Test
+  public void mustDeserializeToSubclassWithConstructorParam() throws JsonProcessingException {
+    BsonDocumentObjectMapper objectMapper = new BsonDocumentObjectMapper();
+    String randomType = RandomStringUtils.randomAlphabetic(10);
+    String json = "{\"type\":\"".concat(randomType).concat("\"}");
+    ConcreteBean expectedConcreteBean = new ConcreteBean(randomType);
+    ConcreteBean actualConcreteBean = objectMapper.readValue(json, ConcreteBean.class);
+    Assert.assertNotNull(actualConcreteBean);
+    Assert.assertEquals(actualConcreteBean.getType(), expectedConcreteBean.getType());
+  }
+
+  static abstract class BaseBean {
+
+    @Getter
+    protected final String type;
+
+    protected BaseBean(String type) {
+      this.type = type;
+    }
+  }
+
+  @EqualsAndHashCode(callSuper = true)
+  static class ConcreteBean extends BaseBean {
+
+    @JsonCreator
+    public ConcreteBean(@JsonProperty("type") String type) {
+      super(type);
+    }
   }
 }

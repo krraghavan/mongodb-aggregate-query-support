@@ -29,6 +29,16 @@ public class ParameterBindingParserTest {
         };
   }
 
+  @DataProvider
+  public static Object[][] singleJsonPlaceholderFixture() {
+    return new Object[][] {
+        new Object[] {"{\"a\" : \"@2\"}", 2, true},
+        new Object[] {"{\"a\" : \"@5\"}", 5, true},
+        new Object[] {"{\"a\" : @7}", 7, false},
+        new Object[] {"{\"a\" : \"foo.@7\"}", 7, true},
+        new Object[] {"{\"bar.@3\" : \"foo\"}", 3, true},
+        };  }
+
   @Test(dataProvider = "singlePlaceholderFixture")
   public void mustParseSinglePlaceholdersOnRHS(String input, int parameterIndex, boolean quoted) {
     ParameterBindingParser parser = new ParameterBindingParser() {
@@ -41,11 +51,6 @@ public class ParameterBindingParserTest {
     assertNotNull(bindings);
     assertEquals(bindings.size(), 1);
     validateBinding(parameterIndex, quoted, bindings.get(0));
-  }
-
-  private void validateBinding(int parameterIndex, boolean quoted, ParameterBinding binding) {
-    assertEquals(binding.getParameterIndex(), parameterIndex);
-    assertEquals(binding.isQuoted(), quoted);
   }
 
   @Test(dataProvider = "multiplePlaceholdersFixture")
@@ -66,5 +71,26 @@ public class ParameterBindingParserTest {
     binding = bindings.get(1);
     validateBinding(parameterIndex2, quoted2, binding);
   }
+
+  @Test(dataProvider = "singleJsonPlaceholderFixture")
+  public void mustParseSingleJsonPlaceholder(String input, int parameterIndex, boolean quoted) {
+    ParameterBindingParser parser = new ParameterBindingParser() {
+      @Override
+      protected void bindDriverSpecificTypes(List<ParameterBinding> bindings, Object value) {
+        throw new UnsupportedOperationException("Not supported");
+      }
+    };
+    List<ParameterBinding> bindings = parser.parseParameterBindingsFrom(input);
+    assertNotNull(bindings);
+    assertEquals(bindings.size(), 1);
+    ParameterBinding binding = bindings.get(0);
+    validateBinding(parameterIndex, quoted, binding);
+  }
+
+  private void validateBinding(int parameterIndex, boolean quoted, ParameterBinding binding) {
+    assertEquals(binding.getParameterIndex(), parameterIndex);
+    assertEquals(binding.isQuoted(), quoted);
+  }
+
 
 }
