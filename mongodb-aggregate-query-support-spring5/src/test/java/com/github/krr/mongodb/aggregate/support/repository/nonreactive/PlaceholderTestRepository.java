@@ -21,4 +21,12 @@ public interface PlaceholderTestRepository extends TestMongoRepository<TestAggre
   @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class, outputBeanType = Map.class)
   @Match(query = "{'randomAttribute1':\"foo.?0\"}", order = 0)
   List<Map<String, String>> replaceSingleNestedPlaceholderWithParameterValue(String value);
+
+  @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class, outputBeanType = Map.class)
+  @Match(query = "{'randomAttribute1':\"foo.?0Id\"}", order = 0)
+  List<Map<String, String>> replaceSingleNestedPlaceholderWithSuffix(String value);
+
+  @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class, outputBeanType = Map.class)
+  @Match(query = "{'randomAttribute1':\"foo.@0Id\"}", order = 0)
+  List<Map<String, String>> replaceSingleNestedJsonPlaceholderWithSuffix(String value);
 }

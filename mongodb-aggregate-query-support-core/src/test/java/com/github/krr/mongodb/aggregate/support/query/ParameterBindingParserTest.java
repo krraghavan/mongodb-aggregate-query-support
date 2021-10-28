@@ -37,6 +37,8 @@ public class ParameterBindingParserTest {
         new Object[] {"{\"a\" : @7}", 7, false},
         new Object[] {"{\"a\" : \"foo.@7\"}", 7, true},
         new Object[] {"{\"bar.@3\" : \"foo\"}", 3, true},
+        // with suffix after placeholder
+        new Object[] {"{\"bar.@3Id\" : \"foo\"}", 3, true},
         };  }
 
   @Test(dataProvider = "singlePlaceholderFixture")

@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
  * <p>
  * A parser that extracts the parameter bindings from a given query string.
  */
+@SuppressWarnings("RegExpRedundantEscape")
 public abstract class ParameterBindingParser {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ParameterBindingParser.class);
@@ -25,11 +26,10 @@ public abstract class ParameterBindingParser {
   private static final String PARAMETER_PREFIX = "_param_";
   private static final String QUOTED_PARSEABLE_PARAMETER = "\"" + PARAMETER_PREFIX + "$2\"";
   private static final String PARSEABLE_PARAMETER = "\"" + PARAMETER_PREFIX + "$1\"";
-  private static final Pattern PARAMETER_BINDING_PATTERN = Pattern.compile("(?<beginQuote>[\"|'])?(?<prefixToPrefix>[\\w\\.]*)?(?<prefix>[\\?|@])(?<index>\\d+)(?<endQuote>[\"|'])?");
+  private static final Pattern PARAMETER_BINDING_PATTERN = Pattern.compile("(?<beginQuote>[\"|'])?(?<prefixToPrefix>[\\w\\.]*)?(?<prefix>[\\?|@])(?<index>\\d+)(?<suffixToPrefix>[\\w\\.]*)?(?<endQuote>[\"|'])?");
   private static final Pattern PARSEABLE_BINDING_PATTERN = Pattern.compile("(?<beginQuote>[\"|'])?" + PARAMETER_PREFIX + "(\\d+)(?<endQuote>[\"|'])?");
 
   private static final String LHS_PARAMETER_PREFIX = "@lhs@";
-  private static final String LHS_PARSEABLE_PARAMETER = LHS_PARAMETER_PREFIX + "$1";
   private static final Pattern LHS_PARAMETER_BINDING_PATTERN = Pattern.compile("@(\\d+)");
   private static final Pattern LHS_PARSEABLE_BINDING_PATTERN = Pattern.compile(LHS_PARAMETER_PREFIX + "(\\d+)?");
 
@@ -62,7 +62,7 @@ public abstract class ParameterBindingParser {
 
   private String makeParameterReferencesParseable(Matcher matcher, List<ParameterBinding> bindings, String input) {
     String parseableParameter = PARSEABLE_PARAMETER;
-    String retval = input;
+    String retval;
     while(matcher.find()) {
       boolean beginQuote = matcher.group("beginQuote") != null;
       boolean endQuote = matcher.group("endQuote") != null;
