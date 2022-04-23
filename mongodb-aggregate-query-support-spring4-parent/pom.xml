@@ -14,7 +14,7 @@
 
   <properties>
     <spring4-data-version>1.10.16.RELEASE</spring4-data-version>
-    <spring4-version>4.3.20.RELEASE</spring4-version>
+    <spring4-version>5.3.19</spring4-version>
   </properties>
 
   <dependencyManagement>
