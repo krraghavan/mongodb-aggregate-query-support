@@ -13,7 +13,7 @@
   <name>Mongodb Aggregate Query Support (Reactive Parent)</name>
 
   <properties>
-    <spring5-data-version>2.2.1.RELEASE</spring5-data-version>
+    <spring5-data-version>3.3.5</spring5-data-version>
     <spring5-version>5.2.1.RELEASE</spring5-version>
     <mongo-reactive-java-driver.version>1.12.0</mongo-reactive-java-driver.version>
   </properties>
