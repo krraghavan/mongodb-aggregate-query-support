@@ -21,8 +21,8 @@ package com.github.krr.mongodb.aggregate.support.config;
 
 import com.github.krr.mongodb.embeddedmongo.config.Mongo42xDownloadConfigBuilder;
 import com.github.krr.mongodb.embeddedmongo.config.MongoDbVersion;
+import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
-import com.mongodb.async.client.MongoClientSettings;
 import com.mongodb.connection.ClusterSettings;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
@@ -95,12 +95,12 @@ public class ReactiveMongoClientTestConfiguration {
   @Bean
   public MongoClient mongoClient() throws IOException {
     ServerAddress serverAddress = getServerAddress();
-    MongoClientSettings settings = MongoClientSettings.builder()
-                                                      .clusterSettings(ClusterSettings.builder()
-                                                                                      .hosts(singletonList(serverAddress))
-                                                                                      .requiredClusterType(STANDALONE)
-                                                                                      .build()).build();
-    return MongoClients.create(settings);
+    MongoClientSettings.Builder builder = MongoClientSettings.builder();
+    builder.applyToClusterSettings(builder1 ->
+            builder1.hosts(singletonList(serverAddress))
+                    .requiredClusterType(STANDALONE)
+                    .build());
+    return MongoClients.create(builder.build());
   }
 
   private ServerAddress getServerAddress() throws UnknownHostException {

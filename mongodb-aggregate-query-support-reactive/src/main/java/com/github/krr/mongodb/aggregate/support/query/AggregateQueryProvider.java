@@ -19,6 +19,8 @@
 
 package com.github.krr.mongodb.aggregate.support.query;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.krr.mongodb.aggregate.support.annotations.Aggregate;
 import com.github.krr.mongodb.aggregate.support.annotations.Conditional;
 import com.github.krr.mongodb.aggregate.support.annotations.Conditional.ConditionalMatchType;
@@ -34,11 +36,10 @@ import com.github.krr.mongodb.aggregate.support.processor.ParameterPlaceholderRe
 import com.github.krr.mongodb.aggregate.support.processor.PipelineStageQueryProcessor;
 import com.github.krr.mongodb.aggregate.support.utils.ArrayUtils;
 import com.github.krr.mongodb.aggregate.support.utils.ReactiveProcessorUtils;
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DBRef;
-import com.mongodb.util.JSON;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.BSON;
 import org.bson.internal.Base64;
 import org.slf4j.Logger;
 import org.springframework.core.annotation.AnnotationUtils;
@@ -59,7 +60,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.krr.mongodb.aggregate.support.utils.ArrayUtils.NULL_STRING;
-import static com.mongodb.util.JSON.serialize;
 import static java.lang.String.format;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -97,6 +97,8 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider<Pagea
   private ParameterBindingParser parameterBindingParser = new NonReactiveParameterBindingParser();
 
   private boolean isLimiting;
+
+  static final byte B_GENERAL = 0;
 
   public AggregateQueryProvider(Method method, MongoParameterAccessor mongoParameterAccessor,
                                 ConvertingParameterAccessor convertingParameterAccessor) throws
@@ -220,7 +222,7 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider<Pagea
    */
   @SuppressWarnings({"Duplicates", "WeakerAccess"})
   protected String replacePlaceholders(String query) {
-    List<ParameterBinding> queryParameterBindings = parameterBindingParser.parseParameterBindingsFrom(query, JSON::parse);
+    List<ParameterBinding> queryParameterBindings = parameterBindingParser.parseParameterBindingsFrom(query, BasicDBObject::parse);
 
     if (queryParameterBindings.isEmpty()) {
       return query;
@@ -263,13 +265,22 @@ public class AggregateQueryProvider extends AbstractAggregateQueryProvider<Pagea
 
       String base64representation = Base64.encode((byte[]) value);
       if (!binding.isQuoted()) {
-        return "{ '$binary' : '" + base64representation + "', '$type' : " + BSON.B_GENERAL + "}";
+        return "{ '$binary' : '" + base64representation + "', '$type' : " + B_GENERAL + "}";
       }
 
       return base64representation;
     }
 
-    return serialize(value);
+    ObjectMapper mapper = new ObjectMapper();
+    String json = null;
+    try {
+      json = mapper.writeValueAsString(value);
+    } catch (JsonProcessingException e) {
+      LOGGER.error("Error serializing parameter value ", e);
+      throw new IllegalStateException(e);
+    }
+
+    return json;
   }
 
   @Override

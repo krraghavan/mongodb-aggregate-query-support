@@ -13,9 +13,10 @@
   <name>Mongodb Aggregate Query Support (Reactive Parent)</name>
 
   <properties>
-    <spring5-data-version>2.2.1.RELEASE</spring5-data-version>
-    <spring5-version>5.2.1.RELEASE</spring5-version>
-    <mongo-reactive-java-driver.version>1.12.0</mongo-reactive-java-driver.version>
+    <spring5-data-mongodb>3.2.3</spring5-data-mongodb>
+    <spring5-data-version>2.5.3</spring5-data-version>
+    <spring5-version>5.3.9</spring5-version>
+    <mongo-reactive-java-driver.version>4.3.2</mongo-reactive-java-driver.version>
   </properties>
 
   <dependencyManagement>
@@ -23,7 +24,7 @@
       <dependency>
         <groupId>org.springframework.data</groupId>
         <artifactId>spring-data-mongodb</artifactId>
-        <version>${spring5-data-version}</version>
+        <version>${spring5-data-mongodb}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.data</groupId>
@@ -43,6 +44,11 @@
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context</artifactId>
+        <version>${spring5-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-tx</artifactId>
         <version>${spring5-version}</version>
       </dependency>
       <dependency>
