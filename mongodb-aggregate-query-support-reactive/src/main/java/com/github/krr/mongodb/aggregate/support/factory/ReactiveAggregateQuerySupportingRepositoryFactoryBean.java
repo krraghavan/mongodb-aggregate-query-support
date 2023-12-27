@@ -20,7 +20,7 @@
 package com.github.krr.mongodb.aggregate.support.factory;
 
 
-import com.github.krr.mongodb.aggregate.support.api.MongoQueryExecutor;
+import com.github.krr.mongodb.aggregate.support.api.ReactiveMongoQueryExecutor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.repository.support.ReactiveMongoRepositoryFactoryBean;
@@ -39,11 +39,11 @@ import java.io.Serializable;
 public class ReactiveAggregateQuerySupportingRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extends Serializable>
     extends ReactiveMongoRepositoryFactoryBean<T, S, ID> {
 
-  private final MongoQueryExecutor queryExecutor;
+  private final ReactiveMongoQueryExecutor queryExecutor;
 
   @Autowired
   public ReactiveAggregateQuerySupportingRepositoryFactoryBean(Class<? extends T> repositoryInterface,
-                                                               MongoQueryExecutor queryExecutor) {
+                                                               ReactiveMongoQueryExecutor queryExecutor) {
     super(repositoryInterface);
     this.queryExecutor = queryExecutor;
   }

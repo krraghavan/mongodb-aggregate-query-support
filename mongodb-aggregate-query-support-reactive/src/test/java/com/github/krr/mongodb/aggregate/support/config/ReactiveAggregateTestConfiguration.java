@@ -38,7 +38,6 @@ import org.springframework.data.repository.query.QueryMethodEvaluationContextPro
 @Import({
             DocumentAnnotationTestConfiguration.class,
             ReactiveMongoQueryExecutorConfiguration.class,
-            ReactiveMongoClientTestConfiguration.class,
             ReactiveMongoDbTestConfiguration.class,
             ReactiveTestMongoRepositoryConfiguration.class
 })

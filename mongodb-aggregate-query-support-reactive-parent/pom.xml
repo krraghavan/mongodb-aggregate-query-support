@@ -13,9 +13,10 @@
   <name>Mongodb Aggregate Query Support (Reactive Parent)</name>
 
   <properties>
-    <spring5-data-version>2.2.1.RELEASE</spring5-data-version>
-    <spring5-version>5.2.1.RELEASE</spring5-version>
-    <mongo-reactive-java-driver.version>1.12.0</mongo-reactive-java-driver.version>
+    <spring-data-version>3.1.4</spring-data-version>
+    <spring-version>6.0.13</spring-version>
+    <spring-data-mongodb-version>4.1.4</spring-data-mongodb-version>
+    <mongo-reactive-java-driver.version>4.11.0</mongo-reactive-java-driver.version>
   </properties>
 
   <dependencyManagement>
@@ -23,27 +24,27 @@
       <dependency>
         <groupId>org.springframework.data</groupId>
         <artifactId>spring-data-mongodb</artifactId>
-        <version>${spring5-data-version}</version>
+        <version>${spring-data-mongodb-version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.data</groupId>
         <artifactId>spring-data-commons</artifactId>
-        <version>${spring5-data-version}</version>
+        <version>${spring-data-version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-core</artifactId>
-        <version>${spring5-version}</version>
+        <version>${spring-version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-test</artifactId>
-        <version>${spring5-version}</version>
+        <version>${spring-version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
         <artifactId>spring-context</artifactId>
-        <version>${spring5-version}</version>
+        <version>${spring-version}</version>
       </dependency>
       <dependency>
         <groupId>org.mongodb</groupId>

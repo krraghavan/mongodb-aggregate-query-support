@@ -18,13 +18,13 @@
  */
 package com.github.krr.mongodb.aggregate.support.config;
 
-import com.github.krr.mongodb.aggregate.support.api.MongoQueryExecutor;
+import com.github.krr.mongodb.aggregate.support.api.ReactiveMongoQueryExecutor;
 import com.github.krr.mongodb.aggregate.support.query.ReactiveMongoNativeJavaDriverQueryExecutor;
 import com.mongodb.reactivestreams.client.MongoClient;
+import com.mongodb.reactivestreams.client.MongoClients;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 
@@ -33,7 +33,6 @@ import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
  * 10/21/2015.
  */
 @Configuration
-@Import(ReactiveMongoClientTestConfiguration.class)
 public class ReactiveMongoDbTestConfiguration {
 
   @Bean
@@ -47,8 +46,12 @@ public class ReactiveMongoDbTestConfiguration {
   }
 
   @Bean
-  public MongoQueryExecutor queryExecutor(ReactiveMongoOperations mongoOperations) {
+  public ReactiveMongoQueryExecutor queryExecutor(ReactiveMongoOperations mongoOperations) {
     return new ReactiveMongoNativeJavaDriverQueryExecutor(mongoOperations);
   }
 
+  @Bean
+  public MongoClient mongoClient() {
+    return MongoClients.create();
+  }
 }

@@ -26,7 +26,7 @@ import com.github.krr.mongodb.aggregate.support.annotations.Sort;
 import com.github.krr.mongodb.aggregate.support.beans.Possessions;
 import com.github.krr.mongodb.aggregate.support.condition.ParameterValueNotNullCondition;
 import com.mongodb.DBObject;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -36,6 +36,7 @@ import java.util.List;
  * Created by rkolliva
  * 3/1/17.
  */
+@SuppressWarnings("unused")
 public interface PossessionsRepository2 extends MongoRepository<Possessions, String> {
 
   @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class)

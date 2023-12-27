@@ -22,6 +22,7 @@ import com.github.krr.mongodb.aggregate.support.annotations.Conditional;
 import com.github.krr.mongodb.aggregate.support.annotations.Conditional.ConditionalMatchType;
 import com.github.krr.mongodb.aggregate.support.enums.AggregationType;
 import com.github.krr.mongodb.aggregate.support.query.AbstractAggregateQueryProvider.AggregationStage;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -29,7 +30,8 @@ import java.util.List;
  * Created by rkolliva on 10/21/2015.
  *
  */
-public interface QueryProvider<T> {
+@SuppressWarnings("rawtypes")
+public interface QueryProvider {
 
   // Define default value of five minutes on the server side for an aggregate
   // query to finish running before timing out.
@@ -48,7 +50,7 @@ public interface QueryProvider<T> {
   /**
    * @return repository's aggregate function's return type
    */
-  Class getMethodReturnType();
+  Class<?> getMethodReturnType();
 
   /**
    * @return result key
@@ -66,7 +68,7 @@ public interface QueryProvider<T> {
    * @return - The Pageable object if the query is pageable null otherwise.
    *
    */
-  T getPageable();
+  Pageable getPageable();
 
   /**
    * @return true if the query is allowed to use disk space to avoid sort/groupBy space limitations
@@ -82,7 +84,7 @@ public interface QueryProvider<T> {
    * the same mechanism as db.killOp(). MongoDB only terminates an operation at
    * one of its designated interrupt points."
    *
-   * Reference: https://docs.mongodb.com/manual/reference/command/aggregate/
+   * Reference: <a href="https://docs.mongodb.com/manual/reference/command/aggregate/">...</a>
    *
    */
   long getMaxTimeMS();

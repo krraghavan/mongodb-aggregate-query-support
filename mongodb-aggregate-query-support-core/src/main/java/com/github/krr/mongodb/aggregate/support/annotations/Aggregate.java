@@ -41,7 +41,7 @@ public @interface Aggregate {
    * @return The class name of the input collection on which the aggregation pipeline starts.
    * Also used to derive the collection name if collectionName is not defined.
    */
-  Class inputType();
+  Class<?> inputType();
 
   /**
    * @return - the name of the collection on which the aggregation query is performed.  If

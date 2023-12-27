@@ -21,7 +21,7 @@ package com.github.krr.mongodb.aggregate.support.factory;
 
 
 import com.github.krr.mongodb.aggregate.support.annotations.Aggregate;
-import com.github.krr.mongodb.aggregate.support.api.MongoQueryExecutor;
+import com.github.krr.mongodb.aggregate.support.api.ReactiveMongoQueryExecutor;
 import com.github.krr.mongodb.aggregate.support.query.ReactiveAggregateMongoQuery;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
@@ -47,7 +47,7 @@ public class ReactiveAggregateQuerySupportingRepositoryFactory extends ReactiveM
 
   private final ReactiveMongoOperations mongoOperations;
 
-  private MongoQueryExecutor queryExecutor;
+  private final ReactiveMongoQueryExecutor queryExecutor;
 
   /**
    * Creates a new {@link MongoRepositoryFactory} with the given {@link MongoOperations}.
@@ -56,7 +56,7 @@ public class ReactiveAggregateQuerySupportingRepositoryFactory extends ReactiveM
    * @param queryExecutor - the query executor
    */
   public ReactiveAggregateQuerySupportingRepositoryFactory(ReactiveMongoOperations mongoOperations,
-                                                           MongoQueryExecutor queryExecutor) {
+                                                           ReactiveMongoQueryExecutor queryExecutor) {
     super(mongoOperations);
     this.mongoOperations = mongoOperations;
     this.queryExecutor = queryExecutor;

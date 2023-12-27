@@ -30,21 +30,22 @@
 
   <modules>
     <module>mongodb-aggregate-query-support-core</module>
-    <module>mongodb-aggregate-query-support-spring4-parent</module>
+    <module>mongodb-aggregate-query-support-spring-parent</module>
     <module>mongodb-aggregate-query-support-reactive-parent</module>
-    <module>mongodb-aggregate-query-support-spring4</module>
+    <module>mongodb-aggregate-query-support-spring</module>
     <module>mongodb-aggregate-query-support-reactive</module>
-    <module>mongodb-aggregate-query-support-test</module>
   </modules>
 
   <properties>
-    <maqs.version>0.8.9</maqs.version>
-    <mongodb.driver.version>3.11.2</mongodb.driver.version>
-    <embedded-mongo-version>2.2.0</embedded-mongo-version>
-    <jackson.version>2.10.1</jackson.version>
+    <maqs.version>0.8.10-SNAPSHOT</maqs.version>
+    <mongodb.driver.version>4.11.1</mongodb.driver.version>
+    <embedded-mongo-version>4.12.0</embedded-mongo-version>
+    <jackson.version>2.15.3</jackson.version>
     <commons-lang3.version>3.8.1</commons-lang3.version>
-    <commons-collections.version>3.2.2</commons-collections.version>
-    <guava.version>27.0-jre</guava.version>
+    <commons-collections.version>4.4</commons-collections.version>
+    <guava.version>33.0.0-jre</guava.version>
+    <testng.version>7.7.0</testng.version>
+    <lombok.version>1.18.30</lombok.version>
   </properties>
 
   <name>Mongo DB Aggregation Query Support</name>
@@ -62,8 +63,8 @@
   <developers>
     <developer>
       <name>Kollivakkam Raghavan</name>
-      <organization>Nutanix</organization>
-      <organizationUrl>http://www.nutanix.com</organizationUrl>
+      <organization>Google</organization>
+      <organizationUrl>http://www.google.com</organizationUrl>
     </developer>
   </developers>
 
@@ -117,14 +118,14 @@
         <version>${commons-lang3.version}</version>
       </dependency>
       <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-collections4</artifactId>
         <version>${commons-collections.version}</version>
       </dependency>
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>27.0-jre</version>
+        <version>${guava.version}</version>
       </dependency>
       <dependency>
         <groupId>de.flapdoodle.embed</groupId>
@@ -140,7 +141,7 @@
       <dependency>
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
-        <version>6.14.3</version>
+        <version>${testng.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>
@@ -165,34 +166,26 @@
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>1.18.12</version>
+      <version>${lombok.version}</version>
       <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.code.findbugs</groupId>
+      <artifactId>jsr305</artifactId>
+      <version>3.0.2</version>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
       <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.22.1</version>
-        <executions>
-          <execution>
-            <id>unitTests</id>
-            <phase>test</phase>
-            <goals>
-              <goal>test</goal>
-            </goals>
-          </execution>
-        </executions>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+        <configuration>
+          <target>1.8</target>
+          <source>1.8</source>
+        </configuration>
       </plugin>
     </plugins>
   </build>
@@ -216,7 +209,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.0.1</version>
+            <version>3.3.0</version>
             <executions>
               <execution>
                 <id>attach-sources</id>

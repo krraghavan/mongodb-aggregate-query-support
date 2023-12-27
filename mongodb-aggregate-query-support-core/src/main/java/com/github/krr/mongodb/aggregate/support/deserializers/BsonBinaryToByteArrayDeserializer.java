@@ -1,7 +1,7 @@
 package com.github.krr.mongodb.aggregate.support.deserializers;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.bson.internal.Base64;
+import java.util.Base64;
 
 /**
  * Created by rkolliva
@@ -17,6 +17,6 @@ public class BsonBinaryToByteArrayDeserializer extends GenericMongoExtendedJsonD
 
   @Override
   protected byte[] doDeserialize(JsonNode nodeValue) {
-    return Base64.decode(nodeValue.textValue());
+    return Base64.getDecoder().decode(nodeValue.get("base64").textValue());
   }
 }
