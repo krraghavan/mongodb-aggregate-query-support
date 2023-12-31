@@ -30,22 +30,30 @@
 
   <modules>
     <module>mongodb-aggregate-query-support-core</module>
-    <module>mongodb-aggregate-query-support-spring-parent</module>
-    <module>mongodb-aggregate-query-support-reactive-parent</module>
+<!--    <module>mongodb-aggregate-query-support-spring-parent</module>-->
+<!--    <module>mongodb-aggregate-query-support-reactive-parent</module>-->
     <module>mongodb-aggregate-query-support-spring</module>
     <module>mongodb-aggregate-query-support-reactive</module>
   </modules>
 
   <properties>
-    <maqs.version>0.8.10-SNAPSHOT</maqs.version>
-    <mongodb.driver.version>4.11.1</mongodb.driver.version>
-    <embedded-mongo-version>4.12.0</embedded-mongo-version>
-    <jackson.version>2.15.3</jackson.version>
     <commons-lang3.version>3.8.1</commons-lang3.version>
     <commons-collections.version>4.4</commons-collections.version>
     <guava.version>33.0.0-jre</guava.version>
-    <testng.version>7.7.0</testng.version>
+    <jackson.version>2.15.3</jackson.version>
     <lombok.version>1.18.30</lombok.version>
+    <maqs.version>0.8.10-SNAPSHOT</maqs.version>
+    <testng.version>7.7.0</testng.version>
+    <!-- Mongo and Spring versions -->
+    <embedded-mongo-version>4.12.0</embedded-mongo-version>
+    <mongodb.driver.version>4.11.1</mongodb.driver.version>
+    <spring-data-version>3.1.4</spring-data-version>
+    <spring-version>6.0.13</spring-version>
+    <spring-data-mongodb-version>4.1.4</spring-data-mongodb-version>
+    <mongo-reactive-java-driver.version>4.11.0</mongo-reactive-java-driver.version>
+    <!-- Reactive Support -->
+    <reactive-streams.version>1.0.4</reactive-streams.version>
+    <reactor-core.version>3.6.1</reactor-core.version>
   </properties>
 
   <name>Mongo DB Aggregation Query Support</name>
@@ -90,6 +98,39 @@
 
   <dependencyManagement>
     <dependencies>
+      <!-- Sync mongo Driver -->
+      <dependency>
+        <groupId>org.mongodb</groupId>
+        <artifactId>mongo-java-driver</artifactId>
+        <version>${mongodb.driver.version}</version>
+      </dependency>
+      <!-- Async mongo Driver -->
+      <dependency>
+        <groupId>org.mongodb</groupId>
+        <artifactId>mongodb-driver-reactivestreams</artifactId>
+        <version>${mongo-reactive-java-driver.version}</version>
+      </dependency>
+
+      <!-- Core Mongo Libraries -->
+      <dependency>
+        <groupId>org.mongodb</groupId>
+        <artifactId>mongodb-driver-core</artifactId>
+        <version>${mongodb.driver.version}</version>
+      </dependency>
+
+      <!-- Reactor libraries for Async support -->
+      <dependency>
+        <groupId>io.projectreactor</groupId>
+        <artifactId>reactor-core</artifactId>
+        <version>${reactor-core.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.github.krraghavan</groupId>
+        <artifactId>mongodb-aggregate-query-support-core</artifactId>
+        <version>${maqs.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-bom</artifactId>
@@ -128,16 +169,45 @@
         <version>${guava.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-core</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-test</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-context</artifactId>
+        <version>${spring-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-data-commons</artifactId>
+        <version>${spring-data-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework.data</groupId>
+        <artifactId>spring-data-mongodb</artifactId>
+        <version>${spring-data-mongodb-version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+          </exclusion>
+        </exclusions>
+        <optional>true</optional>
+      </dependency>
+
+      <!-- TEST DEPENDENCIES -->
+      <dependency>
         <groupId>de.flapdoodle.embed</groupId>
         <artifactId>de.flapdoodle.embed.mongo</artifactId>
         <version>${embedded-mongo-version}</version>
         <scope>test</scope>
       </dependency>
-<!--      <dependency>-->
-<!--        <groupId>io.projectreactor</groupId>-->
-<!--        <artifactId>reactor-core</artifactId>-->
-<!--        <version>3.2.2.RELEASE</version>-->
-<!--      </dependency>-->
       <dependency>
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
@@ -179,6 +249,89 @@
       <groupId>com.google.code.findbugs</groupId>
       <artifactId>jsr305</artifactId>
       <version>3.0.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.data</groupId>
+      <artifactId>spring-data-mongodb</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-context</artifactId>
+        </exclusion>
+      </exclusions>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
+    </dependency>
+
+    <!-- TEST DEPENDENCIES -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.webjars</groupId>
+          <artifactId>jquery</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.krraghavan</groupId>
+      <artifactId>mongodb-aggregate-query-support-test</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.flapdoodle.embed</groupId>
+      <artifactId>de.flapdoodle.embed.mongo</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.immutables</groupId>
+      <artifactId>value</artifactId>
+      <version>2.10.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.annotation</groupId>
+      <artifactId>javax.annotation-api</artifactId>
+      <version>1.3.2</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 
