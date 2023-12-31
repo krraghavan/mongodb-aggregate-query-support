@@ -58,7 +58,6 @@ public class SortTest extends AbstractTestNGSpringContextTests {
     Assert.assertNotNull(testSortRepository);
     List<TestSortResultsBean> sortResultsBeans = testSortRepository.sortByTags();
     Assert.assertNotNull(sortResultsBeans);
-    Assert.assertTrue(sortResultsBeans.size() == 22);
-    // verify sorts here (@todo after fongo support added)
+    Assert.assertEquals(sortResultsBeans.size(), 22);
   }
 }

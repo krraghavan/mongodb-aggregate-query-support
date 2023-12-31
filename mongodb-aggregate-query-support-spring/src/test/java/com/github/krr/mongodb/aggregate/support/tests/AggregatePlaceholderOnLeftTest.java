@@ -84,7 +84,7 @@ public class AggregatePlaceholderOnLeftTest extends AbstractTestNGSpringContextT
     });
   }
 
-  @Test(expectedExceptions = ArrayIndexOutOfBoundsException.class)
+  @Test(expectedExceptions = IllegalArgumentException.class)
   public void mustThrowExceptionIfAtAtParameterIsOutOfBounds() {
     possessionsRepository.getPossessionsInvalidSortParameter("xxx", "xxx");
   }

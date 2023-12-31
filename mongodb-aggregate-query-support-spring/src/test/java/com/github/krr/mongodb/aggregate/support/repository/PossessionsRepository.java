@@ -116,12 +116,12 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Stri
   @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class)
   @Match(query = "{" +
                 "   'tag': ?0," +
-                "   '_id': { $in : ?1 }" +
+                "   '_id': { $in : '?1' }" +
                 "}", order = 0, condition = {
      @Conditional(condition = ParameterValueNotNullCondition.class, parameterIndex = 1)
   })
   @Match(query = "{" +
-                "   'tag': ?0" +
+                "   'tag': '?0'" +
                 "}", order = 0, condition = {
      @Conditional(condition = ParameterValueNullCondition.class, parameterIndex = 1)
   })
@@ -129,7 +129,7 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Stri
   List<Possessions> getPossessionsWithPotentiallyNullIdList(String tag, List<String> ids);
 
   @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class)
-  @Match(order = 0, query = "{'tag' : ?0}")
+  @Match(order = 0, query = "{'tag' : '?0'}")
   @Limit(order = 1, query = "4", conditionMatchType = Conditional.ConditionalMatchType.ANY,
          condition = {
               @Conditional(condition = ParameterValueTrueCondition.class, parameterIndex = 1),
