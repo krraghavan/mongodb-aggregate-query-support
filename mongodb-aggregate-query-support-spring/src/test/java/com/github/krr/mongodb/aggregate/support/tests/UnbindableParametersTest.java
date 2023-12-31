@@ -5,8 +5,6 @@ import com.github.krr.mongodb.aggregate.support.config.AggregateTestConfiguratio
 import com.github.krr.mongodb.aggregate.support.repository.PossessionsRepository;
 import com.github.krr.mongodb.aggregate.support.utils.FixtureUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ContextConfiguration;
@@ -23,8 +21,6 @@ import static org.testng.Assert.assertNotNull;
  */
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
 public class UnbindableParametersTest extends AbstractTestNGSpringContextTests {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(UnbindableParametersTest.class);
 
   @Autowired
   private PossessionsRepository possessionsRepository;

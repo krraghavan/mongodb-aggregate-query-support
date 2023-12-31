@@ -111,7 +111,7 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
 
     Annotation annotation = method.getAnnotation(Aggregate.class);
     Assert.notNull(annotation, "Either Aggregate or Aggregate2 must be specified on the method");
-    return new NonReactiveAggregateQueryProvider(method, mongoParameterAccessor, parameterAccessor);
+    return new MongoAggregateQueryProvider(method, mongoParameterAccessor, parameterAccessor);
   }
 
   @Override

@@ -191,7 +191,6 @@ public class MongoNativeJavaDriverQueryExecutor extends AbstractQueryExecutor {
             // even though we're not returning a Page, the query itself could involve a Pageable.
             // in this case we'll throw away the totalResultSetCount from the returned results.
             Object results = dbObject.get(RESULTS);
-            Assert.isAssignable(DBObject.class, results.getClass(), "Expecting DBObject type");
             Assert.isAssignable(List.class, results.getClass(), "Expecting a list of results");
             //noinspection rawtypes
             extractDeserializedListFromResults(outputClass, retval, (List) results);

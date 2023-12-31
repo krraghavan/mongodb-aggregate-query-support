@@ -79,7 +79,7 @@ public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
     this.queryExecutor = queryExecutor;
   }
 
-  @SuppressWarnings("rawtypes")
+  @SuppressWarnings("unchecked")
   @Override
   public Publisher<Object> execute(Object[] parameters) {
     MongoParameterAccessor mongoParameterAccessor = new MongoParametersParameterAccessor(getQueryMethod(), parameters);
@@ -113,8 +113,8 @@ public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
       throws InvalidAggregationQueryException {
 
     Annotation annotation = method.getAnnotation(Aggregate.class);
-    Assert.notNull(annotation, "Aggregate2 must be specified on the method");
-    return new ReactiveAggregateQueryProvider(method, mongoParameterAccessor, parameterAccessor);
+    Assert.notNull(annotation, "Aggregate must be specified on the method");
+    return new MongoAggregateQueryProvider(method, mongoParameterAccessor, parameterAccessor);
   }
 
   @Override

@@ -86,6 +86,7 @@ public class ReactiveMongoNativeJavaDriverQueryExecutor extends AbstractReactive
     }
 
     Class<?> outputClass = queryProvider.getOutputClass();
+
     if (isFlux) {
       LOGGER.trace("Return type is Flux<{}>", outputClass);
       Flux<Document> retval = aggregatePublisherMono.flatMapMany(ap -> ap);

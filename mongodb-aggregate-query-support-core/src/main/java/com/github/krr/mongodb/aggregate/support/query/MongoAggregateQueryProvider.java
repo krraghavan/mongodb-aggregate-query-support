@@ -34,7 +34,6 @@ import com.github.krr.mongodb.aggregate.support.utils.ProcessorUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperationContext;
@@ -64,11 +63,11 @@ import static org.slf4j.LoggerFactory.getLogger;
  * 4/1/17.
  */
 @SuppressWarnings("squid:S1067")
-public class NonReactiveAggregateQueryProvider extends AbstractAggregateQueryProvider {
+public class MongoAggregateQueryProvider extends AbstractAggregateQueryProvider {
 
   private static final String COULD_NOT_DETERMINE_ORDER = "Could not determine order for annotation %s with query %s";
 
-  private static final Logger LOGGER = getLogger(NonReactiveAggregateQueryProvider.class);
+  private static final Logger LOGGER = getLogger(MongoAggregateQueryProvider.class);
 
   private static final SpelExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
 
@@ -93,8 +92,8 @@ public class NonReactiveAggregateQueryProvider extends AbstractAggregateQueryPro
   private boolean hasLimitStage;
 
   @SuppressWarnings("WeakerAccess")
-  public NonReactiveAggregateQueryProvider(Method method, MongoParameterAccessor mongoParameterAccessor,
-                                           ConvertingParameterAccessor convertingParameterAccessor)
+  public MongoAggregateQueryProvider(Method method, MongoParameterAccessor mongoParameterAccessor,
+                                     ConvertingParameterAccessor convertingParameterAccessor)
       throws InvalidAggregationQueryException {
     super(method);
     this.mongoParameterAccessor = mongoParameterAccessor;
@@ -247,8 +246,7 @@ public class NonReactiveAggregateQueryProvider extends AbstractAggregateQueryPro
 
   @Override
   public boolean isPageable() {
-    return Page.class.isAssignableFrom(method.getReturnType());
-//    return true;
+    return mongoParameterAccessor.getPageable().isPaged();
   }
 
   @Override
