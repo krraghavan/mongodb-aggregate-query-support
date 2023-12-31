@@ -27,6 +27,11 @@
     <relativePath>../mongodb-aggregate-query-support-reactive-parent/pom.xml</relativePath>
   </parent>
 
+  <properties>
+    <reactive-streams.version>1.0.4</reactive-streams.version>
+    <reactor-core.version>3.6.1</reactor-core.version>
+  </properties>
+
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>mongodb-aggregate-query-support-reactive</artifactId>
@@ -39,8 +44,8 @@
   <developers>
     <developer>
       <name>Kollivakkam Raghavan</name>
-      <organization>Cisco</organization>
-      <organizationUrl>http://www.cisco.com</organizationUrl>
+      <organization>Google</organization>
+      <organizationUrl>http://www.google.com</organizationUrl>
     </developer>
   </developers>
 
@@ -54,17 +59,23 @@
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-mongodb</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.springframework.data</groupId>
-      <artifactId>spring-data-commons</artifactId>
-    </dependency>
+<!--    <dependency>-->
+<!--      <groupId>org.springframework.data</groupId>-->
+<!--      <artifactId>spring-data-commons</artifactId>-->
+<!--    </dependency>-->
     <dependency>
       <groupId>io.projectreactor</groupId>
       <artifactId>reactor-core</artifactId>
+      <version>${reactor-core.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mongodb</groupId>
       <artifactId>mongodb-driver-reactivestreams</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongodb-driver-core</artifactId>
+      <version>${mongodb.driver.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -120,4 +131,22 @@
     <!-- TEST DEPENDENCIES -->
   </dependencies>
 
+  <build>
+  <plugins>
+    <plugin>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-failsafe-plugin</artifactId>
+      <version>3.2.3</version>
+      <executions>
+        <execution>
+          <id>reactive-integration-tests</id>
+          <phase>integration-test</phase>
+          <goals>
+            <goal>integration-test</goal>
+          </goals>
+        </execution>
+      </executions>
+    </plugin>
+  </plugins>
+  </build>
 </project>

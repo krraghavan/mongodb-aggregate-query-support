@@ -20,19 +20,30 @@ package com.github.krr.mongodb.aggregate.support.config;
 
 import com.github.krr.mongodb.aggregate.support.api.ReactiveMongoQueryExecutor;
 import com.github.krr.mongodb.aggregate.support.query.ReactiveMongoNativeJavaDriverQueryExecutor;
+import com.mongodb.MongoClientSettings;
+import com.mongodb.ServerAddress;
 import com.mongodb.reactivestreams.client.MongoClient;
 import com.mongodb.reactivestreams.client.MongoClients;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by rkolliva
  * 10/21/2015.
  */
 @Configuration
+@Import({
+    EmbeddedMongoConfiguration.class,
+    DocumentAnnotationTestConfiguration.class,
+    ReactiveTestMongoRepositoryConfiguration.class,
+})
 public class ReactiveMongoDbTestConfiguration {
 
   @Bean
@@ -51,7 +62,14 @@ public class ReactiveMongoDbTestConfiguration {
   }
 
   @Bean
-  public MongoClient mongoClient() {
-    return MongoClients.create();
+  public MongoClient mongoClient(int mongoDbPort) {
+    ServerAddress serverAddress = new ServerAddress(ServerAddress.defaultHost(), mongoDbPort);
+    List<ServerAddress> serverAddresses = new ArrayList<>();
+    serverAddresses.add(serverAddress);
+    MongoClientSettings mongoClientSettings = MongoClientSettings.builder()
+                                                                 .applyToClusterSettings((b) -> {
+                                                                   b.hosts(serverAddresses).build();
+                                                                 }).build();
+    return MongoClients.create(mongoClientSettings);
   }
 }

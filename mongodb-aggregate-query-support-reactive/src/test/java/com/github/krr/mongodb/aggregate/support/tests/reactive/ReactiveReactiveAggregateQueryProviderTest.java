@@ -36,7 +36,7 @@ import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
 import org.springframework.data.repository.query.QueryLookupStrategy;
-import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
+import org.springframework.data.repository.query.ReactiveQueryMethodEvaluationContextProvider;
 import org.springframework.data.repository.query.RepositoryQuery;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -56,7 +56,7 @@ import static org.testng.Assert.*;
  * Created by rkolliva
  * 4/2/17.
  */
-@SuppressWarnings({"SpringJavaInjectionPointsAutowiringInspection", "ConstantConditions"})
+@SuppressWarnings({"ConstantConditions"})
 @ContextConfiguration(classes = ReactiveAggregateTestConfiguration.class)
 public class ReactiveReactiveAggregateQueryProviderTest extends AbstractTestNGSpringContextTests {
 
@@ -67,7 +67,7 @@ public class ReactiveReactiveAggregateQueryProviderTest extends AbstractTestNGSp
   private ReactiveMongoQueryExecutor queryExecutor;
 
   @Autowired
-  private QueryMethodEvaluationContextProvider evaluationContextProvider;
+  private ReactiveQueryMethodEvaluationContextProvider evaluationContextProvider;
 
   @Autowired
   private ReactiveTestValidDocumentAnnotationRepository testValidDocumentAnnotationRepository;

@@ -44,11 +44,21 @@ public interface TestAggregateRepository2 extends TestMongoRepository<TestAggreg
   @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class,
              outputBeanType = TestAggregateAnnotation2FieldsBean.class)
   @Out(query = "'?0'")
-  void aggregateQueryWithOut(String outputRepository);
+  void aggregateQueryWithOut(String outputRepository, @CollectionName String srcRepo);
 
   @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class,
              outputBeanType = TestAggregateAnnotation2FieldsBean.class)
   @Match(query = "{'randomAttribute1':'?0'}", order = 0)
   @Out(query = "'?1'")
-  void aggregateQueryWithMatchAndOut(String randomAttribute, String outputRepository);
+  void aggregateQueryWithMatchAndOut(String randomAttribute, String outputRepository, @CollectionName String srcRepo);
+
+  @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class)
+  @Match(query = "{'randomAttribute1':?0}", order = 0)
+  @Out(query = "?1")
+  void aggregateQueryWithMatchAndOutNoQuotes(String randomAttribute, String outputRepository, @CollectionName String srcRepo);
+
+  @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class)
+  @Out(query = "?0")
+  void aggregateQueryWithOutNoQuotes(String outputRepository, @CollectionName String srcRepo);
+
 }

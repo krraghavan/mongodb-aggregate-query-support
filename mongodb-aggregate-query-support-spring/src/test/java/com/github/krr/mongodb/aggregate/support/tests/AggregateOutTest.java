@@ -21,12 +21,12 @@ package com.github.krr.mongodb.aggregate.support.tests;
 import com.github.krr.mongodb.aggregate.support.beans.TestAggregateAnnotation2FieldsBean;
 import com.github.krr.mongodb.aggregate.support.config.AggregateTestConfiguration;
 import com.github.krr.mongodb.aggregate.support.repository.TestAggregateRepository2;
-import com.mongodb.client.FindIterable;
-import org.bson.Document;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import java.util.List;
@@ -49,18 +49,32 @@ public class AggregateOutTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private MongoTemplate mongoTemplate;
 
-  @Test
-  public void outMustPlaceRepositoryObjectsInDifferentRepository() {
+  @DataProvider
+  private Object[][] outRepoFixtures() {
+    return new Object[][] {
+        new Object[]{true},
+        new Object[]{false},
+        };
+  }
+
+  @Test(dataProvider = "outRepoFixtures")
+  public void outMustPlaceRepositoryObjectsInDifferentRepository(boolean quotesInPlaceholder) {
     TestAggregateAnnotation2FieldsBean obj1 = new TestAggregateAnnotation2FieldsBean(randomAlphabetic(10));
     obj1.setOid(UUID.randomUUID().toString());
     TestAggregateAnnotation2FieldsBean obj2 = new TestAggregateAnnotation2FieldsBean(randomAlphabetic(20),
                                                                                      nextInt(1, 10000));
     obj2.setOid(UUID.randomUUID().toString());
+    String srcRepo = RandomStringUtils.randomAlphabetic(12);
 
-    testAggregateRepository2.save(obj1);
-    testAggregateRepository2.save(obj2);
-    String outputRepoName = "temp1";
-    testAggregateRepository2.aggregateQueryWithOut(outputRepoName);
+    mongoTemplate.save(obj1, srcRepo);
+    mongoTemplate.save(obj2, srcRepo);
+    String outputRepoName = RandomStringUtils.randomAlphabetic(10);
+    if(quotesInPlaceholder) {
+      testAggregateRepository2.aggregateQueryWithOut(outputRepoName, srcRepo);
+    }
+    else {
+      testAggregateRepository2.aggregateQueryWithOutNoQuotes(outputRepoName, srcRepo);
+    }
     assertTrue(mongoTemplate.collectionExists(outputRepoName));
     List<TestAggregateAnnotation2FieldsBean> copiedObjs = mongoTemplate.findAll(TestAggregateAnnotation2FieldsBean.class,
                                                                                 outputRepoName);
@@ -76,24 +90,29 @@ public class AggregateOutTest extends AbstractTestNGSpringContextTests {
     }
   }
 
-  @Test
-  public void outMustPlaceRepositoryObjectsInDifferentRepositoryIfOtherQueryAnnotationsArePresent() {
+  @Test(dataProvider = "outRepoFixtures")
+  public void outMustPlaceRepositoryObjectsInDifferentRepositoryIfOtherQueryAnnotationsArePresent(boolean quotesInPh) {
     String randomStr = randomAlphabetic(10);
     TestAggregateAnnotation2FieldsBean obj1 = new TestAggregateAnnotation2FieldsBean(randomStr);
     TestAggregateAnnotation2FieldsBean obj2 = new TestAggregateAnnotation2FieldsBean(randomAlphabetic(20),
                                                                                      nextInt(1, 10000));
     TestAggregateAnnotation2FieldsBean obj3 = new TestAggregateAnnotation2FieldsBean(randomStr, nextInt(1, 10000));
-    testAggregateRepository2.save(obj1);
-    testAggregateRepository2.save(obj2);
-    testAggregateRepository2.save(obj3);
-    String outputRepoName = "tempBroken";
-    testAggregateRepository2.aggregateQueryWithMatchAndOut(randomStr, outputRepoName);
+
+    String srcRepo = RandomStringUtils.randomAlphabetic(12);
+    mongoTemplate.save(obj1, srcRepo);
+    mongoTemplate.save(obj2, srcRepo);
+    mongoTemplate.save(obj3, srcRepo);
+    String outputRepoName = RandomStringUtils.randomAlphabetic(10);
+    if(quotesInPh) {
+      testAggregateRepository2.aggregateQueryWithMatchAndOut(randomStr, outputRepoName, srcRepo);
+    }
+    else {
+      testAggregateRepository2.aggregateQueryWithMatchAndOutNoQuotes(randomStr, outputRepoName, srcRepo);
+    }
     assertTrue(mongoTemplate.collectionExists(outputRepoName));
     List<TestAggregateAnnotation2FieldsBean> copiedObjs = mongoTemplate.findAll(TestAggregateAnnotation2FieldsBean.class,
                                                                                 outputRepoName);
-    //clear testAggregateAnnotationFieldsBean repo before running this test
+    // only two beans match random string out of the 3 inserted.
     assertSame(copiedObjs.size(), 2);
-    FindIterable<Document> dbCursor = mongoTemplate.getCollection("tempBroken").find();
-    assertTrue(dbCursor.iterator().hasNext());
   }
 }

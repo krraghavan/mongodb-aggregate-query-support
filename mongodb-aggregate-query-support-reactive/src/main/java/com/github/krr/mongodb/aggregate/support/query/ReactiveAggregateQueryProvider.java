@@ -34,11 +34,7 @@ import com.github.krr.mongodb.aggregate.support.processor.ParameterPlaceholderRe
 import com.github.krr.mongodb.aggregate.support.processor.PipelineStageQueryProcessor;
 import com.github.krr.mongodb.aggregate.support.utils.ArrayUtils;
 import com.github.krr.mongodb.aggregate.support.utils.ReactiveProcessorUtils;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.DBRef;
 import org.apache.commons.lang3.StringUtils;
-import org.bson.BsonType;
 import org.slf4j.Logger;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.data.domain.Pageable;
@@ -57,6 +53,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import static com.github.krr.mongodb.aggregate.support.utils.ArrayUtils.NULL_STRING;
 import static java.lang.String.format;
@@ -92,8 +89,6 @@ public class ReactiveAggregateQueryProvider extends AbstractAggregateQueryProvid
   private final ReactiveProcessorUtils processorUtils = new ReactiveProcessorUtils();
 
   private final StandardEvaluationContext context = new StandardEvaluationContext();
-
-  private final ParameterBindingParser parameterBindingParser = new NonReactiveParameterBindingParser();
 
   private boolean isLimiting;
 
@@ -219,62 +214,41 @@ public class ReactiveAggregateQueryProvider extends AbstractAggregateQueryProvid
    */
   @SuppressWarnings({"Duplicates", "WeakerAccess"})
   protected String replacePlaceholders(AggregationStage aggregationStage, String query) {
-    List<ParameterBinding> queryParameterBindings = parameterBindingParser.parseParameterBindingsFrom(query,
-                                                                                                      BasicDBObject::parse);
-    if (queryParameterBindings.isEmpty()) {
-      return query;
-    }
-    String lquery = query;
-    if(query.contains("@@")) {
-      // strip quotes from the query
-      lquery = query.replace("\"", "").replace("@@", "@");
-    }
-    StringBuilder result = new StringBuilder(lquery);
-
-    for (ParameterBinding binding : queryParameterBindings) {
-      String parameter = binding.getParameter();
-      int idx = result.indexOf(parameter);
-      String parameterValueForBinding = getParameterValueForBinding(convertingParameterAccessor, binding);
-      if (idx != -1) {
-        result.replace(idx, idx + parameter.length(), parameterValueForBinding);
-      }
-    }
-    LOGGER.debug("Query after replacing place holders - {}", result);
-    return result.toString();
+    Object[] values = mongoParameterAccessor.getValues();
+    BiFunction<Integer, Class<?>, String> cbFn =
+        (index, valueClass) -> {
+          if(!valueClass.isAssignableFrom(values[index].getClass())) {
+            throw new IllegalArgumentException("Parameter at index " + index + " is not assignable to " + valueClass);
+          }
+          return getParameterValueForBinding(convertingParameterAccessor, index);
+        };
+    return aggregationStage.getAggregationType().getValue(values, query, cbFn);
   }
 
   /**
    * Returns the serialized value to be used for the given {@link ParameterBinding}.
    *
    * @param accessor - the accessor
-   * @param binding  - the binding
+   * @param parameterIndex  - the index of the parameter in the methods argument array
    * @return - the value of the parameter
    */
   @SuppressWarnings("Duplicates")
-  private String getParameterValueForBinding(ConvertingParameterAccessor accessor, ParameterBinding binding) {
+  private String getParameterValueForBinding(ConvertingParameterAccessor accessor, int parameterIndex) {
 
-    Object value = accessor.getBindableValue(binding.getParameterIndex());
+    Object value = accessor.getBindableValue(parameterIndex);
+    boolean isString = value instanceof String;
     if(value == null) {
-      throw new IllegalArgumentException("Null bound value where non-null was expected for " + binding.getParameter() +
-                                         " at index:" + binding.getParameterIndex());
+      throw new IllegalArgumentException("Got a null value for parameter at index:" + parameterIndex);
     }
-    if (value instanceof String && binding.isQuoted()) {
+    if (isString) {
       return (String) value;
     }
     else if (value instanceof byte[]) {
-
       String base64representation = Base64.getEncoder().encodeToString((byte[]) value);
-      if (!binding.isQuoted()) {
-        return "{ '$binary' : '" + base64representation + "', '$type' : " + BsonType.BINARY + "}";
-      }
-
-      return base64representation;
+      return String.format("BinData(0, '%s')", base64representation);
     }
-    if(!(value instanceof BasicDBObject)) {
-      throw new IllegalArgumentException("Expecting bound value to be instance of BasicDBObject");
-    }
-
-    return ((BasicDBObject)value).toJson();
+    // Just return string representation.
+    return value.toString();
   }
 
   @Override
@@ -309,29 +283,4 @@ public class ReactiveAggregateQueryProvider extends AbstractAggregateQueryProvid
     }
   }
 
-  private static class NonReactiveParameterBindingParser extends ParameterBindingParser  {
-
-    @SuppressWarnings("Duplicates")
-    @Override
-    protected void bindDriverSpecificTypes(List<ParameterBinding> bindings, Object value) {
-      if (value instanceof DBRef) {
-
-        DBRef dbref = (DBRef) value;
-        potentiallyAddBinding(dbref.getCollectionName(), bindings);
-        potentiallyAddBinding(dbref.getId().toString(), bindings);
-
-      }
-      else if (value instanceof DBObject) {
-
-        DBObject dbo = (DBObject) value;
-
-        for (String field : dbo.keySet()) {
-          // replace @ params on lhs
-          collectParameterReferencesIntoBindings(bindings, field);
-          // replace ? params on RHS
-          collectParameterReferencesIntoBindings(bindings, dbo.get(field));
-        }
-      }
-    }
-  }
 }

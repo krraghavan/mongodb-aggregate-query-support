@@ -64,7 +64,7 @@ public enum AggregationType implements BoundParameterValue {
       if(!onlyContainsAtAtPlaceholder) {
         throw new IllegalArgumentException("$sort with @@ placeholders must only contain the placeholder with the index" +
                                            " of the method parameter that provides the sort string.  Query " + query
-                                           + " does not match @@[0-9]+$");
+                                           + " does not match /@@[0-9]+$/.  Did you use embedded quotes (' or \")?");
       }
       int indexOfParameter = AggregationType.getParameterIndex(methodParameterValues, "@@", query);
       Object value = methodParameterValues[indexOfParameter];
@@ -89,10 +89,70 @@ public enum AggregationType implements BoundParameterValue {
   FACET("$facet", Facet.class),
   COUNT("$count", Count.class),
   SKIP("$skip", Skip.class),
-  OUT("$out", Out.class),
+  OUT("$out", Out.class) {
+    private static final String OUT_PH_REGEX = "^(?<startQuote>[\\Q'|\"\\E]?)(?<placeholder>\\Q?\\E)(?<index>[0-9]+)(?<endQuote>[\\Q'|\"\\E]?)$";
+
+    private final Pattern PATTERN = Pattern.compile(OUT_PH_REGEX);
+
+    @Override
+    public String getValue(Object[] methodParameterValues, String query,
+                           BiFunction<Integer, Class<?>, String> valueProviderFn) {
+      boolean containsPlaceholder = containsPlaceholder(query);
+      if (!containsPlaceholder) {
+        return query;
+      }
+      Matcher matcher = PATTERN.matcher(query);
+      boolean validPlaceholder = matcher.matches();
+      if (!validPlaceholder) {
+        throw new IllegalArgumentException("$out can only have ? placeholders with the index" +
+                                           " of the method parameter that provides the limit value.  Query " + query
+                                           + " does not match ?[0-9]+$.");
+      }
+      int indexOfParameter = Integer.parseInt(matcher.group("index"));
+      if(indexOfParameter >= methodParameterValues.length) {
+        throw new ArrayIndexOutOfBoundsException("Method has only " + methodParameterValues.length + " parameters " +
+                                                 "(0 based)but the placeholder requested parameter at index "
+                                                 + indexOfParameter + " at or near " + matcher.end("index"));
+      }
+      Object value = methodParameterValues[indexOfParameter];
+      if (!(value instanceof String)) {
+        throw new IllegalArgumentException("Placeholder for $out stages must be bound to string values only. " +
+                                           "Placeholder + ? " + " is bound to parameter at index " +
+                                           indexOfParameter + " which is of type " + value.getClass());
+      }
+      String outCollectionName = valueProviderFn.apply(indexOfParameter, String.class);
+      return String.format("\"%s\"", outCollectionName);
+    }
+  },
   MERGE("$merge", Merge.class)
 
   ;
+
+  private static boolean validateQuotes(String queryWithPlaceholders, Matcher matcher) {
+    char charBeforePlaceholder = queryWithPlaceholders.charAt(matcher.end("placeholder") - 2);
+    boolean startSingleQuote = charBeforePlaceholder == '\'';
+    boolean startDoubleQuote = charBeforePlaceholder == '\"';
+    int endIndex = matcher.end("index");
+    if ((startSingleQuote || startDoubleQuote) && (endIndex == queryWithPlaceholders.length())) {
+      // reached end of string without a closing quote
+      throw new IllegalArgumentException("Unterminated quoted string at or near index " + endIndex);
+    }
+    boolean quoted = false;
+    if (endIndex < queryWithPlaceholders.length()) {
+      char charAfterIndex = queryWithPlaceholders.charAt(endIndex);
+      boolean endSingleQuote = charAfterIndex == '\'';
+      boolean endDoubleQuote = charAfterIndex == '\"';
+      if ((startSingleQuote && !endSingleQuote) || (!startDoubleQuote && endDoubleQuote) ||
+          (!startSingleQuote && endSingleQuote) || (startDoubleQuote && !endDoubleQuote)) {
+        throw new IllegalArgumentException("Query " + queryWithPlaceholders + " has mismatched quotes at or near "
+                                           + endIndex);
+      }
+      else if (startSingleQuote || startDoubleQuote) {
+        quoted = true;
+      }
+    }
+    return quoted;
+  }
 
   private static final BoundValueImpl IMPLEMENTATION = new BoundValueImpl();
 
@@ -103,6 +163,7 @@ public enum AggregationType implements BoundParameterValue {
   }
 
   private static boolean containsPlaceholder(String query) {
+    //noinspection RegExpDuplicateCharacterInClass,RegExpRedundantEscape
     return query.matches("(.*)[@@|\\?|@]+(.*)");
   }
 
@@ -127,6 +188,7 @@ public enum AggregationType implements BoundParameterValue {
 
   private final Class<? extends Annotation> annotationClass;
 
+  @SuppressWarnings("RegExpDuplicateCharacterInClass")
   private static final String PLACEHOLDER_MATCHER =
       "(?<everythingBeforePh>[^@|?]*)(?<placeholder>[@|@@|?]+)?(?<index>[0-9]+)(?<restOfString>.*)$";
   private static final Pattern PLACEHOLDER_REGEX = Pattern.compile(PLACEHOLDER_MATCHER,
@@ -161,11 +223,12 @@ public enum AggregationType implements BoundParameterValue {
   }
 
   static class BoundValueImpl implements BoundParameterValue {
-    @SuppressWarnings({"unchecked", "ArraysAsListWithZeroOrOneArgument", "rawtypes", "DataFlowIssue"})
+    @SuppressWarnings({"unchecked", "ArraysAsListWithZeroOrOneArgument", "rawtypes"})
     @Override
     public String getValue(Object[] methodParameterValues, String query,
                            BiFunction<Integer, Class<?>, String> valueProviderFn) {
       // keep a copy
+      @SuppressWarnings("StringOperationCanBeSimplified")
       String queryWithPlaceholders = new String(query);
       Matcher matcher = PLACEHOLDER_REGEX.matcher(query);
       boolean done = false;
@@ -181,27 +244,7 @@ public enum AggregationType implements BoundParameterValue {
             continue;
           }
           else {
-            char charBeforePlaceholder = queryWithPlaceholders.charAt(matcher.end("placeholder") - 2);
-            boolean startSingleQuote = charBeforePlaceholder == '\'';
-            boolean startDoubleQuote = charBeforePlaceholder == '\"';
-            int endIndex = matcher.end("index");
-            if ((startSingleQuote || startDoubleQuote) && (endIndex == query.length())) {
-              // reached end of string without a closing quote
-              throw new IllegalArgumentException("Unterminated quoted string at or near index " + endIndex);
-            }
-            boolean quoted = false;
-            if (endIndex < query.length()) {
-              char charAfterIndex = queryWithPlaceholders.charAt(endIndex);
-              boolean endSingleQuote = charAfterIndex == '\'';
-              boolean endDoubleQuote = charAfterIndex == '\"';
-              if ((startSingleQuote && !endSingleQuote) || (!startDoubleQuote && endDoubleQuote) ||
-                  (!startSingleQuote && endSingleQuote) || (startDoubleQuote && !endDoubleQuote)) {
-                throw new IllegalArgumentException("Query " + query + " has mismatched quotes at or near " + endIndex);
-              }
-              else if (startSingleQuote || startDoubleQuote) {
-                quoted = true;
-              }
-            }
+            boolean quoted = validateQuotes(queryWithPlaceholders, matcher);
             int numParameters = methodParameterValues.length;
             if (index >= numParameters) {
               throw new IllegalArgumentException("Parameter index " + index + " is invalid for query " + query +

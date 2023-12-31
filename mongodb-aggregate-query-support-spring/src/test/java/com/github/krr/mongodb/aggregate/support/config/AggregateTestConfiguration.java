@@ -38,7 +38,6 @@ import org.springframework.data.repository.query.QueryMethodEvaluationContextPro
    DocumentAnnotationTestConfiguration.class,
    MongoDBTestConfiguration.class,
    TestMongoRepositoryConfiguration.class,
-   MongoQueryExecutorConfiguration.class
 })
 public class AggregateTestConfiguration {
 
@@ -46,36 +45,4 @@ public class AggregateTestConfiguration {
   public QueryMethodEvaluationContextProvider evaluationContextProvider() {
     return new ApplicationContextQueryMethodEvaluationContextProvider();
   }
-
-//  @Bean
-//  public String dbName() {
-//    return RandomStringUtils.randomAlphabetic(7);
-//  }
-//
-//  @Bean
-//  public MongoDatabaseFactory mongoDbFactory(MongoClient mongo, String dbName) {
-//    return new SimpleMongoClientDatabaseFactory(mongo, dbName);
-//  }
-//
-//  @Bean
-//  public MongoMappingContext mongoMappingContext() {
-//    return new MongoMappingContext();
-//  }
-//
-//  @Bean
-//  public DbRefResolver dbRefResolver(MongoDatabaseFactory mongoDbFactory) {
-//    return new DefaultDbRefResolver(mongoDbFactory);
-//  }
-//
-//  @Bean
-//  public MongoTemplate mongoTemplate(MongoClient mongo, MongoConverter mongoConverter, String dbName) {
-//    MongoTemplate mongoTemplate = new MongoTemplate(mongoDbFactory(mongo, dbName), mongoConverter);
-//    mongoTemplate.setWriteConcern(WriteConcern.ACKNOWLEDGED);
-//    return mongoTemplate;
-//  }
-//
-//  @Bean
-//  public MappingMongoConverter mongoConverter(MongoMappingContext mappingContext, DbRefResolver dbRefResolver) {
-//    return new MappingMongoConverter(dbRefResolver, mappingContext);
-//  }
 }

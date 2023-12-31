@@ -43,7 +43,7 @@ import static org.testng.Assert.assertNotNull;
 
 
 @SuppressWarnings(
-    {"SpringJavaAutowiredMembersInspection", "Duplicates", "SpringJavaInjectionPointsAutowiringInspection"})
+    {"SpringJavaAutowiredMembersInspection", "Duplicates"})
 @ContextConfiguration(classes = ReactiveAggregateTestConfiguration.class)
 public class ReactiveAggregateAddFieldsTest extends AbstractTestNGSpringContextTests {
 

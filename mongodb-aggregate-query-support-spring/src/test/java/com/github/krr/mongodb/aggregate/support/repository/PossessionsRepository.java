@@ -155,4 +155,11 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Stri
                  "}", order = 0)
   @Sort(query = "@@1", order = 1)
   void getPossessionsInvalidSortParameter(String param1, int param2);
+
+  @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class)
+  @Match(query = "{" +
+                 "   \"tag\": '?0'" +
+                 "}", order = 0)
+  @Sort(query = "'@@1'", order = 1)
+  void getPossessionsInvalidSortParameterWithQuotes(String param1, int param2);
 }

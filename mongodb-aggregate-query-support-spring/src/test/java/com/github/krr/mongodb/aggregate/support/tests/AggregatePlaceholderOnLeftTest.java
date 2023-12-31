@@ -94,6 +94,11 @@ public class AggregatePlaceholderOnLeftTest extends AbstractTestNGSpringContextT
     possessionsRepository.getPossessionsInvalidSortParameter("xxx", 123);
   }
 
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void mustThrowExceptionIfAtAtParameterIsQuoted() {
+    possessionsRepository.getPossessionsInvalidSortParameterWithQuotes("xxx", 123);
+  }
+
   @DataProvider
   public Object[][] possessionsProvider() {
     return new Object[][] {

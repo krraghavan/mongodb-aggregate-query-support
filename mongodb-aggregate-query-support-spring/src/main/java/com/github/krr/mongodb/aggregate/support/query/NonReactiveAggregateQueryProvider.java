@@ -229,6 +229,9 @@ public class NonReactiveAggregateQueryProvider extends AbstractAggregateQueryPro
   private String getParameterValueForBinding(ConvertingParameterAccessor accessor, int parameterIndex) {
 
     Object value = accessor.getBindableValue(parameterIndex);
+    if(value == null) {
+      throw new IllegalArgumentException("Got a null value for parameter at index:" + parameterIndex);
+    }
 
     boolean isString = value instanceof String;
     if (isString) {
@@ -237,9 +240,6 @@ public class NonReactiveAggregateQueryProvider extends AbstractAggregateQueryPro
     else if (value instanceof byte[]) {
       String base64representation = Base64.getEncoder().encodeToString((byte[]) value);
       return String.format("BinData(0, '%s')", base64representation);
-    }
-    if(value == null) {
-      throw new IllegalArgumentException("Got a null value for parameter at index:" + parameterIndex);
     }
     // Just return string representation.
     return value.toString();

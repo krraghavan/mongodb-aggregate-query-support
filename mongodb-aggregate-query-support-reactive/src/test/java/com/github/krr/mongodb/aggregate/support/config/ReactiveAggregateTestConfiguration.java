@@ -25,8 +25,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.repository.query.ExtensionAwareQueryMethodEvaluationContextProvider;
 import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
+import org.springframework.data.repository.query.ReactiveExtensionAwareQueryMethodEvaluationContextProvider;
 
 /**
  * @author rkolliva.
@@ -36,16 +36,15 @@ import org.springframework.data.repository.query.QueryMethodEvaluationContextPro
  */
 @Configuration
 @Import({
-            DocumentAnnotationTestConfiguration.class,
-            ReactiveMongoQueryExecutorConfiguration.class,
-            ReactiveMongoDbTestConfiguration.class,
-            ReactiveTestMongoRepositoryConfiguration.class
+  DocumentAnnotationTestConfiguration.class,
+  ReactiveMongoDbTestConfiguration.class,
+  ReactiveTestMongoRepositoryConfiguration.class
 })
 public class ReactiveAggregateTestConfiguration {
 
   @Bean
   public QueryMethodEvaluationContextProvider evaluationContextProvider(ApplicationContext applicationContext) {
-    return new ExtensionAwareQueryMethodEvaluationContextProvider(applicationContext);
+    return new ReactiveExtensionAwareQueryMethodEvaluationContextProvider(applicationContext);
   }
 
 }

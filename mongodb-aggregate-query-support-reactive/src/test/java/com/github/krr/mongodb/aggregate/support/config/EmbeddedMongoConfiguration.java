@@ -42,26 +42,25 @@ public class EmbeddedMongoConfiguration {
     Mongod mongod = Mongod.builder()
                           .net(Start.to(Net.class).initializedWith(Net.defaults()
                                                                       .withPort(mongoDbPort)))
-                          .processOutput(Start.to(ProcessOutput.class)
-                                              .providedBy(Try.<ProcessOutput,
-                                                                 IOException>supplier(() ->
-                                                                                          ProcessOutput.builder()
-                                                                                                       .output(
-                                                                                                           Processors.named(
-                                                                                                               "[mongod>]",
-                                                                                                               new FileStreamProcessor(
-                                                                                                                   new File(
-                                                                                                                       "mongod.log"))))
-                                                                                                       .error(
-                                                                                                           new FileStreamProcessor(
-                                                                                                               new File(
-                                                                                                                   "mongod-error.log")))
-                                                                                                       .commands(
-                                                                                                           Processors.namedConsole(
-                                                                                                               "[console>]"))
-                                                                                                       .build())
-                                                             .mapToUncheckedException(RuntimeException::new))
-                                              .withTransitionLabel("create named console"))
+                          .processOutput(
+                              Start.to(ProcessOutput.class)
+                                   .providedBy(Try.<ProcessOutput,
+                                              IOException>supplier(() ->
+                                                                       ProcessOutput.builder()
+                                                                                    .output(
+                                                                                        Processors.named(
+                                                                                            "[mongod>]",
+                                                                                            new FileStreamProcessor(
+                                                                                                new File("mongod.log"))))
+                                                                                    .error(
+                                                                                        new FileStreamProcessor(
+                                                                                            new File("mongod-error.log")))
+                                                                                    .commands(
+                                                                                        Processors.namedConsole(
+                                                                                            "[console>]"))
+                                                                                    .build())
+                                          .mapToUncheckedException(RuntimeException::new))
+                                   .withTransitionLabel("create named console"))
                           .build();
     mongodProcess = mongod.start(Version.V7_0_4).current();
   }
@@ -98,5 +97,7 @@ public class EmbeddedMongoConfiguration {
         e.printStackTrace();
       }
     }
+
   }
+
 }
