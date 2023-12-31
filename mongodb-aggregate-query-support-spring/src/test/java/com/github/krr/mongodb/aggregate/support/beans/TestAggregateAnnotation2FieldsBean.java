@@ -18,7 +18,7 @@
  */
 package com.github.krr.mongodb.aggregate.support.beans;
 
-import com.github.krr.mongodb.aggregate.support.nonreactive.annotations.MongoId;
+import com.github.krr.mongodb.aggregate.support.annotations.MongoId;
 
 import java.util.Objects;
 

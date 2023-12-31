@@ -27,5 +27,5 @@ import org.reactivestreams.Publisher;
  */
 public interface ReactiveMongoQueryExecutor {
 
-  <T> Publisher<?> executeQuery(QueryProvider queryProvider) throws MongoQueryException;
+  Publisher<?> executeQuery(QueryProvider queryProvider) throws MongoQueryException;
 }

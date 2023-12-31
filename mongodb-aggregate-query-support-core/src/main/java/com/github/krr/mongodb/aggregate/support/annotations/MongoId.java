@@ -1,4 +1,4 @@
-package com.github.krr.mongodb.aggregate.support.nonreactive.annotations;
+package com.github.krr.mongodb.aggregate.support.annotations;
 
 import com.fasterxml.jackson.annotation.JacksonAnnotationsInside;
 import com.fasterxml.jackson.annotation.JsonProperty;
