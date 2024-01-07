@@ -34,6 +34,7 @@
 <!--    <module>mongodb-aggregate-query-support-reactive-parent</module>-->
     <module>mongodb-aggregate-query-support-spring</module>
     <module>mongodb-aggregate-query-support-reactive</module>
+    <module>mongodb-aggregate-query-support-test</module>
   </modules>
 
   <properties>
@@ -45,7 +46,6 @@
     <maqs.version>0.8.10-SNAPSHOT</maqs.version>
     <testng.version>7.7.0</testng.version>
     <!-- Mongo and Spring versions -->
-    <embedded-mongo-version>4.12.0</embedded-mongo-version>
     <mongodb.driver.version>4.11.1</mongodb.driver.version>
     <spring-data-version>3.1.4</spring-data-version>
     <spring-version>6.0.13</spring-version>
@@ -203,12 +203,6 @@
 
       <!-- TEST DEPENDENCIES -->
       <dependency>
-        <groupId>de.flapdoodle.embed</groupId>
-        <artifactId>de.flapdoodle.embed.mongo</artifactId>
-        <version>${embedded-mongo-version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
         <version>${testng.version}</version>
@@ -308,17 +302,6 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.github.krraghavan</groupId>
-      <artifactId>mongodb-aggregate-query-support-test</artifactId>
-      <version>${project.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>de.flapdoodle.embed</groupId>
-      <artifactId>de.flapdoodle.embed.mongo</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

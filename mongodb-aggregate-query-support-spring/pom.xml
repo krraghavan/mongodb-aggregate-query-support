@@ -47,6 +47,12 @@
       <groupId>com.github.krraghavan</groupId>
       <artifactId>mongodb-aggregate-query-support-core</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.github.krraghavan</groupId>
+      <artifactId>mongodb-aggregate-query-support-test</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

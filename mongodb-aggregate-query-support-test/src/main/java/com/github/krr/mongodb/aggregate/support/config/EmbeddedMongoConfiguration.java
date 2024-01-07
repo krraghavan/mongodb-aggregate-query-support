@@ -51,11 +51,11 @@ public class EmbeddedMongoConfiguration {
                                                                                                                "[mongod>]",
                                                                                                                new FileStreamProcessor(
                                                                                                                    new File(
-                                                                                                                       "mongod.log"))))
+                                                                                                                       "target/mongod.log"))))
                                                                                                        .error(
                                                                                                            new FileStreamProcessor(
                                                                                                                new File(
-                                                                                                                   "mongod-error.log")))
+                                                                                                                   "target/mongod-error.log")))
                                                                                                        .commands(
                                                                                                            Processors.namedConsole(
                                                                                                                "[console>]"))
