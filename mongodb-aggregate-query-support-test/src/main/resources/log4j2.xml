@@ -20,7 +20,7 @@
 
 <Configuration>
   <Appenders>
-    <RollingFile name="FILE" fileName="target/logfile1.txt" filePattern="logfile-%d{MM-dd-yyyy}-%i.log.gz">
+    <RollingFile name="FILE" fileName="target/logfile.txt" filePattern="logfile-%d{MM-dd-yyyy}-%i.log.gz">
       <PatternLayout>
         <Pattern>%d [%t] %-5p %c{2} - %m%n</Pattern>
       </PatternLayout>

@@ -14,30 +14,38 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 @Configuration
 public class EmbeddedMongoConfiguration {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EmbeddedMongoConfiguration.class);
 
-  private final RunningMongodProcess mongodProcess;
+  private RunningMongodProcess mongodProcess;
 
-  private final int mongoDbPort;
+  private int mongoDbPort;
 
   @PreDestroy
   public void clean() {
     mongodProcess.stop();
   }
 
-  public EmbeddedMongoConfiguration() throws Exception {
+  public EmbeddedMongoConfiguration() {
+  }
 
+  @PostConstruct
+  public void startMongo() throws IOException {
     mongoDbPort = de.flapdoodle.net.Net.freeServerPort();
-    LOGGER.info("Starting MongoDb process on port {}", mongoDbPort);
+    Version runningVersion = version(System.getProperty("mongoVersion"));
+    String runningMongoVersion = runningVersion.numericVersion().asString();
+    System.out.println("Tests will use Mongo version:" + runningMongoVersion);
+    LOGGER.info("Starting MongoDb process (version:{}) on port {}", runningMongoVersion, mongoDbPort);
 
     Mongod mongod = Mongod.builder()
                           .net(Start.to(Net.class).initializedWith(Net.defaults()
@@ -63,7 +71,25 @@ public class EmbeddedMongoConfiguration {
                                                              .mapToUncheckedException(RuntimeException::new))
                                               .withTransitionLabel("create named console"))
                           .build();
-    mongodProcess = mongod.start(Version.V7_0_4).current();
+    mongodProcess = mongod.start(runningVersion).current();
+  }
+
+  private Version version(String mongoVersion) {
+    Version[] versions = Version.values();
+    // fragile - counting on convention in this ennm
+    Version latest = versions[versions.length - 2];
+    if(mongoVersion == null) {
+      return getLatestMongoVersion("null", latest);
+    }
+    return Arrays.stream(Version.values()).filter(version -> version.numericVersion().asString().equals(mongoVersion))
+                 .findFirst()
+                 .orElseGet(() -> getLatestMongoVersion(mongoVersion, latest));
+  }
+
+  private static Version getLatestMongoVersion(String mongoVersion, Version latest) {
+    LOGGER.warn("Mongo version {} not supported.  Running tests with LATEST version {}", mongoVersion,
+                latest.numericVersion().asString());
+    return latest;
   }
 
   @Bean
@@ -85,7 +111,7 @@ public class EmbeddedMongoConfiguration {
         outputStream.write(block.getBytes());
       }
       catch (IOException e) {
-        e.printStackTrace();
+        LOGGER.error("EmbeddedMongoConfiguration::onProcessed:", e);
       }
     }
 
@@ -95,7 +121,7 @@ public class EmbeddedMongoConfiguration {
         outputStream.close();
       }
       catch (IOException e) {
-        e.printStackTrace();
+        LOGGER.error("EmbeddedMongoConfiguration::onProcessed:", e);
       }
     }
   }

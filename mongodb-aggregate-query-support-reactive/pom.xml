@@ -70,14 +70,33 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-failsafe-plugin</artifactId>
+        <artifactId>maven-surefire-plugin</artifactId>
         <version>3.2.3</version>
         <executions>
           <execution>
-            <id>reactive-integration-tests</id>
-            <phase>integration-test</phase>
+            <id>default-test</id>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </execution>
+          <execution>
+            <id>reactive-tests-mongo6</id>
+            <phase>test</phase>
+            <configuration>
+              <argLine>-DmongoVersion=${mongo6.version}</argLine>
+            </configuration>
             <goals>
-              <goal>integration-test</goal>
+              <goal>test</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>reactive-tests-mongo7</id>
+            <phase>test</phase>
+            <configuration>
+              <argLine>-DmongoVersion=${mongo7.version}</argLine>
+            </configuration>
+            <goals>
+              <goal>test</goal>
             </goals>
           </execution>
         </executions>

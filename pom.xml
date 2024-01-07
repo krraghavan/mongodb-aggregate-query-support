@@ -45,15 +45,22 @@
     <lombok.version>1.18.30</lombok.version>
     <maqs.version>0.8.10-SNAPSHOT</maqs.version>
     <testng.version>7.7.0</testng.version>
+
     <!-- Mongo and Spring versions -->
     <mongodb.driver.version>4.11.1</mongodb.driver.version>
     <spring-data-version>3.1.4</spring-data-version>
     <spring-version>6.0.13</spring-version>
     <spring-data-mongodb-version>4.1.4</spring-data-mongodb-version>
     <mongo-reactive-java-driver.version>4.11.0</mongo-reactive-java-driver.version>
+
     <!-- Reactive Support -->
     <reactive-streams.version>1.0.4</reactive-streams.version>
     <reactor-core.version>3.6.1</reactor-core.version>
+
+    <!-- Test -->
+    <mongo6.version>6.0.12</mongo6.version>
+    <mongo7.version>7.0.4</mongo7.version>
+
   </properties>
 
   <name>Mongo DB Aggregation Query Support</name>
