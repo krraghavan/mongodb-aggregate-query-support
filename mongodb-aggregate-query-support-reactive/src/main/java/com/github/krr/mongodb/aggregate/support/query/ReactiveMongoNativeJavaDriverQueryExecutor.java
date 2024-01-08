@@ -10,6 +10,7 @@ import org.bson.Document;
 import org.bson.codecs.DocumentCodec;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.conversions.Bson;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -31,14 +32,14 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  */
 
 @SuppressWarnings("unused")
-public class ReactiveMongoNativeJavaDriverQueryExecutor extends AbstractQueryExecutor<ReactiveMongoOperations> {
+public class ReactiveMongoNativeJavaDriverQueryExecutor extends AbstractReactiveQueryExecutor {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReactiveMongoNativeJavaDriverQueryExecutor.class);
 
   private static final String MONGO_V3_6_VERSION = "3.6";
 
   @SuppressWarnings({"FieldCanBeLocal", "unused"})
-  private boolean isMongo360OrLater;
+//  private boolean isMongo360OrLater;
 
   public ReactiveMongoNativeJavaDriverQueryExecutor(ReactiveMongoOperations mongoOperations) {
     super(mongoOperations);
@@ -52,14 +53,14 @@ public class ReactiveMongoNativeJavaDriverQueryExecutor extends AbstractQueryExe
 
   private void initialize(ReactiveMongoOperations mongoOperations) {
     Document result = mongoOperations.executeCommand("{buildinfo:1}").block();
-    this.isMongo360OrLater = ((String)result.get("version")).startsWith(MONGO_V3_6_VERSION);
+//    this.isMongo360OrLater = ((String)result.get("version")).startsWith(MONGO_V3_6_VERSION);
   }
 
   @Override
-  public Object executeQuery(QueryProvider queryProvider) {
+  public Publisher<?> executeQuery(QueryProvider queryProvider) {
 
     // convert the pipelines by parsing the JSON strings
-    Iterator iterator = queryProvider.getPipelines().iterator();
+    Iterator<?> iterator = queryProvider.getPipelines().iterator();
     int i = 0;
 
     String collectionName = queryProvider.getCollectionName();
@@ -71,28 +72,31 @@ public class ReactiveMongoNativeJavaDriverQueryExecutor extends AbstractQueryExe
       pipelineStages.add(document);
     }
     // run the pipeline and return a flux.
-    MongoCollection<Document> collection = mongoOperations.getCollection(collectionName);
-    AggregatePublisher<Document> aggregatePublisher = collection.aggregate(pipelineStages)
-                                                                .allowDiskUse(queryProvider.isAllowDiskUse())
-                                                                .maxTime(queryProvider.getMaxTimeMS(), MILLISECONDS);
-    Class methodReturnType = queryProvider.getMethodReturnType();
+    Mono<MongoCollection<Document>> collectionMono = mongoOperations.getCollection(collectionName);
+    Mono<AggregatePublisher<Document>> aggregatePublisherMono = collectionMono.map(collection -> collection.aggregate(pipelineStages)
+                                                                                 .allowDiskUse(queryProvider.isAllowDiskUse())
+                                                                                 .maxTime(queryProvider.getMaxTimeMS(),
+                                                                                          MILLISECONDS));
+    Class<?> methodReturnType = queryProvider.getMethodReturnType();
     boolean isFlux = Flux.class.isAssignableFrom(methodReturnType);
     boolean isMono = Mono.class.isAssignableFrom(methodReturnType);
     boolean isFluxOrMono = isFlux || isMono;
     if (!isFluxOrMono) {
       throw new IllegalArgumentException("Method return type must be of Flux or Mono type");
     }
+
     Class<?> outputClass = queryProvider.getOutputClass();
+
     if (isFlux) {
       LOGGER.trace("Return type is Flux<{}>", outputClass);
-      Flux<Document> retval = Flux.from(aggregatePublisher);
+      Flux<Document> retval = aggregatePublisherMono.flatMapMany(ap -> ap);
       if (outputClass != null) {
         return adaptPipeline(queryProvider, outputClass, retval);
       }
       return retval;
     }
     else {
-      Mono<Document> mono = Mono.from(aggregatePublisher);
+      Mono<Document> mono = aggregatePublisherMono.flatMap(ap -> (Mono<Document>)ap.first());
       if (outputClass != null) {
         LOGGER.trace("Return type is Mono<{}>", outputClass);
         return adaptPipeline(queryProvider, outputClass, mono);
@@ -101,7 +105,7 @@ public class ReactiveMongoNativeJavaDriverQueryExecutor extends AbstractQueryExe
     }
   }
 
-  private <T> Mono<T> adaptPipeline(QueryProvider queryProvider, Class<T> outputClass, Mono<Document> retval) {
+  private Mono<?> adaptPipeline(QueryProvider queryProvider, Class<?> outputClass, Mono<Document> retval) {
     String key = queryProvider.getQueryResultKey();
     if (BeanUtils.isSimpleValueType(outputClass)) {
       return retval.map(d -> d.get(key, outputClass))
@@ -151,7 +155,6 @@ public class ReactiveMongoNativeJavaDriverQueryExecutor extends AbstractQueryExe
     }
   }
 
-  @SuppressWarnings("unchecked")
   private <T> T deserialize(Class<T> outputClass, BsonDocument d) {
     try {
       return objectMapper.readValue(d.toJson(), outputClass);

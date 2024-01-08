@@ -6,11 +6,12 @@ import com.github.krr.mongodb.aggregate.support.api.QueryProvider;
 import com.github.krr.mongodb.aggregate.support.enums.AggregationType;
 import com.github.krr.mongodb.aggregate.support.exceptions.InvalidAggregationQueryException;
 import com.github.krr.mongodb.aggregate.support.utils.Assert;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
@@ -28,8 +29,8 @@ import static com.github.krr.mongodb.aggregate.support.utils.ArrayUtils.NULL_STR
  * 4/25/18.
  */
 
-@SuppressWarnings("WeakerAccess")
-public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider<T> {
+@SuppressWarnings({"WeakerAccess", "rawtypes"})
+public abstract class AbstractAggregateQueryProvider implements QueryProvider {
 
   protected final Method method;
 
@@ -39,7 +40,7 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
 
   private static final String COULD_NOT_DETERMINE_QUERY = "Could not determine query";
 
-  protected Function<String, String> placeholderRepFn;
+  protected BiFunction<AggregationStage, String, String> placeholderRepFn;
 
   protected String collectionName;
 
@@ -51,7 +52,7 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
 
   protected final BiFunction<AggregationStage, String, String> getQueryString = (aggregationStage, query) -> {
     if (aggregationStage.allowStage()) {
-      String queryStringForStage = placeholderRepFn.apply(query);
+      String queryStringForStage = placeholderRepFn.apply(aggregationStage, query);
       if (!StringUtils.isEmpty(queryStringForStage)) {
         return String.format("{%s:%s}", aggregationStage.getAggregationType().getRepresentation(),
                              queryStringForStage);
@@ -93,7 +94,7 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
     if(!StringUtils.isEmpty(collectionName.trim())) {
       return collectionName;
     }
-    Class className = aggregateAnnotation.inputType();
+    Class<?> className = aggregateAnnotation.inputType();
 
     // if the @CollectionName annotation is present use that.
     collectionName = deriveCollectionName(parameterValueSupplier);
@@ -104,7 +105,7 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
     // check if document annotation is present on bean.
     collectionName = documentAnnotationNameSupplier.get();
 
-    // if @Document annoation is present
+    // if @Document annotation is present
     if (StringUtils.isEmpty(collectionName)) {
       // Not present - derive it from class name.
       collectionName = getSimpleCollectionName(className);
@@ -227,7 +228,7 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
     return retval;
   }
 
-  protected String getSimpleCollectionName(Class className) {
+  protected String getSimpleCollectionName(Class<?> className) {
     String collectionName;
     String simpleName = className.getSimpleName();
     collectionName = Character.toLowerCase(simpleName.charAt(0)) + simpleName.substring(1);
@@ -289,7 +290,7 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
   }
 
   @Override
-  public Class getMethodReturnType() {
+  public Class<?> getMethodReturnType() {
     return method.getReturnType();
   }
 
@@ -298,7 +299,7 @@ public abstract class AbstractAggregateQueryProvider<T> implements QueryProvider
     return aggregateAnnotation.resultKey();
   }
 
-  public abstract T getPageable();
+  public abstract Pageable getPageable();
 
   @Override
   public boolean isAllowDiskUse() {

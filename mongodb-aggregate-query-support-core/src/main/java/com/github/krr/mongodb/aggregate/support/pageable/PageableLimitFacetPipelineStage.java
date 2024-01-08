@@ -31,9 +31,9 @@ import java.lang.annotation.Annotation;
  */
 public class PageableLimitFacetPipelineStage implements FacetPipelineStage {
 
-  private final int pageSize;
+  private final long pageSize;
 
-  public PageableLimitFacetPipelineStage(int pageSize) {
+  public PageableLimitFacetPipelineStage(long pageSize) {
     this.pageSize = pageSize;
   }
 

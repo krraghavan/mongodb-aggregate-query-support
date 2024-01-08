@@ -31,9 +31,9 @@ import java.lang.annotation.Annotation;
  */
 public class PageableSkipFacetPipelineStage implements FacetPipelineStage {
 
-  private final int offset;
+  private final long offset;
 
-  public PageableSkipFacetPipelineStage(int offset) {
+  public PageableSkipFacetPipelineStage(long offset) {
     this.offset = offset;
   }
 

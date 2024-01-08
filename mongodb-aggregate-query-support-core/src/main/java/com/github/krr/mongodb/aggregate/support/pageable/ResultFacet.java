@@ -33,11 +33,11 @@ import java.lang.annotation.Annotation;
  */
 public class ResultFacet implements FacetPipeline {
 
-  private final int offset;
+  private final long offset;
 
-  private final int pageSize;
+  private final long pageSize;
 
-  ResultFacet(int offset, int size) {
+  ResultFacet(long offset, long size) {
     this.offset = offset;
     this.pageSize = size;
   }

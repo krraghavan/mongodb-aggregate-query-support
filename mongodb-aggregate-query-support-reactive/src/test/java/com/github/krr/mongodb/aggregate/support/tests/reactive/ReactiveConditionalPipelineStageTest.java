@@ -43,7 +43,7 @@ import static org.testng.Assert.*;
  * 3/8/17.
  */
 
-@SuppressWarnings("ConstantConditions")
+@SuppressWarnings({"ConstantConditions", "ReactiveStreamsUnusedPublisher"})
 @ContextConfiguration(classes = ReactiveAggregateTestConfiguration.class)
 public class ReactiveConditionalPipelineStageTest extends AbstractTestNGSpringContextTests {
 

@@ -34,16 +34,15 @@ public class PageableFacet implements Facet {
 
   private final int order;
 
-  private final int offset;
+  private final long offset;
 
-  private final int pageSize;
+  private final long pageSize;
 
-  public PageableFacet(int order, int offset, int pageSize) {
+  public PageableFacet(int order, long offset, long pageSize) {
     this.order = order;
     this.offset = offset;
     this.pageSize = pageSize;
   }
-
 
   @Override
   public Class<? extends Annotation> annotationType() {

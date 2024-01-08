@@ -27,11 +27,10 @@ import static org.testng.Assert.*;
 @ContextConfiguration(classes = ReactiveAggregateTestConfiguration.class)
 public class ReactiveAggregatePageableTest extends AbstractTestNGSpringContextTests {
 
-  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private ReactivePageableRepository pageableRepository;
 
-  private int[] scoreArr = {70, 75, 80, 85, 90, 95};
+  private final int[] scoreArr = {70, 75, 80, 85, 90, 95};
 
   private final String[] SCORE_DOCS = {"{ \"_id\" : 1, \"subject\" : \"History\", \"score\" : " + scoreArr[0] + " }",
                                        "{ \"_id\" : 2, \"subject\" : \"History\", \"score\" : " + scoreArr[5] + " }",
@@ -52,7 +51,7 @@ public class ReactiveAggregatePageableTest extends AbstractTestNGSpringContextTe
         scores.add(mapper.readValue(s, Score.class));
       }
       catch (IOException e) {
-        assertTrue(false, e.getMessage());
+        fail(e.getMessage());
       }
     });
     pageableRepository.insert(scores).collectList().block();
@@ -81,11 +80,10 @@ public class ReactiveAggregatePageableTest extends AbstractTestNGSpringContextTe
   public void mustReturnCorrectPagesFromQueryWithPageable(int page, int size) {
     Pageable pageable = PageRequest.of(page, size);
     List<Score> scoresAfterSkip = pageableRepository.getPageableScores(pageable).collectList().block();
-//    List<Score> scoresAfterSkip = scoresAfterSkipDoc.getContent();
     assertNotNull(scoresAfterSkip);
     assertEquals(scoresAfterSkip.size(), pageable.getPageSize());
     for (int i = 0; i < scoresAfterSkip.size(); i++) {
-      Score score = (Score) scoresAfterSkip.get(i);
+      Score score = scoresAfterSkip.get(i);
       //map the returned score in the page to the entry in scoreArr
       assertEquals(score.getScore(), scoreArr[page * size + i]);
     }

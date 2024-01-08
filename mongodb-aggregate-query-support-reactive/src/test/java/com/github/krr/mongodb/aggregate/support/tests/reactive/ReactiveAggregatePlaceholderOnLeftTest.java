@@ -44,7 +44,6 @@ import static org.testng.Assert.assertTrue;
 @ContextConfiguration(classes = ReactiveAggregateTestConfiguration.class)
 public class ReactiveAggregatePlaceholderOnLeftTest extends AbstractTestNGSpringContextTests {
 
-  @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
   @Autowired
   private ReactivePossessionsRepository possessionsRepository;
 
@@ -86,6 +85,14 @@ public class ReactiveAggregatePlaceholderOnLeftTest extends AbstractTestNGSpring
       assertTrue(sortTestNumber <= lastNumber[0]);
       lastNumber[0] = sortTestNumber;
     });
+  }
+  @Test(expectedExceptions = IllegalArgumentException.class)
+  public void mustThrowExceptionIfSortParameterPlaceholderHasQuotes() {
+    String tag = "mustReplaceSortParameterWithPlaceholder";
+    List<Possessions> possessionss = createPossessionsWithSortField(tag);
+    possessionsRepository.saveAll(possessionss).collectList().block();
+    String sortString = "{sortTestNumber:-1}";
+    possessionsRepository.getPossesionsSortedByTagInvalidSortPlaceholder(tag, sortString).collectList().block();
   }
 
   @DataProvider

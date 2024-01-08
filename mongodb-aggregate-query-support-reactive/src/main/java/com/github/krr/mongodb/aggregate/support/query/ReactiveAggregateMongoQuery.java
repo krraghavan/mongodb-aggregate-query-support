@@ -19,28 +19,24 @@
 package com.github.krr.mongodb.aggregate.support.query;
 
 import com.github.krr.mongodb.aggregate.support.annotations.Aggregate;
-import com.github.krr.mongodb.aggregate.support.api.MongoQueryExecutor;
+import com.github.krr.mongodb.aggregate.support.api.ReactiveMongoQueryExecutor;
 import com.github.krr.mongodb.aggregate.support.exceptions.InvalidAggregationQueryException;
 import com.github.krr.mongodb.aggregate.support.exceptions.MongoQueryException;
+import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.query.*;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
-import org.springframework.data.repository.query.ExtensionAwareQueryMethodEvaluationContextProvider;
-import org.springframework.data.repository.query.Parameters;
-import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
-import org.springframework.expression.EvaluationContext;
+import org.springframework.data.repository.query.ReactiveQueryMethodEvaluationContextProvider;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Mono;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -59,9 +55,9 @@ public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
 
   private final Method method;
 
-  private final MongoQueryExecutor queryExecutor;
+  private final ReactiveMongoQueryExecutor queryExecutor;
 
-  private static final QueryMethodEvaluationContextProvider CONTEXT_PROVIDER =
+  private static final ReactiveQueryMethodEvaluationContextProvider CONTEXT_PROVIDER =
       new ApplicationContextQueryMethodEvaluationContextProvider();
 
   /**
@@ -72,7 +68,7 @@ public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
    */
   @Autowired
   public ReactiveAggregateMongoQuery(Method method, RepositoryMetadata metadata, ReactiveMongoOperations mongoOperations,
-                                     ProjectionFactory projectionFactory, MongoQueryExecutor queryExecutor) {
+                                     ProjectionFactory projectionFactory, ReactiveMongoQueryExecutor queryExecutor) {
     super(new ReactiveMongoQueryMethod(method, metadata, projectionFactory,
                                        mongoOperations.getConverter().getMappingContext()),
           mongoOperations,
@@ -83,15 +79,16 @@ public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
     this.queryExecutor = queryExecutor;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public Object execute(Object[] parameters) {
+  public Publisher<Object> execute(Object[] parameters) {
     MongoParameterAccessor mongoParameterAccessor = new MongoParametersParameterAccessor(getQueryMethod(), parameters);
     ConvertingParameterAccessor parameterAccessor = new ConvertingParameterAccessor(mongoOperations.getConverter(),
                                                                                     mongoParameterAccessor);
     try {
       AbstractAggregateQueryProvider aggregateQueryProvider = createAggregateQueryProvider(mongoParameterAccessor,
                                                                                            parameterAccessor);
-      return queryExecutor.executeQuery(aggregateQueryProvider);
+      return (Publisher<Object>) queryExecutor.executeQuery(aggregateQueryProvider);
     }
     catch (MongoQueryException e) {
       LOGGER.error("Error executing aggregate query", e);
@@ -116,12 +113,12 @@ public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
       throws InvalidAggregationQueryException {
 
     Annotation annotation = method.getAnnotation(Aggregate.class);
-    Assert.notNull(annotation, "Aggregate2 must be specified on the method");
-    return new AggregateQueryProvider(method, mongoParameterAccessor, parameterAccessor);
+    Assert.notNull(annotation, "Aggregate must be specified on the method");
+    return new MongoAggregateQueryProvider(method, mongoParameterAccessor, parameterAccessor);
   }
 
   @Override
-  protected Query createQuery(ConvertingParameterAccessor accessor) {
+  protected Mono<Query> createQuery(ConvertingParameterAccessor accessor) {
     throw new UnsupportedOperationException("AggregateMongoQuery does not support createQuery");
   }
 

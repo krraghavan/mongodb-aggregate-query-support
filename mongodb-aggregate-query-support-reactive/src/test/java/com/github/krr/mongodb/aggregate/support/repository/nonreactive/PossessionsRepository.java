@@ -26,7 +26,7 @@ import com.github.krr.mongodb.aggregate.support.condition.ParameterValueNotNullC
 import com.github.krr.mongodb.aggregate.support.condition.ParameterValueNullCondition;
 import com.github.krr.mongodb.aggregate.support.condition.ParameterValueTrueCondition;
 import com.mongodb.DBObject;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
@@ -37,6 +37,7 @@ import java.util.List;
  * Created by rkolliva
  * 3/1/17.
  */
+@SuppressWarnings("unused")
 public interface PossessionsRepository extends MongoRepository<Possessions, String> {
 
   @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class)

@@ -19,7 +19,7 @@
 
 package com.github.krr.mongodb.aggregate.support.beans;
 
-import com.github.krr.mongodb.aggregate.support.reactive.annotations.MongoId;
+import com.github.krr.mongodb.aggregate.support.annotations.MongoId;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 
 import java.util.List;

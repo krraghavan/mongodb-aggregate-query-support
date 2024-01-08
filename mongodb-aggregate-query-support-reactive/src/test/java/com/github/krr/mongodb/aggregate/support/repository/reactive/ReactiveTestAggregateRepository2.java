@@ -24,7 +24,6 @@ import com.github.krr.mongodb.aggregate.support.beans.TestAggregateAnnotation2Fi
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -46,11 +45,21 @@ public interface ReactiveTestAggregateRepository2 extends
   Flux<Map<String, String>> aggregateQueryWithMatchAndLimit(int value, int limit);
 
   @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class)
-  @Out(query = "?0")
+  @Out(query = "'?0'")
   Mono<Void> aggregateQueryWithOut(String outputRepository, @CollectionName String coll);
 
   @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class)
   @Match(query = "{'randomAttribute1':?0}", order = 0)
-  @Out(query = "?2")
+  @Out(query = "'?2'")
   Mono<Void> aggregateQueryWithMatchAndOut(String randomAttribute, @CollectionName String srcRepo, String outputRepository);
+
+  @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class)
+  @Match(query = "{'randomAttribute1':?0}", order = 0)
+  @Out(query = "?2")
+  Mono<Void> aggregateQueryWithMatchAndOutNoQuotes(String randomAttribute, @CollectionName String srcRepo, String outputRepository);
+
+  @Aggregate(inputType = TestAggregateAnnotation2FieldsBean.class)
+  @Out(query = "?0")
+  Mono<Void> aggregateQueryWithOutNoQuotes(String outputRepository, @CollectionName String coll);
+
 }

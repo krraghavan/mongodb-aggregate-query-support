@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import reactor.core.publisher.Flux;
 
@@ -50,8 +51,16 @@ public class ReactiveAggregateOutTest extends AbstractTestNGSpringContextTests {
   @Autowired
   private ReactiveMongoOperations reactiveMongoOperations;
 
-  @Test
-  public void outMustPlaceRepositoryObjectsInDifferentRepository() {
+  @DataProvider
+  private Object[][] outRepoFixtures() {
+    return new Object[][] {
+        new Object[]{true},
+        new Object[]{false},
+    };
+  }
+
+  @Test(dataProvider = "outRepoFixtures")
+  public void outMustPlaceRepositoryObjectsInDifferentRepository(boolean placeholderWithQuotes) {
     TestAggregateAnnotation2FieldsBean obj1 = new TestAggregateAnnotation2FieldsBean(randomAlphabetic(10));
     obj1.setOid(UUID.randomUUID().toString());
     TestAggregateAnnotation2FieldsBean obj2 = new TestAggregateAnnotation2FieldsBean(randomAlphabetic(20),
@@ -63,7 +72,12 @@ public class ReactiveAggregateOutTest extends AbstractTestNGSpringContextTests {
     reactiveMongoOperations.save(obj1, srcRepo).block();
     reactiveMongoOperations.save(obj2, srcRepo).block();
     String outputRepoName = RandomStringUtils.randomAlphabetic(10);
-    testAggregateRepository2.aggregateQueryWithOut(outputRepoName, srcRepo).block();
+    if(placeholderWithQuotes) {
+      testAggregateRepository2.aggregateQueryWithOut(outputRepoName, srcRepo).block();
+    }
+    else {
+      testAggregateRepository2.aggregateQueryWithOutNoQuotes(outputRepoName, srcRepo).block();
+    }
     assertNotNull(reactiveMongoOperations.collectionExists(outputRepoName));
     Boolean collectionExists = reactiveMongoOperations.collectionExists(outputRepoName).block();
     assertNotNull(collectionExists);
@@ -84,8 +98,8 @@ public class ReactiveAggregateOutTest extends AbstractTestNGSpringContextTests {
     }
   }
 
-  @Test
-  public void outMustPlaceRepositoryObjectsInDifferentRepositoryIfOtherQueryAnnotationsArePresent() {
+  @Test(dataProvider = "outRepoFixtures")
+  public void outMustPlaceRepositoryObjectsInDifferentRepositoryIfOtherQueryAnnotationsArePresent(boolean quotesInPh) {
     String randomStr = randomAlphabetic(10);
     TestAggregateAnnotation2FieldsBean obj1 = new TestAggregateAnnotation2FieldsBean(randomStr);
     TestAggregateAnnotation2FieldsBean obj2 = new TestAggregateAnnotation2FieldsBean(randomAlphabetic(20),
@@ -98,7 +112,12 @@ public class ReactiveAggregateOutTest extends AbstractTestNGSpringContextTests {
     reactiveMongoOperations.save(obj3, srcRepo).block();
 
     String outputRepoName = RandomStringUtils.randomAlphabetic(10);
-    testAggregateRepository2.aggregateQueryWithMatchAndOut(randomStr, srcRepo, outputRepoName).block();
+    if(quotesInPh) {
+      testAggregateRepository2.aggregateQueryWithMatchAndOut(randomStr, srcRepo, outputRepoName).block();
+    }
+    else {
+      testAggregateRepository2.aggregateQueryWithMatchAndOutNoQuotes(randomStr, srcRepo, outputRepoName).block();
+    }
 
     Boolean collectionExists = reactiveMongoOperations.collectionExists(outputRepoName).block();
     assertNotNull(collectionExists);
@@ -106,7 +125,6 @@ public class ReactiveAggregateOutTest extends AbstractTestNGSpringContextTests {
     List<TestAggregateAnnotation2FieldsBean> copiedObjs = reactiveMongoOperations.findAll(TestAggregateAnnotation2FieldsBean.class,
                                                                                           outputRepoName)
                                                                                 .collectList().block();
-    //clear testAggregateAnnotationFieldsBean repo before running this test
     assertNotNull(copiedObjs);
     assertSame(copiedObjs.size(), 2);
   }

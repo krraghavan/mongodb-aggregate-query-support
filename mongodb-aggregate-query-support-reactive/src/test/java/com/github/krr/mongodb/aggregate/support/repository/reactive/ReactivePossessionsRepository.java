@@ -64,8 +64,15 @@ public interface ReactivePossessionsRepository extends ReactiveMongoRepository<P
   @Match(query = "{" +
                  "   \"tag\": ?0" +
                  "}", order = 0)
-  @Sort(query = "\"@@1\"", order = 1)
+  @Sort(query = "@@1", order = 1)
   Flux<Possessions> getPossesionsSortedByTag(String tag, String sort);
+
+  @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class)
+  @Match(query = "{" +
+                 "   \"tag\": ?0" +
+                 "}", order = 0)
+  @Sort(query = "\"@@1\"", order = 1)
+  Flux<Possessions> getPossesionsSortedByTagInvalidSortPlaceholder(String tag, String sort);
 
   @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class)
   @Match(query = "{" +
@@ -115,7 +122,7 @@ public interface ReactivePossessionsRepository extends ReactiveMongoRepository<P
   @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class)
   @Match(query = "{" +
                  "   'tag': ?0," +
-                 "   '_id': { $in : ?1 }" +
+                 "   '_id': { $in : '?1' }" +
                  "}", order = 0, condition = {
       @Conditional(condition = ParameterValueNotNullCondition.class, parameterIndex = 1)
   })

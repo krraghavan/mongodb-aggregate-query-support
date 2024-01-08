@@ -1,16 +1,53 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN">
+<!--
+  ~  Copyright (c) 2016 the original author or authors.
+  ~
+  ~  Licensed under the Apache License, Version 2.0 (the "License");
+  ~  you may not use this file except in compliance with the License.
+  ~  You may obtain a copy of the License at
+  ~
+  ~        http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~  Unless required by applicable law or agreed to in writing, software
+  ~  distributed under the License is distributed on an "AS IS" BASIS,
+  ~  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~  See the License for the specific language governing permissions and
+  ~  limitations under the License.
+  ~
+  ~
+  ~
+  -->
+
+<Configuration>
   <Appenders>
-    <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    <RollingFile name="FILE" fileName="target/logfile.txt" filePattern="logfile-%d{MM-dd-yyyy}-%i.log.gz">
+      <PatternLayout>
+        <Pattern>%d [%t] %-5p %c{2} - %m%n</Pattern>
+      </PatternLayout>
+      <Policies>
+        <TimeBasedTriggeringPolicy/>
+        <SizeBasedTriggeringPolicy size="50 MB"/>
+      </Policies>
+      <DefaultRolloverStrategy max="4"/>
+    </RollingFile>
+
+    <Console name="STDOUT" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d [%t] %-5p %c{2} - %m%n"/>
     </Console>
   </Appenders>
   <Loggers>
-    <Logger name="com.github.krr.mongodb.embeddedmongo.config" level="error">
-      <AppenderRef ref="Console"/>
-    </Logger>
-    <Root level="error">
-      <AppenderRef ref="Console"/>
+    <Root level="info">
+      <AppenderRef ref="FILE"/>
     </Root>
+
+    <Logger name="com.github.krr" level="info" additivity="false">
+      <AppenderRef ref="FILE"/>
+    </Logger>
+    <Logger name="org.springframework.data.mongodb" level="info" additivity="false">
+      <AppenderRef ref="FILE"/>
+    </Logger>
+    <Logger name="AggregateQueryProvider.Query" level="error" additivity="false">
+      <AppenderRef ref="FILE"/>
+    </Logger>
   </Loggers>
 </Configuration>
