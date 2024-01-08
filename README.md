@@ -11,8 +11,9 @@ queries with practically no code being written.
 
 ## New in 0.9.0 version
 1. Upgraded Spring support to Spring 6.x and Mongo to 6.x+.  With this release version, we will end support for Spring 4
-and earlier version of Mongo DB.
-2. Java version 17 for source and target.  
+and earlier version of Mongo DB.  Those will continue to be supported on the 0.8.x train.
+2. Tested with Java version 17 for source and target and it works but retaining Java 8 to support clients that have not
+yet upgraded.
 
 ## New in 0.8.9 version
 1. Fixed Mongo distribution for all Linux distributions (Thanks Siddharth Agrawal)

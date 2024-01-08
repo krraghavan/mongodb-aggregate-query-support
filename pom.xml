@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.krraghavan</groupId>
   <artifactId>mongodb-aggregate-query-support</artifactId>
-  <version>0.8.10-SNAPSHOT</version>
+  <version>0.9.0</version>
 
   <packaging>pom</packaging>
 
@@ -41,7 +41,7 @@
     <guava.version>33.0.0-jre</guava.version>
     <jackson.version>2.15.3</jackson.version>
     <lombok.version>1.18.30</lombok.version>
-    <maqs.version>0.8.10-SNAPSHOT</maqs.version>
+    <maqs.version>${project.version}</maqs.version>
     <testng.version>7.7.0</testng.version>
 
     <!-- Mongo and Spring versions -->
@@ -362,7 +362,7 @@
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6.7</version>
+            <version>1.6.13</version>
             <extensions>true</extensions>
             <configuration>
               <serverId>sonatype</serverId>
