@@ -32,7 +32,7 @@
 
   <artifactId>mongodb-aggregate-query-support-reactive</artifactId>
 
-  <name>Mongodb Aggregate Query Reactive Support (Reactive)</name>
+  <name>Mongo Aggregate Query Support for Spring (Reactive)</name>
 
   <description>Spring Data @Query like support for Mongo Aggregation queries</description>
   <url>https://github.com/krraghavan/mongodb-aggregate-query-support-reactive</url>

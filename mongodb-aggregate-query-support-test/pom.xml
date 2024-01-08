@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>mongodb-aggregate-query-support-test</artifactId>
-
+  <name>Mongo Aggregate Query Support Test Classes</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <embedded-mongo-version>4.12.0</embedded-mongo-version>
