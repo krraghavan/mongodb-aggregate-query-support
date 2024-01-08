@@ -1,4 +1,4 @@
-[![Java CI with Maven](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml)
+[![Java CI with Maven](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml)[![Release Version](https://img.shields.io/badge/version-v0.9.0-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -12,6 +12,7 @@ queries with practically no code being written.
 ## New in 0.9.0 version
 1. Upgraded Spring support to Spring 6.x and Mongo to 6.x+.  With this release version, we will end support for Spring 4
 and earlier version of Mongo DB.
+2. Java version 17 for source and target.  
 
 ## New in 0.8.9 version
 1. Fixed Mongo distribution for all Linux distributions (Thanks Siddharth Agrawal)

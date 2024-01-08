@@ -332,11 +332,10 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.11.0</version>
         <configuration>
-          <target>17</target>
-          <source>17</source>
+          <target>1.8</target>
+          <source>1.8</source>
           <fork>true</fork>
           <compilerArgs>
-            <arg>--enable-preview</arg>
             <arg>-Xlint:all</arg>
             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED</arg>
             <arg>-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED</arg>
