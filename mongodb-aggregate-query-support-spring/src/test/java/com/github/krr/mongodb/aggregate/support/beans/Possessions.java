@@ -21,6 +21,8 @@ package com.github.krr.mongodb.aggregate.support.beans;
 
 import com.github.krr.mongodb.aggregate.support.annotations.MongoId;
 import com.github.krr.mongodb.aggregate.support.config.AggregateTestConfiguration;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
@@ -31,6 +33,8 @@ import java.util.List;
  */
 
 @ContextConfiguration(classes = AggregateTestConfiguration.class)
+@ToString
+@EqualsAndHashCode
 public class Possessions {
 
   @MongoId

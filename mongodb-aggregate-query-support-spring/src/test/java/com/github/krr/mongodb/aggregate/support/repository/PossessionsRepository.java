@@ -115,6 +115,14 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Stri
 
   @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class)
   @Match(query = "{" +
+                "   \"tag\"  : '?0'," +
+                "   \"assets.@1\" : { $exists: true, $ne : []}" +
+                "}", order = 0, condition = {
+  })
+  List<Possessions> placeholderOnKeys(String tag, String key, Pageable pageable);
+
+  @Aggregate(inputType = Possessions.class, outputBeanType = Possessions.class)
+  @Match(query = "{" +
                 "   'tag': ?0," +
                 "   '_id': { $in : '?1' }" +
                 "}", order = 0, condition = {

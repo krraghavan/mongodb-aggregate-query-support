@@ -50,7 +50,7 @@ public class AggregateQuerySupportingRepositoryFactoryBean<T extends Repository<
 
   @Override
   protected RepositoryFactorySupport getFactoryInstance(MongoOperations operations) {
-    Assert.notNull(queryExecutor);
+    Assert.notNull(queryExecutor, "Expecting queryExecutor to not be null");
     return new AggregateQuerySupportingRepositoryFactory(operations, queryExecutor);
   }
 }

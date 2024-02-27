@@ -331,29 +331,12 @@ public abstract class AbstractAggregateQueryProvider implements QueryProvider {
 
     private final int parameterIndex;
 
-    private final boolean quoted;
-
     private final String prefix;
 
-    /**
-     * Creates a new {@link ParameterBinding} with the given {@code parameterIndex} and {@code quoted} information.
-     *
-     * @param parameterIndex - the index of the parameterIndex
-     * @param quoted         whether or not the parameter is already quoted.
-     */
-    ParameterBinding(int parameterIndex, boolean quoted) {
-      this(parameterIndex, quoted, "?");
-    }
-
-    ParameterBinding(int parameterIndex, boolean quoted, String prefix) {
+    ParameterBinding(int parameterIndex, String prefix) {
 
       this.parameterIndex = parameterIndex;
-      this.quoted = quoted;
       this.prefix = prefix;
-    }
-
-    public boolean isQuoted() {
-      return quoted;
     }
 
     public int getParameterIndex() {

@@ -19,8 +19,8 @@
 
 package com.github.krr.mongodb.aggregate.support.beans;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -28,6 +28,8 @@ import java.util.List;
  * Created by rkolliva
  * 3/1/17.
  */
+@ToString
+@EqualsAndHashCode
 public class Asset {
 
   private List<String> cars;

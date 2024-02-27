@@ -5,6 +5,7 @@ import org.testng.annotations.Test;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 public class BoundValueImplTest {
 
@@ -22,12 +23,13 @@ public class BoundValueImplTest {
                         "}", false},
       // @ placeholder
       new Object[]{"{" +
-                   "   \"tag\": '@0'" +
+                   "   \"tag.@0\": '?0'" +
                    "}", new Object[] {randomValues2}, "{" +
-                        "   \"tag\": '" + randomValues2 + "'" +
+                        "   \"tag." + randomValues2 + "\": '" + randomValues2 + "'" +
                         "}", true},
       // only @@ placeholder
-      new Object[]{"@@2", new Object[] {randomValues1, randomValues2, randomValues3}, randomValues3, false},
+      new Object[]{"'@@2'", new Object[] {randomValues1, randomValues2, randomValues3}, "'".concat(randomValues3)
+          .concat("'"), false},
       // multiple placeholders
       new Object[]{"{" +
                    "   \"tag\": '?0', \"abc\":'?1'" +
@@ -109,6 +111,21 @@ public class BoundValueImplTest {
       new Object[]{"@@12", new Object[] {randomValues1, randomValues2, randomValues3}},
     };
   }
+  @DataProvider
+  private Object[][] invalidMatchQueryFixtures() {
+    String randomValues1 = randomAlphabetic(10);
+    String randomValues2 = randomAlphabetic(10);
+    String randomValues3 = "{$match:{\"".concat(randomAlphabetic(10)).concat("\":\"")
+                                        .concat(randomAlphabetic(15)).concat("\"}}");
+    return new Object[][] {
+      // ? placeholder for sort query
+      new Object[]{"{" +
+                   "   \"tag\": '?10'" +
+                   "}", new Object[] {randomValues1}},
+      // only @@ placeholder
+      new Object[]{"@@12", new Object[] {randomValues1, randomValues2, randomValues3}},
+    };
+  }
 
   @Test(dataProvider = "queryFixtures")
   public void mustExtractPlaceholderValues(String placeholderQuery, Object[] args, String expectedQuery,
@@ -131,7 +148,7 @@ public class BoundValueImplTest {
   }
 
   @Test
-  public void mustProcessValidAtAtParameter() {
+  public void mustProcessValidAtAtParameterForSort() {
     String expectedQuery = "$sort: '" + randomAlphabetic(5) + "':-1}";
     Object[] args = {randomAlphabetic(5), expectedQuery};
     String query = AggregationType.SORT.getValue(args, "@@1", (index, valueClass) -> (String) args[index]);
@@ -143,4 +160,27 @@ public class BoundValueImplTest {
     String actualQuery = AggregationType.SORT.getValue(args, query, (index, valueClass) -> (String) args[index]);
     assertEquals(query, actualQuery);
   }
+
+  @Test(dataProvider = "invalidMatchQueryFixtures", expectedExceptions = IllegalArgumentException.class)
+  public void mustThrowExceptionForInvalidMatch(String query, Object[] args) {
+    String actualQuery = AggregationType.MATCH.getValue(args, query, (index, valueClass) -> (String) args[index]);
+    assertEquals(query, actualQuery);
+  }
+
+  @Test
+  public void mustProcessValidAtAtParameterForMatch() {
+    String expectedQuery = "{'" + randomAlphabetic(5) + "':'" + randomAlphabetic(10) + "'}";
+    Object[] args = {randomAlphabetic(5), expectedQuery};
+    String query = AggregationType.MATCH.getValue(args, "@@1", (index, valueClass) -> (String) args[index]);
+    assertEquals(query, expectedQuery);
+  }
+
+  @Test
+  public void mustProcessValidAtAtParameterForEmptyMatch() {
+    String expectedQuery = "{   }";
+    Object[] args = {randomAlphabetic(5), expectedQuery};
+    String query = AggregationType.MATCH.getValue(args, "@@1", (index, valueClass) -> (String) args[index]);
+    assertNull(query);
+  }
+
 }
