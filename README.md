@@ -9,6 +9,12 @@ It is highly desirable to have a similar mechanism for MongoDB aggregate queries
 queries with practically no code being written.
 
 
+## New in 0.9.1 version
+1. Fixed multiple bugs in placeholder handling.
+   1. @ placeholders which are used to specify keys dynamically e.g. ``` {"@1" : "value"}```"
+   2. @@ placeholders (which specify the entire query string in the parameter) are now supported on Match stages.  Placeholder values that map to {} return null
+   3. @@ and @ placeholders can only be strings
+
 ## New in 0.9.0 version
 1. Upgraded Spring support to Spring 6.x and Mongo to 6.x+.  With this release version, we will end support for Spring 4
 and earlier version of Mongo DB.  Those will continue to be supported on the 0.8.x train.
