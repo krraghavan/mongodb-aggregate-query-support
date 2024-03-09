@@ -1,4 +1,4 @@
-[![Java CI with Maven](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml)[![Release Version](https://img.shields.io/badge/version-v0.9.1-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
+[![Java CI with Maven](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml)[![Release Version](https://img.shields.io/badge/version-v0.9.2-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -8,6 +8,12 @@ The @Query annotation provided by Spring Data MongoDb allows queries to be execu
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
 
+## New in 0.9.2 version
+1. Fixed date parsing in extended Bson parsing, longs, and ISO string formats with and without msecs is now correctly deserialized.  See [Mongo Extended BSON Date](https://www.mongodb.com/docs/manual/reference/mongodb-extended-json/#mongodb-bsontype-Date)
+   1. Date in long format: ```{"$date":{"$numberLong":"1710005987717"}}```
+   2. Date as ISO String (msec): ```{"$date":"2024-03-09T09:39:47,717Z"}```
+   3. Date as ISO String (no msec): ```{"$date":"2024-03-09T09:39:47Z"}```
+2. Upgraded ```Spring Core``` version to ```6.1.4```, ```Spring Data``` to ```3.2.3``` and ```Spring Data MongoDb``` to ```4.2.3``` to address critical vulnerabilities 
 
 ## New in 0.9.1 version
 1. Fixed multiple bugs in placeholder handling.
