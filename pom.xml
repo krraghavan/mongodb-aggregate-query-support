@@ -24,7 +24,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.krraghavan</groupId>
   <artifactId>mongodb-aggregate-query-support</artifactId>
-  <version>0.9.3-SNAPSHOT</version>
+  <version>0.9.3</version>
 
   <packaging>pom</packaging>
 
@@ -59,6 +59,7 @@
     <mongo7.version>7.0.4</mongo7.version>
     <testng.version>7.7.0</testng.version>
 
+    <commons-compress.version>1.26.2</commons-compress.version>
   </properties>
 
   <name>Mongo DB Aggregation Query Support</name>
@@ -139,7 +140,7 @@
       <dependency>
         <groupId>org.apache.logging.log4j</groupId>
         <artifactId>log4j-bom</artifactId>
-        <version>2.11.0</version>
+        <version>2.23.1</version>
         <scope>import</scope>
         <type>pom</type>
       </dependency>
@@ -373,12 +374,12 @@
           <plugin>
             <groupId>org.sonatype.plugins</groupId>
             <artifactId>nexus-staging-maven-plugin</artifactId>
-            <version>1.6.13</version>
+            <version>1.7.0</version>
             <extensions>true</extensions>
             <configuration>
               <serverId>sonatype</serverId>
               <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-              <autoReleaseAfterClose>false</autoReleaseAfterClose>
+              <autoReleaseAfterClose>true</autoReleaseAfterClose>
             </configuration>
           </plugin>
           <plugin>

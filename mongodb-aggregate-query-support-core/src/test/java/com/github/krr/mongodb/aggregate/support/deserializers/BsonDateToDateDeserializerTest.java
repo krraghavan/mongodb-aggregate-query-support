@@ -35,6 +35,9 @@ public class BsonDateToDateDeserializerTest {
     DateFormat dfNoMsec = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
     String nowAsISONoMsec = dfNoMsec.format(expectedDate);
     Date expectedDateNoMsec = dfNoMsec.parse(nowAsISONoMsec);
+    DateFormat dfMsecWithDot = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    String nowAsISOMsecWithDot = dfMsecWithDot.format(expectedDate);
+    Date expectedDateWithDot = dfMsecWithDot.parse(nowAsISOMsecWithDot);
     return new Object[][] {
       // milliseconds
       new Object[] {"{\"someDate\":" + String.format("{\"$date\":{\"$numberLong\":\"%s\"}}", epochMilli) + "}",
@@ -43,6 +46,8 @@ public class BsonDateToDateDeserializerTest {
       new Object[] {"{\"someDate\":{\"$date\":\"" + nowAsISOMsec + "\"}}", expectedDate},
       // ISO String, no msec
       new Object[] {"{\"someDate\":{\"$date\":\"" + nowAsISONoMsec + "\"}}", expectedDateNoMsec},
+      // ISO String,  msec with dot - fixes https://github.com/krraghavan/mongodb-aggregate-query-support/issues/49
+      new Object[] {"{\"someDate\":{\"$date\":\"" + nowAsISOMsecWithDot + "\"}}", expectedDateWithDot},
     };
   }
 
@@ -51,5 +56,6 @@ public class BsonDateToDateDeserializerTest {
     TestBean testBean = MAPPER.readValue(json, TestBean.class);
     Assert.assertEquals(testBean.someDate, expectedDate);
   }
+
 
 }

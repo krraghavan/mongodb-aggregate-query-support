@@ -16,6 +16,9 @@ import java.util.Date;
 public class BsonDateToDateDeserializer extends GenericMongoExtendedJsonDeserializer<Date> {
 
   private static final String NODE_KEY = "$date";
+  public static final String DATETIME_FORMAT_ERROR_MSG = "Only ISO date format (with or without msecs) is supported.  If " +
+                                                         "msecs are specified it can  be HH:mm:ss.SSS or HH:mm:ss,SSS" +
+                                                         "Could not deserialize: %s";
 
   public BsonDateToDateDeserializer() {
     super(Date.class, NODE_KEY);
@@ -41,14 +44,25 @@ public class BsonDateToDateDeserializer extends GenericMongoExtendedJsonDeserial
         return df.parse(dateTextValue);
       }
       catch (ParseException e) {
-        // try with no msecs
-        DateFormat dfNoMsec = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         try {
-          return dfNoMsec.parse(dateTextValue);
+          // try msecs with dot
+          DateFormat dfMsecWithDot = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+          try {
+            return dfMsecWithDot.parse(dateTextValue);
+          }
+          catch (ParseException ex) {
+            throw new UnsupportedOperationException(String.format(DATETIME_FORMAT_ERROR_MSG, dateTextValue), e);
+          }
         }
-        catch (ParseException ex) {
-          throw new UnsupportedOperationException("Only ISO date format (with or without msecs) is supported.  " +
-                                                  "Could not deserialize " + dateTextValue, e);
+        catch (Exception e2) {
+          // try with no msecs
+          DateFormat dfNoMsec = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+          try {
+            return dfNoMsec.parse(dateTextValue);
+          }
+          catch (ParseException ex) {
+            throw new UnsupportedOperationException(String.format(DATETIME_FORMAT_ERROR_MSG, dateTextValue), e);
+          }
         }
       }
     }
