@@ -2,6 +2,7 @@ package com.github.krr.mongodb.aggregate.support.query;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.krr.mongodb.aggregate.support.api.QueryProvider;
+import com.github.krr.mongodb.aggregate.support.exceptions.MongoQueryException;
 import com.mongodb.reactivestreams.client.AggregatePublisher;
 import com.mongodb.reactivestreams.client.MongoCollection;
 import org.apache.commons.lang3.StringUtils;
@@ -76,7 +77,12 @@ public class ReactiveMongoNativeJavaDriverQueryExecutor extends AbstractReactive
     Mono<AggregatePublisher<Document>> aggregatePublisherMono = collectionMono.map(collection -> collection.aggregate(pipelineStages)
                                                                                  .allowDiskUse(queryProvider.isAllowDiskUse())
                                                                                  .maxTime(queryProvider.getMaxTimeMS(),
-                                                                                          MILLISECONDS));
+                                                                                          MILLISECONDS))
+                                                                              .doOnError(e -> {
+                                                                                LOGGER.error("Error executing query {}",
+                                                                                             pipelineStages, e);
+                                                                                throw new MongoQueryException(e);
+                                                                              });
     Class<?> methodReturnType = queryProvider.getMethodReturnType();
     boolean isFlux = Flux.class.isAssignableFrom(methodReturnType);
     boolean isMono = Mono.class.isAssignableFrom(methodReturnType);
@@ -89,7 +95,11 @@ public class ReactiveMongoNativeJavaDriverQueryExecutor extends AbstractReactive
 
     if (isFlux) {
       LOGGER.trace("Return type is Flux<{}>", outputClass);
-      Flux<Document> retval = aggregatePublisherMono.flatMapMany(ap -> ap);
+      Flux<Document> retval = aggregatePublisherMono.flatMapMany(ap -> ap)
+                                                    .doOnError(e -> {
+                                                      LOGGER.error("Error executing query {}", pipelineStages, e);
+                                                      throw new MongoQueryException(e);
+                                                    });
       if (outputClass != null) {
         return adaptPipeline(queryProvider, outputClass, retval);
       }

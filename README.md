@@ -1,4 +1,4 @@
-[![Java CI with Maven](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml)[![Release Version](https://img.shields.io/badge/version-v0.9.3-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
+[![Java CI with Maven](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml)[![Release Version](https://img.shields.io/badge/version-v0.9.4-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -7,6 +7,11 @@ Spring Data module.
 The @Query annotation provided by Spring Data MongoDb allows queries to be executed with minimum code being written.  
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
+
+## New in 0.9.4 version
+1. [Bug 50](https://github.com/krraghavan/mongodb-aggregate-query-support/issues/50): Added ```@@``` support for ```@Project``` and ```@Group``` stages
+1. [Bug 51](https://github.com/krraghavan/mongodb-aggregate-query-support/issues/51): Facets with ```@@@``` annotations in ```@Project``` do not parse correctly
+
 
 ## New in 0.9.3 version
 1. [Bug 49](https://github.com/krraghavan/mongodb-aggregate-query-support/issues/49): Fixed Date parsing when msecs are separated by dot (.).

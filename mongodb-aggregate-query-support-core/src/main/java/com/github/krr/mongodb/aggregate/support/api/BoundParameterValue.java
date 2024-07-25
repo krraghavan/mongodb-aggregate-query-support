@@ -20,7 +20,6 @@ public interface BoundParameterValue {
   String getValue(Object[] methodParameterValues, String query, BiFunction<Integer, Class<?>, String> valueProviderFn);
 
   default boolean isString(Object[] methodParameterValues, int index) {
-    int length = methodParameterValues.length;
     validateIndex(methodParameterValues, index);
     return (methodParameterValues[index] instanceof String);
   }

@@ -2,12 +2,14 @@ package com.github.krr.mongodb.aggregate.support.query;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.krr.mongodb.aggregate.support.api.QueryProvider;
+import com.github.krr.mongodb.aggregate.support.exceptions.MongoQueryException;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
+import org.bson.json.JsonParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -62,8 +64,14 @@ public class MongoNativeJavaDriverQueryExecutor extends AbstractQueryExecutor {
     while (iterator.hasNext()) {
       String query = iterator.next();
       LOGGER.trace("Processing query string {} for pipeline stage {}", query, i++);
-      BasicDBObject dbObject = BasicDBObject.parse(query);
-      pipelineStages.add(dbObject);
+      try {
+        BasicDBObject dbObject = BasicDBObject.parse(query);
+        pipelineStages.add(dbObject);
+      }
+      catch (JsonParseException e) {
+        LOGGER.error("Error parsing query string {} for pipeline stage {}", query, i++, e);
+        throw e;
+      }
     }
 
     MongoCollection<Document> collection = mongoOperations.getCollection(collectionName);
@@ -82,6 +90,10 @@ public class MongoNativeJavaDriverQueryExecutor extends AbstractQueryExecutor {
           return getPageableResults(queryProvider, cursor);
         }
       }
+    }
+    catch (Exception e) {
+      LOGGER.error("Error executing query {}.  Operation failed with error", pipelineStages, e);
+      throw new MongoQueryException(e);
     }
     return null;
   }

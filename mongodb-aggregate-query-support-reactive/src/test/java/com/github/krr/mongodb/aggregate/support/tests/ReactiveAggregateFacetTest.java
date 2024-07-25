@@ -20,10 +20,10 @@
 package com.github.krr.mongodb.aggregate.support.tests;
 
 import com.github.krr.mongodb.aggregate.support.beans.Artwork;
-import com.github.krr.mongodb.aggregate.support.config.MongoDBTestConfiguration;
+import com.github.krr.mongodb.aggregate.support.config.ReactiveAggregateTestConfiguration;
 import com.github.krr.mongodb.aggregate.support.fixtures.AggregateQueryFixtures;
-import com.github.krr.mongodb.aggregate.support.repository.ArtworkRepository;
-import com.github.krr.mongodb.aggregate.support.repository.ComplexQueryRepository;
+import com.github.krr.mongodb.aggregate.support.repository.ReactiveArtworkRepository;
+import com.github.krr.mongodb.aggregate.support.repository.ReactiveComplexQueryRepository;
 import org.apache.commons.lang3.RandomUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -44,31 +44,31 @@ import static org.testng.Assert.*;
  */
 
 @SuppressWarnings({"ConstantConditions", "Duplicates"})
-@ContextConfiguration(classes = MongoDBTestConfiguration.class)
-public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
-
-  private int expectedLength = 0;
+@ContextConfiguration(classes = ReactiveAggregateTestConfiguration.class)
+public class ReactiveAggregateFacetTest extends AbstractTestNGSpringContextTests {
 
   @Autowired
-  private ArtworkRepository artworkRepository;
+  private ReactiveArtworkRepository artworkRepository;
 
   @Autowired
-  private ComplexQueryRepository complexQueryRepository;
+  private ReactiveComplexQueryRepository complexQueryRepository;
+
+  private int expectedArtworkCount;
 
   @BeforeClass
   public void setup() throws Exception {
     List<Artwork> artworks = AggregateQueryFixtures.newArtworkBeans();
-    artworkRepository.insert(artworks);
-    expectedLength = artworks.size();
+    artworkRepository.insert(artworks).collectList().block();
+    expectedArtworkCount = artworks.size();
   }
 
   @Test
   public void mustReturnBucketsFromRepository2() {
     assertNotNull(artworkRepository, "Must have a repository");
-    List<Artwork> artworks = artworkRepository.findAll();
+    List<Artwork> artworks = artworkRepository.findAll().collectList().block();
     assertNotNull(artworks);
-    assertEquals(artworks.size(), expectedLength);
-    Map<String, Object> facets = artworkRepository.getFacetResults2();
+    assertEquals(artworks.size(), expectedArtworkCount);
+    Map<String, Object> facets = artworkRepository.getFacetResults2().block();
     assertNotNull(facets);
     assertEquals(facets.size(), 2);
     assertTrue(facets.containsKey("categorizedByTags"));
@@ -78,10 +78,10 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
   @Test
   public void mustReturnResultsWithMultipleFacets() {
     assertNotNull(artworkRepository, "Must have a repository");
-    List<Artwork> artworks = artworkRepository.findAll();
+    List<Artwork> artworks = artworkRepository.findAll().collectList().block();
     assertNotNull(artworks);
-    assertEquals(artworks.size(), expectedLength);
-    Map<String, Object> facets = artworkRepository.getFacetResultsWithMultipleFacets();
+    assertEquals(artworks.size(), expectedArtworkCount);
+    Map<String, Object> facets = artworkRepository.getFacetResultsWithMultipleFacets().block();
     assertNotNull(facets);
     assertEquals(facets.size(), 1);
     assertTrue(facets.containsKey("count"));
@@ -90,10 +90,10 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
   @Test
   public void mustHonorConditionalsInFacetPipeline() {
     assertNotNull(artworkRepository, "Must have a repository");
-    List<Artwork> artworks = artworkRepository.findAll();
+    List<Artwork> artworks = artworkRepository.findAll().collectList().block();
     assertNotNull(artworks);
-    assertEquals(artworks.size(), expectedLength);
-    Map<String, Object> facets = artworkRepository.getFacetResultsWithConditional(false);
+    assertEquals(artworks.size(), expectedArtworkCount);
+    Map<String, Object> facets = artworkRepository.getFacetResultsWithConditional(false).block();
     assertNotNull(facets);
     assertEquals(facets.size(), 1);
     assertFalse(facets.containsKey("categorizedByTags"));
@@ -103,10 +103,10 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
   @Test
   public void mustHonorConditionalsInFacetPipeline2() {
     assertNotNull(artworkRepository, "Must have a repository");
-    List<Artwork> artworks = artworkRepository.findAll();
+    List<Artwork> artworks = artworkRepository.findAll().collectList().block();
     assertNotNull(artworks);
-    assertEquals(artworks.size(), expectedLength);
-    Map<String, Object> facets = artworkRepository.getFacetResultsWithConditional(true);
+    assertEquals(artworks.size(), expectedArtworkCount);
+    Map<String, Object> facets = artworkRepository.getFacetResultsWithConditional(true).block();
     assertNotNull(facets);
     assertEquals(facets.size(), 2);
     assertTrue(facets.containsKey("categorizedByTags"));
@@ -116,9 +116,10 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
   @Test
   public void mustHonorConditionalsInFacetPipelineStage() {
     assertNotNull(artworkRepository, "Must have a repository");
-    List<Artwork> artworks = artworkRepository.findAll();
+    List<Artwork> artworks = artworkRepository.findAll().collectList().block();
     assertNotNull(artworks);
-    Map<String, Object> facets = artworkRepository.getFacetResultsWithConditional(true, false, true);
+    Map<String, Object> facets = artworkRepository.getFacetResultsWithConditional(true, false,
+                                                                                  true).block();
     assertNotNull(facets);
     assertEquals(facets.size(), 2);
     assertTrue(facets.containsKey("categorizedByTags"));
@@ -132,10 +133,11 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
   @Test
   public void mustHonorConditionalsInFacetPipelineStage2() {
     assertNotNull(artworkRepository, "Must have a repository");
-    List<Artwork> artworks = artworkRepository.findAll();
+    List<Artwork> artworks = artworkRepository.findAll().collectList().block();
     assertNotNull(artworks);
-    assertEquals(artworks.size(), expectedLength);
-    Map<String, Object> facets = artworkRepository.getFacetResultsWithConditional(true, true, false);
+    assertEquals(artworks.size(), expectedArtworkCount);
+    Map<String, Object> facets = artworkRepository.getFacetResultsWithConditional(true, true,
+                                                                                  false).block();
     assertNotNull(facets);
     assertEquals(facets.size(), 2);
     assertTrue(facets.containsKey("categorizedByTags"));
@@ -149,12 +151,12 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
   @Test
   public void mustDoOrAndOnConditionalsInFacetPipelineStage2() {
     assertNotNull(artworkRepository, "Must have a repository");
-    List<Artwork> artworks = artworkRepository.findAll();
+    List<Artwork> artworks = artworkRepository.findAll().collectList().block();
     assertNotNull(artworks);
-    assertEquals(artworks.size(),expectedLength);
+    assertEquals(artworks.size(), expectedArtworkCount);
 
     //When 2 conditions are false, should limit the results to 3
-    Map<String, Object> facets = artworkRepository.getFacetResultsOnMultipleConditionals(false, false);
+    Map<String, Object> facets = artworkRepository.getFacetResultsOnMultipleConditionals(false, false).block();
     assertNotNull(facets);
     Object limitPipeline = facets.get("limitPipeline");
     assertNotNull(limitPipeline);
@@ -163,7 +165,7 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
     assertEquals(limitPipelineList.size(), 3);
 
     //When 1 condition is false and the other is true, should limit the results to 2
-    facets = artworkRepository.getFacetResultsOnMultipleConditionals(false, true);
+    facets = artworkRepository.getFacetResultsOnMultipleConditionals(false, true).block();
     assertNotNull(facets);
     limitPipeline = facets.get("limitPipeline");
     assertNotNull(limitPipeline);
@@ -178,27 +180,33 @@ public class AggregateFacetTest extends AbstractTestNGSpringContextTests {
     String projectStr = "{'" + randomAlphabetic(5) + "':'" + randomAlphabetic(10) + "'}";
     String addFieldsStr = "{'" + randomAlphabetic(5) + "':'" + randomAlphabetic(10) + "'}";
 
+    //noinspection ReactiveStreamsUnusedPublisher
     artworkRepository.facetPipelineStageWithAtAtPh(10L, RandomUtils.nextLong(), projectStr);
-    complexQueryRepository.findMappingsByTypeAndVersion("1.2.3", ComplexQueryRepository.MappingType.BAR);
+
+    complexQueryRepository.findMappingsByTypeAndVersion("1.2.3", ReactiveComplexQueryRepository.MappingType.BAR);
 
     String matchStr = "{'" + randomAlphabetic(5) + "':'" + randomAlphabetic(10) + "'}";
     String colMatchStr = "{'" + randomAlphabetic(5) + "':'" + randomAlphabetic(10) + "'}";
     String sortStr = "{'" + randomAlphabetic(5) + "':1}";
 
+    //noinspection ReactiveStreamsUnusedPublisher
     complexQueryRepository.getPrefixesAggQuery(RandomUtils.nextLong(),
-                                          null,
-                                          addFieldsStr,
-                                          matchStr,
-                                          colMatchStr,
-                                          RandomUtils.nextInt(),
-                                          RandomUtils.nextInt(),
-                                          RandomUtils.nextInt(),
-                                          RandomUtils.nextInt(),
-                                          RandomUtils.nextInt(),
-                                          sortStr,
-                                          RandomUtils.nextInt(),
-                                          RandomUtils.nextInt(),
-                                          UUID.randomUUID().toString()
-                                          );
+                                               null,
+                                               addFieldsStr,
+                                               matchStr,
+                                               colMatchStr,
+                                               RandomUtils.nextInt(),
+                                               RandomUtils.nextInt(),
+                                               RandomUtils.nextInt(),
+                                               RandomUtils.nextInt(),
+                                               RandomUtils.nextInt(),
+                                               sortStr,
+                                               RandomUtils.nextInt(),
+                                               RandomUtils.nextInt(),
+                                               UUID.randomUUID().toString()
+                                              );
+
   }
+
+
 }

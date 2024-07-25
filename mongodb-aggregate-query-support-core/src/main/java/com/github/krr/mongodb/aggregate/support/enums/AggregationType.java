@@ -3,6 +3,7 @@ package com.github.krr.mongodb.aggregate.support.enums;
 import com.github.krr.mongodb.aggregate.support.annotations.*;
 import com.github.krr.mongodb.aggregate.support.api.BoundParameterValue;
 import com.mongodb.internal.VisibleForTesting;
+import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.annotation.Annotation;
@@ -21,7 +22,75 @@ import static com.github.krr.mongodb.aggregate.support.enums.AggregationType.QUO
  * 4/25/18.
  */
 
+@Getter
 public enum AggregationType implements BoundParameterValue {
+
+
+  // Use ADD_FIELDS instead
+  @Deprecated
+  ADDFIELDS("$addFields", AddFields.class) {
+    @Override
+    public String getValue(Object[] methodParameterValues, String query, BiFunction<Integer, Class<?>, String> valueProviderFn) {
+      return addFieldsGetValue(methodParameterValues, query, valueProviderFn);
+    }
+  },
+  ADD_FIELDS("$addFields", AddFields.class) {
+    @Override
+    public String getValue(Object[] methodParameterValues, String query, BiFunction<Integer, Class<?>, String> valueProviderFn) {
+      return addFieldsGetValue(methodParameterValues, query, valueProviderFn);
+    }
+  },
+
+  BUCKET("$bucket", Bucket.class),
+
+  // Use BUCKET_AUTO
+  @Deprecated
+  BUCKETAUTO("$bucketAuto", BucketAuto.class),
+  BUCKET_AUTO("$bucketAuto", BucketAuto.class),
+
+  COUNT("$count", Count.class),
+
+  FACET("$facet", Facet.class),
+
+  GROUP("$group", Group.class) {
+    @Override
+    public String getValue(Object[] methodParameterValues, String query,
+                           BiFunction<Integer, Class<?>, String> valueProviderFn) {
+      boolean containsPlaceholder = containsPlaceholder(query);
+      if (!containsPlaceholder) {
+        return query;
+      }
+      boolean containsAtAtPlaceholder = isAtAtPlaceholder(query);
+      int indexOfParameter;
+      if (containsAtAtPlaceholder) {
+        indexOfParameter = AggregationType.getParameterIndex(methodParameterValues, "@@", query);
+        Object value = methodParameterValues[indexOfParameter];
+        if (!(value instanceof String)) {
+          throw new IllegalArgumentException("@@ placeholder for $match stages must be bound to string values only. " +
+                                             "Placeholder @@ is bound to parameter at index " +
+                                             indexOfParameter + " which is of type " + value.getClass());
+        }
+        return valueProviderFn.apply(indexOfParameter, String.class);
+      }
+      return IMPLEMENTATION.getValue(methodParameterValues, query, valueProviderFn);
+    }
+  },
+
+  // Use GRAPH_LOOKUP
+  @Deprecated
+  GRAPHLOOKUP("$graphLookup", GraphLookup.class),
+  GRAPH_LOOKUP("$graphLookup", GraphLookup.class),
+
+  LIMIT("$limit", Limit.class) {
+    @Override
+    public String getValue(Object[] methodParameterValues, String query,
+                           BiFunction<Integer, Class<?>, String> valueCbFn) {
+      return getIntOrLongValueForQmarkPh(LIMIT, methodParameterValues, query, valueCbFn);
+    }
+  },
+
+  LOOKUP("$lookup", Lookup.class),
+
   MATCH("$match", Match.class) {
     @Override
     public String getValue(Object[] methodParameterValues, String query,
@@ -31,7 +100,7 @@ public enum AggregationType implements BoundParameterValue {
         return query;
       }
       // if a match stage contains a placeholder, it can be @@<index of parameter>, or ?<index of parameter>
-      boolean containsAtAtPlaceholder = query.matches("@@[0-9]+$");
+      boolean containsAtAtPlaceholder = isAtAtPlaceholder(query);
       int indexOfParameter;
       if (containsAtAtPlaceholder) {
         indexOfParameter = AggregationType.getParameterIndex(methodParameterValues, "@@", query);
@@ -53,80 +122,8 @@ public enum AggregationType implements BoundParameterValue {
       return IMPLEMENTATION.getValue(methodParameterValues, query, valueProviderFn);
     }
   },
-  GROUP("$group", Group.class),
-  UNWIND("$unwind", Unwind.class),
-  LOOKUP("$lookup", Lookup.class),
-  PROJECT("$project", Project.class),
-  LIMIT("$limit", Limit.class) {
-    @Override
-    public String getValue(Object[] methodParameterValues, String query,
-                           BiFunction<Integer, Class<?>, String> valueCbFn) {
-      boolean containsPlaceholder = containsPlaceholder(query);
-      if (!containsPlaceholder) {
-        return query;
-      }
-      boolean validPlaceholder = query.matches("\\?[0-9]+$");
-      if (!validPlaceholder) {
-        throw new IllegalArgumentException("$limit can only have ? placeholders with the index" +
-                                           " of the method parameter that provides the limit value.  Query " + query
-                                           + " does not match ?[0-9]+$.");
-      }
-      int indexOfParameter = AggregationType.getParameterIndex(methodParameterValues, "?", query);
-      Object value = methodParameterValues[indexOfParameter];
-      if (!(value instanceof Integer)) {
-        throw new IllegalArgumentException("Placeholder for $limit stages must be bound to integer values only. " +
-                                           "Placeholder + ? " + " is bound to parameter at index " +
-                                           indexOfParameter + " which is of type " + value.getClass());
-      }
-      return valueCbFn.apply(indexOfParameter, Integer.class);
-    }
-  },
-  BUCKET("$bucket", Bucket.class),
-  ADDFIELDS("$addFields", AddFields.class),
-  REPLACEROOT("$replaceRoot", ReplaceRoot.class),
-  SORT("$sort", Sort.class) {
-    @Override
-    public String getValue(Object[] methodParameterValues, String query,
-                           BiFunction<Integer, Class<?>, String> valueProviderFn) {
-      boolean containsPlaceholder = containsPlaceholder(query);
-      if (!containsPlaceholder) {
-        return query;
-      }
-      // if a sort stage contains a placeholder, it must only contain @@<index of parameter>
-      boolean onlyContainsAtAtPlaceholder = query.matches("@@[0-9]+$");
-      if (!onlyContainsAtAtPlaceholder) {
-        throw new IllegalArgumentException(
-            "$sort with @@ placeholders must only contain the placeholder with the index" +
-            " of the method parameter that provides the sort string.  Query " + query
-            + " does not match /@@[0-9]+$/.  Did you use embedded quotes ' or \"?");
-      }
-      int indexOfParameter = AggregationType.getParameterIndex(methodParameterValues, "@@", query);
-      Object value = methodParameterValues[indexOfParameter];
-      if (!(value instanceof String)) {
-        throw new IllegalArgumentException("Placeholder for $sort stages must be bound to string values only. " +
-                                           "Placeholder + @@ " + " is bound to parameter at index " +
-                                           indexOfParameter + " which is of type " + value.getClass());
-      }
 
-      // anything else returned as is and may fail during query execution if invalid.
-      return valueProviderFn.apply(indexOfParameter, String.class);
-    }
-
-    @Override
-    public boolean stringNeedsQuoting() {
-      return false;
-    }
-  },
-  SORTBYCOUNT("$sortByCount", SortByCount.class),
-  BUCKETAUTO("$bucketAuto", BucketAuto.class),
-  GRAPHLOOKUP("$graphLookup", GraphLookup.class),
-  FACET("$facet", Facet.class),
-  COUNT("$count", Count.class),
-  SKIP("$skip", Skip.class),
   OUT("$out", Out.class) {
-    private static final String OUT_PH_REGEX = "^(?<startQuote>[\\Q'|\"\\E]?)(?<placeholder>\\Q?\\E)(?<index>[0-9]+)(?<endQuote>[\\Q'|\"\\E]?)$";
-
-    private final Pattern PATTERN = Pattern.compile(OUT_PH_REGEX);
 
     @Override
     public String getValue(Object[] methodParameterValues, String query,
@@ -136,17 +133,18 @@ public enum AggregationType implements BoundParameterValue {
         return query;
       }
       Matcher matcher = PATTERN.matcher(query);
-      boolean validPlaceholder = matcher.matches();
-      if (!validPlaceholder) {
+      if(!matcher.matches()) {
         throw new IllegalArgumentException("$out can only have ? placeholders with the index" +
-                                           " of the method parameter that provides the limit value.  Query " + query
-                                           + " does not match ?[0-9]+$.");
+                                           " of the method parameter that provides the collection name.  Query " +
+                                           query + " does not match " + OUT_PH_REGEX);
       }
-      int indexOfParameter = Integer.parseInt(matcher.group("index"));
-      if (indexOfParameter >= methodParameterValues.length) {
-        throw new ArrayIndexOutOfBoundsException("Method has only " + methodParameterValues.length + " parameters " +
-                                                 "(0 based)but the placeholder requested parameter at index "
-                                                 + indexOfParameter + " at or near " + matcher.end("index"));
+      String indexStr = matcher.group("index");
+      int indexOfParameter;
+      try {
+        indexOfParameter = Integer.parseInt(indexStr);
+      }
+      catch (NumberFormatException e) {
+        throw new IllegalArgumentException("Index of placeholder " + query + " is not an integer", e);
       }
       Object value = methodParameterValues[indexOfParameter];
       if (!(value instanceof String)) {
@@ -158,7 +156,170 @@ public enum AggregationType implements BoundParameterValue {
       return String.format("\"%s\"", outCollectionName);
     }
   },
-  MERGE("$merge", Merge.class);
+
+  PROJECT("$project", Project.class) {
+    @Override
+    public String getValue(Object[] methodParameterValues, String query,
+                           BiFunction<Integer, Class<?>, String> valueProviderFn) {
+      boolean containsPlaceholder = containsPlaceholder(query);
+      if (!containsPlaceholder) {
+        return query;
+      }
+      // project can have either ? or @@ placeholders - find out which one this is
+      boolean containsAtAtPlaceholder = isAtAtPlaceholder(query);
+      if(containsAtAtPlaceholder) {
+        return AggregationType.getStringAtAtPlaceholders(PROJECT, methodParameterValues, query, valueProviderFn);
+      }
+      else {
+        return IMPLEMENTATION.getValue(methodParameterValues, query, valueProviderFn);
+      }
+    }
+  },
+  // use REPLACE_ROOT instead
+  @Deprecated
+  REPLACEROOT("$replaceRoot", ReplaceRoot.class),
+  REPLACE_ROOT("$replaceRoot", ReplaceRoot.class),
+
+  SORT("$sort", Sort.class) {
+    @Override
+    public String getValue(Object[] methodParameterValues, String query,
+                           BiFunction<Integer, Class<?>, String> valueProviderFn) {
+      boolean containsPlaceholder = containsPlaceholder(query);
+      if (!containsPlaceholder) {
+        return query;
+      }
+      // project can have either ? or @@ placeholders - find out which one this is
+      boolean containsAtAtPlaceholder = isAtAtPlaceholder(query);
+      if(containsAtAtPlaceholder) {
+        return AggregationType.getStringAtAtPlaceholders(PROJECT, methodParameterValues, query, valueProviderFn);
+      }
+      else {
+        return IMPLEMENTATION.getValue(methodParameterValues, query, valueProviderFn);
+      }
+    }
+
+    @Override
+    public boolean stringNeedsQuoting() {
+      return false;
+    }
+  },
+
+  SKIP("$skip", Skip.class) {
+
+    @Override
+    public String getValue(Object[] methodParameterValues, String query,
+                           BiFunction<Integer, Class<?>, String> valueProviderFn) {
+      return getIntOrLongValueForQmarkPh(SKIP, methodParameterValues, query, valueProviderFn);
+    }
+  },
+
+  // Use SORT_BY_COUNT instead
+  @Deprecated
+  SORTBYCOUNT("$sortByCount", SortByCount.class),
+  SORT_BY_COUNT("$sortByCount", SortByCount.class),
+
+  UNWIND("$unwind", Unwind.class),
+
+  MERGE("$merge", Merge.class)
+
+  ;
+
+  String addFieldsGetValue(Object[] methodParameterValues, String query, BiFunction<Integer, Class<?>, String> valueProviderFn) {
+    boolean containsPlaceholder = containsPlaceholder(query);
+    if (!containsPlaceholder) {
+      return query;
+    }
+    // if a match stage contains a placeholder, it can be @@<index of parameter>, or ?<index of parameter>
+    boolean containsAtAtPlaceholder = isAtAtPlaceholder(query);
+    int indexOfParameter;
+    if (containsAtAtPlaceholder) {
+      indexOfParameter = AggregationType.getParameterIndex(methodParameterValues, "@@", query);
+      Object value = methodParameterValues[indexOfParameter];
+      if (!(value instanceof String)) {
+        throw new IllegalArgumentException("@@ placeholder for $addFields stages must be bound to string values only. " +
+                                           "Placeholder @@ is bound to parameter at index " +
+                                           indexOfParameter + " which is of type " + value.getClass());
+      }
+      // anything else returned as is and may fail during query execution if invalid.
+      // an invalid match string will fail at query time.
+      return valueProviderFn.apply(indexOfParameter, String.class);
+    }
+    return IMPLEMENTATION.getValue(methodParameterValues, query, valueProviderFn);
+  }
+
+  private static boolean isAtAtPlaceholder(String query) {
+    return query.matches("@@[0-9]+$");
+  }
+
+  private static boolean isQmarkPh(String query) {
+    return query.matches("[\\Q'|\"\\E]?\\?[0-9]+[\\Q'|\"\\E]?$");
+  }
+
+  private static final String OUT_PH_REGEX = "^(?<startQuote>[\\Q'|\"\\E]?)(?<placeholder>\\Q?\\E)(?<index>[0-9]+)(?<endQuote>[\\Q'|\"\\E]?)$";
+
+  private static final Pattern PATTERN = Pattern.compile(OUT_PH_REGEX);
+
+  /**
+   * Processes an @@ placeholder type for aggregation stages that just provide the replacement as an entire
+   * String
+   * @param methodParameterValues - the argument list to the methods
+   * @param query - the query string
+   * @param valueProviderFn - the valueProviderFn that gives the actual value of the parameter
+   * @return - the string that replaces the placeholder.
+   */
+  private static String getStringAtAtPlaceholders(AggregationType aggType, Object[] methodParameterValues, String query,
+                                                      BiFunction<Integer, Class<?>, String> valueProviderFn) {
+    String type = aggType.getRepresentation();
+
+    // if the stage contains a placeholder, it must only contain @@<index of parameter>
+    boolean onlyContainsAtAtPlaceholder = isAtAtPlaceholder(query);
+    if (!onlyContainsAtAtPlaceholder) {
+      throw new IllegalArgumentException(type + " with @@ placeholders must only contain the placeholder with the index" +
+          " of the method parameter that provides the " + type + " string.  Query " + query
+          + " does not match /@@[0-9]+$/.  Did you use embedded quotes ' or \"?");
+    }
+    int indexOfParameter = AggregationType.getParameterIndex(methodParameterValues, "@@", query);
+    Object value = methodParameterValues[indexOfParameter];
+    if (!(value instanceof String)) {
+      throw new IllegalArgumentException("Placeholder for " + type + " stages must be bound to string values only. " +
+                                         "Placeholder + @@ " + " is bound to parameter at index " +
+                                         indexOfParameter + " which is of type " + value.getClass());
+    }
+
+    // anything else returned as is and may fail during query execution if invalid.
+    return valueProviderFn.apply(indexOfParameter, String.class);
+  }
+
+  @VisibleForTesting(otherwise = VisibleForTesting.AccessModifier.PRIVATE)
+  static String getIntOrLongValueForQmarkPh(AggregationType aggType, Object[] methodParameterValues, String query,
+                                            BiFunction<Integer, Class<?>, String> valueCbFn) {
+    String type = aggType.getRepresentation();
+    boolean containsPlaceholder = containsPlaceholder(query);
+    if (!containsPlaceholder) {
+      return query;
+    }
+    int indexOfParameter = getQmarkPhIndex(aggType, methodParameterValues, query);
+    Object value = methodParameterValues[indexOfParameter];
+    // aggregation types calling this method only take int or long values.  The returned value is always a string
+    // representation of the long/int value
+    if (!(value instanceof Integer || value instanceof Long)) {
+      throw new IllegalArgumentException("Placeholder for " + type + " stages must be bound to integer/long values only. " +
+                                         "Placeholder + ? " + " is bound to parameter at index " +
+                                         indexOfParameter + " which is of type " + value.getClass());
+    }
+    return valueCbFn.apply(indexOfParameter, value.getClass());
+  }
+
+  private static int getQmarkPhIndex(AggregationType type, Object[] methodParameterValues, String query) {
+    boolean isQmarkPh = isQmarkPh(query);
+    if (!isQmarkPh) {
+      throw new IllegalArgumentException(type.representation + " can only have ? placeholders with the index" +
+                                         " of the method parameter that provides the " + type + " value.  Query " +
+                                         query + " does not match ?[0-9]+$.");
+    }
+    // if the ph has '' or "" get it without them
+    return AggregationType.getParameterIndex(methodParameterValues, "?", query);
+  }
 
   /**
    * @param queryWithPlaceholders - the query string with placeholders
@@ -362,14 +523,6 @@ public enum AggregationType implements BoundParameterValue {
     throw new IllegalArgumentException("Unknown annotation type " + stageType.getName());
   }
 
-  public Class<? extends Annotation> getAnnotationClass() {
-    return annotationClass;
-  }
-
-  public String getRepresentation() {
-    return representation;
-  }
-
   static class BoundValueImpl implements BoundParameterValue {
     @SuppressWarnings({"unchecked", "ArraysAsListWithZeroOrOneArgument", "rawtypes"})
     @Override
@@ -434,7 +587,5 @@ public enum AggregationType implements BoundParameterValue {
       }
       return query;
     }
-
   }
-
 }

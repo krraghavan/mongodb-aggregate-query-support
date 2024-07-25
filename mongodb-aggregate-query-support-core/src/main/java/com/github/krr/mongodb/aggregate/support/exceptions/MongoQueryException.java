@@ -22,7 +22,7 @@ package com.github.krr.mongodb.aggregate.support.exceptions;
  * Created by rkolliva on 10/24/2015.
  * Used for query execution failures
  */
-public class MongoQueryException extends Exception {
+public class MongoQueryException extends RuntimeException {
 
   public MongoQueryException() {
   }

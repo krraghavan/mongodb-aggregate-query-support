@@ -42,7 +42,7 @@ public class AggregationTypeTest {
   }
 
   @Test(dataProvider = "questionMarkFixtures")
-  public void mustParseQuestionMarkPh(String query, AggregationType.QUOTE_TYPE quoteType) {
+  void mustParseQuestionMarkPh(String query, AggregationType.QUOTE_TYPE quoteType) {
     Matcher matcher = AggregationType.PLACEHOLDER_REGEX.matcher(query);
     boolean found = matcher.find();
     assertTrue(found);
@@ -51,7 +51,7 @@ public class AggregationTypeTest {
   }
 
   @Test(dataProvider = "atPhFixtures")
-  public void mustParseAtPh(String query, boolean valid, AggregationType.QUOTE_TYPE quoteType) {
+  void mustParseAtPh(String query, boolean valid, AggregationType.QUOTE_TYPE quoteType) {
     Matcher matcher = AggregationType.PLACEHOLDER_REGEX.matcher(query);
     boolean found = matcher.find();
     assertTrue(found);

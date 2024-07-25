@@ -22,7 +22,6 @@ import com.github.krr.mongodb.aggregate.support.annotations.Aggregate;
 import com.github.krr.mongodb.aggregate.support.api.MongoQueryExecutor;
 import com.github.krr.mongodb.aggregate.support.api.QueryProvider;
 import com.github.krr.mongodb.aggregate.support.exceptions.InvalidAggregationQueryException;
-import com.github.krr.mongodb.aggregate.support.exceptions.MongoQueryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -86,10 +85,6 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
     try {
       QueryProvider aggregateQueryProvider = createAggregateQueryProvider(mongoParameterAccessor, parameterAccessor);
       return queryExecutor.executeQuery(aggregateQueryProvider);
-    }
-    catch (MongoQueryException e) {
-      LOGGER.error("Error executing aggregate query", e);
-      throw new IllegalStateException(e);
     }
     catch (InvalidAggregationQueryException e) {
       LOGGER.error("Invalid aggregation query", e);
