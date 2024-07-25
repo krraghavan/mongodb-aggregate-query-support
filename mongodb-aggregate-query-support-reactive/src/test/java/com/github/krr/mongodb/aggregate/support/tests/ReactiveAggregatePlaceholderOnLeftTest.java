@@ -20,10 +20,9 @@
 package com.github.krr.mongodb.aggregate.support.tests;
 
 import com.github.krr.mongodb.aggregate.support.beans.Possessions;
-import com.github.krr.mongodb.aggregate.support.config.AggregateTestConfiguration;
+import com.github.krr.mongodb.aggregate.support.config.ReactiveAggregateTestConfiguration;
 import com.github.krr.mongodb.aggregate.support.exceptions.MongoQueryException;
-import com.github.krr.mongodb.aggregate.support.repository.PossessionsRepository;
-import com.github.krr.mongodb.aggregate.support.utils.FixtureUtils;
+import com.github.krr.mongodb.aggregate.support.repository.ReactivePossessionsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
@@ -32,50 +31,54 @@ import org.testng.annotations.Test;
 
 import java.util.List;
 
-import static org.testng.Assert.*;
+import static com.github.krr.mongodb.aggregate.support.utils.FixtureUtils.createPossessions;
+import static com.github.krr.mongodb.aggregate.support.utils.FixtureUtils.createPossessionsWithSortField;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Created by rkolliva
  * 3/1/17.
  */
 
-@SuppressWarnings({"SpringJavaAutowiredMembersInspection", "Duplicates"})
-@ContextConfiguration(classes = AggregateTestConfiguration.class)
-public class AggregatePlaceholderOnLeftTest extends AbstractTestNGSpringContextTests {
+@SuppressWarnings("SpringJavaAutowiredMembersInspection")
+@ContextConfiguration(classes = ReactiveAggregateTestConfiguration.class)
+public class ReactiveAggregatePlaceholderOnLeftTest extends AbstractTestNGSpringContextTests {
 
   @Autowired
-  private PossessionsRepository possessionsRepository;
+  private ReactivePossessionsRepository possessionsRepository;
 
   @Test
   public void mustReplacePlaceholderOnLeftForAggregateQuery() {
     String tag = "mustReplacePlaceholderOnLeftForAggregateQuery";
-    Possessions expectedPossessions = FixtureUtils.createPossessions(true, false, tag);
-    possessionsRepository.save(expectedPossessions);
+    Possessions expectedPossessions = createPossessions(true, false, tag);
+    possessionsRepository.save(expectedPossessions).block();
     boolean hasCars = possessionsRepository.hasCars(tag);
     assertTrue(hasCars);
   }
 
   @Test(dataProvider = "possessionsProvider")
   public void mustReturnCarsFromAggregateQuery(String tag, boolean cars, boolean homes) {
-    Possessions expectedPossessions = FixtureUtils.createPossessions(cars, homes, tag);
-    possessionsRepository.save(expectedPossessions);
+    Possessions expectedPossessions = createPossessions(cars, homes, tag);
+    possessionsRepository.save(expectedPossessions).block();
 
-    List<Possessions> possessions = possessionsRepository.getPossessions(tag);
+    List<Possessions> possessions = possessionsRepository.getPossessions(tag).collectList().block();
     assertNotNull(possessions);
-    assertEquals(possessions.size(), 1);
+    assertTrue(possessions.size() == 1);
     Possessions possession = possessions.get(0);
-    assertEquals(expectedPossessions.getId(), possession.getId());
+    assertTrue(possession.getId().equals(expectedPossessions.getId()));
   }
 
   @Test
   public void mustReplaceSortParameterWithPlaceholder() {
     String tag = "mustReplaceSortParameterWithPlaceholder";
-    List<Possessions> possessionss = FixtureUtils.createPossessionsWithSortField(tag);
-    possessionsRepository.saveAll(possessionss);
+    List<Possessions> possessionss = createPossessionsWithSortField(tag);
+    possessionsRepository.saveAll(possessionss).collectList().block();
     String sortString = "{sortTestNumber:-1}";
-    List<Possessions> possessions = possessionsRepository.getPossesionsSortedByTag(tag, sortString);
+    List<Possessions> possessions = possessionsRepository.getPossesionsSortedByTag(tag, sortString).collectList()
+                                                         .block();
     assertNotNull(possessions);
-    assertEquals(possessionss.size(), possessions.size());
+    assertTrue(possessions.size() == possessionss.size());
     // verify that Possessions are in descending order.
     final long[] lastNumber = {999999};
     possessions.forEach(i -> {
@@ -84,20 +87,13 @@ public class AggregatePlaceholderOnLeftTest extends AbstractTestNGSpringContextT
       lastNumber[0] = sortTestNumber;
     });
   }
-
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void mustThrowExceptionIfAtAtParameterIsOutOfBounds() {
-    possessionsRepository.getPossessionsInvalidSortParameter("xxx", "xxx");
-  }
-
-  @Test(expectedExceptions = IllegalArgumentException.class)
-  public void mustThrowExceptionIfAtAtParameterIsNotAString() {
-    possessionsRepository.getPossessionsInvalidSortParameter("xxx", 123);
-  }
-
   @Test(expectedExceptions = MongoQueryException.class)
-  public void mustThrowExceptionIfAtAtParameterIsQuoted() {
-    possessionsRepository.getPossessionsInvalidSortParameterWithQuotes("xxx", 123);
+  public void mustThrowExceptionIfSortParameterPlaceholderHasQuotes() {
+    String tag = "mustReplaceSortParameterWithPlaceholder";
+    List<Possessions> possessionss = createPossessionsWithSortField(tag);
+    possessionsRepository.saveAll(possessionss).collectList().block();
+    String sortString = "{sortTestNumber:-1}";
+    possessionsRepository.getPossesionsSortedByTagInvalidSortPlaceholder(tag, sortString).collectList().block();
   }
 
   @DataProvider

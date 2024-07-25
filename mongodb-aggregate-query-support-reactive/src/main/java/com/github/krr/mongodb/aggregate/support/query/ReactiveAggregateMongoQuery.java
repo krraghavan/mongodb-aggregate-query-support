@@ -21,7 +21,6 @@ package com.github.krr.mongodb.aggregate.support.query;
 import com.github.krr.mongodb.aggregate.support.annotations.Aggregate;
 import com.github.krr.mongodb.aggregate.support.api.ReactiveMongoQueryExecutor;
 import com.github.krr.mongodb.aggregate.support.exceptions.InvalidAggregationQueryException;
-import com.github.krr.mongodb.aggregate.support.exceptions.MongoQueryException;
 import org.reactivestreams.Publisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,10 +88,6 @@ public class ReactiveAggregateMongoQuery extends AbstractReactiveMongoQuery {
       AbstractAggregateQueryProvider aggregateQueryProvider = createAggregateQueryProvider(mongoParameterAccessor,
                                                                                            parameterAccessor);
       return (Publisher<Object>) queryExecutor.executeQuery(aggregateQueryProvider);
-    }
-    catch (MongoQueryException e) {
-      LOGGER.error("Error executing aggregate query", e);
-      throw new IllegalStateException(e);
     }
     catch (InvalidAggregationQueryException e) {
       LOGGER.error("Invalid aggregation query", e);

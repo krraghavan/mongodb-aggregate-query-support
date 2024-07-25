@@ -19,7 +19,7 @@
 package com.github.krr.mongodb.aggregate.support.config;
 
 import com.github.krr.mongodb.aggregate.support.factory.ReactiveAggregateQuerySupportingRepositoryFactoryBean;
-import com.github.krr.mongodb.aggregate.support.repository.reactive.ReactiveTestAggregateRepositoryMarker;
+import com.github.krr.mongodb.aggregate.support.repository.ReactiveTestAggregateRepositoryMarker;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.repository.config.EnableReactiveMongoRepositories;
 

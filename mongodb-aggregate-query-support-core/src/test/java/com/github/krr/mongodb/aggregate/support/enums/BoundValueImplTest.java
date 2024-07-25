@@ -1,13 +1,26 @@
 package com.github.krr.mongodb.aggregate.support.enums;
 
+import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.RandomUtils;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import java.util.function.BiFunction;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNull;
 
 public class BoundValueImplTest {
+
+  @DataProvider
+  public static Object[][] invalidNumericOnlyPhFixtures() {
+    Object[] args = {randomAlphabetic(5), RandomStringUtils.randomAlphabetic(10)};
+    return new Object[][]{
+      new Object[]{AggregationType.LIMIT, args},
+      new Object[]{AggregationType.SKIP, args},
+    };
+  }
 
   @DataProvider
   private Object[][] queryFixtures() {
@@ -175,6 +188,24 @@ public class BoundValueImplTest {
     assertEquals(query, expectedQuery);
   }
 
+  // Resolves: https://github.com/krraghavan/mongodb-aggregate-query-support/issues/51
+  @Test
+  public void mustProcessValidAtAtParameterForProject() {
+    String expectedQuery = "{'" + randomAlphabetic(5) + "':'" + randomAlphabetic(10) + "'}";
+    Object[] args = {randomAlphabetic(5), expectedQuery};
+    String query = AggregationType.PROJECT.getValue(args, "@@1", (index, valueClass) -> (String) args[index]);
+    assertEquals(query, expectedQuery);
+  }
+
+  // Resolves: https://github.com/krraghavan/mongodb-aggregate-query-support/issues/51
+  @Test
+  public void mustProcessValidAtAtParameterForGroup() {
+    String expectedQuery = "{'" + randomAlphabetic(5) + "':'" + randomAlphabetic(10) + "'}";
+    Object[] args = {randomAlphabetic(5), expectedQuery};
+    String query = AggregationType.GROUP.getValue(args, "@@1", (index, valueClass) -> (String) args[index]);
+    assertEquals(query, expectedQuery);
+  }
+
   @Test
   public void mustProcessValidAtAtParameterForEmptyMatch() {
     String expectedQuery = "{   }";
@@ -183,4 +214,34 @@ public class BoundValueImplTest {
     assertNull(query);
   }
 
+  @DataProvider
+  public static Object[][] numericOnlyPhFixtures() {
+    int integer = RandomUtils.nextInt();
+    long longValue = RandomUtils.nextLong();
+    String longStr = String.valueOf(longValue);
+    String intStr = String.valueOf(integer);
+    return new Object[][]{
+        new Object[]{AggregationType.LIMIT, new Object[]{longValue}, longStr,
+                     (BiFunction<Integer, Class<?>, String>) (v, c) -> longStr},
+        new Object[]{AggregationType.LIMIT, new Object[]{integer}, intStr,
+                     (BiFunction<Integer, Class<?>, String>) (v, c) -> intStr},
+        new Object[]{AggregationType.SKIP, new Object[]{integer}, longStr,
+                     (BiFunction<Integer, Class<?>, String>) (v, c) -> longStr},
+        new Object[]{AggregationType.SKIP, new Object[]{integer}, intStr,
+                     (BiFunction<Integer, Class<?>, String>) (v, c) -> intStr},
+    };
+  }
+
+
+  @Test(dataProvider = "numericOnlyPhFixtures")
+  public void mustProcessNumericOnlyPhValues(AggregationType aggregationType, Object [] args, String expectedResult,
+                                             BiFunction<Integer, Class<?>, String> cbFn) {
+    String query = AggregationType.getIntOrLongValueForQmarkPh(aggregationType, args, expectedResult, cbFn);
+    assertEquals(query, expectedResult);
+  }
+
+  @Test(dataProvider = "invalidNumericOnlyPhFixtures", expectedExceptions = IllegalArgumentException.class)
+  public void mustNotProcessNonNumericValuesOnNumericOnlyPhValues(AggregationType aggregationType, Object [] args) {
+    String query = aggregationType.getValue(args, "?0", (index, valueClass) -> (String) args[index]);
+  }
 }
