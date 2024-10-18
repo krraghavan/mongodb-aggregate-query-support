@@ -46,7 +46,7 @@
     <!-- Mongo and Spring versions -->
     <mongodb.driver.version>4.11.1</mongodb.driver.version>
     <spring-data-version>3.2.3</spring-data-version>
-    <spring-version>6.1.4</spring-version>
+    <spring-version>6.1.14</spring-version>
     <spring-data-mongodb-version>4.2.3</spring-data-mongodb-version>
     <mongo-reactive-java-driver.version>4.11.1</mongo-reactive-java-driver.version>
 
