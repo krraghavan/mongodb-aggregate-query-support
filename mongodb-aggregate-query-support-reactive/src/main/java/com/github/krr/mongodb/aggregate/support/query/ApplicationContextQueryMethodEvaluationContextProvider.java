@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.repository.query.Parameters;
 import org.springframework.data.repository.query.ReactiveExtensionAwareQueryMethodEvaluationContextProvider;
 import org.springframework.data.repository.query.ReactiveQueryMethodEvaluationContextProvider;
+import org.springframework.data.spel.EvaluationContextProvider;
 import org.springframework.data.spel.ExpressionDependencies;
 import org.springframework.expression.EvaluationContext;
 import reactor.core.publisher.Mono;
@@ -26,6 +27,11 @@ public class ApplicationContextQueryMethodEvaluationContextProvider implements R
                                                                              Object[] parameterValues,
                                                                              ExpressionDependencies dependencies) {
     return this.delegate.getEvaluationContext(parameters, parameterValues, dependencies);
+  }
+
+  @Override
+  public EvaluationContextProvider getEvaluationContextProvider() {
+    return this.delegate.getEvaluationContextProvider();
   }
 
   @Override

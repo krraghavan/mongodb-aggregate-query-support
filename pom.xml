@@ -36,19 +36,19 @@
   </modules>
 
   <properties>
-    <commons-lang3.version>3.8.1</commons-lang3.version>
+    <commons-lang3.version>3.16.0</commons-lang3.version>
     <commons-collections.version>4.4</commons-collections.version>
     <guava.version>33.0.0-jre</guava.version>
-    <jackson.version>2.15.3</jackson.version>
+    <jackson.version>2.17.2</jackson.version>
     <lombok.version>1.18.30</lombok.version>
     <maqs.version>${project.version}</maqs.version>
 
     <!-- Mongo and Spring versions -->
-    <mongodb.driver.version>4.11.1</mongodb.driver.version>
-    <spring-data-version>3.2.3</spring-data-version>
-    <spring-version>6.1.4</spring-version>
-    <spring-data-mongodb-version>4.2.3</spring-data-mongodb-version>
-    <mongo-reactive-java-driver.version>4.11.1</mongo-reactive-java-driver.version>
+    <mongodb.driver.version>5.2.1</mongodb.driver.version>
+    <spring-data-version>3.4.1</spring-data-version>
+    <spring-version>6.2.2</spring-version>
+    <spring-data-mongodb-version>4.4.0</spring-data-mongodb-version>
+    <mongo-reactive-java-driver.version>5.2.1</mongo-reactive-java-driver.version>
 
     <!-- Reactive Support -->
     <reactive-streams.version>1.0.4</reactive-streams.version>
@@ -59,7 +59,7 @@
     <mongo7.version>7.0.4</mongo7.version>
     <testng.version>7.7.0</testng.version>
 
-    <commons-compress.version>1.26.2</commons-compress.version>
+    <commons-compress.version>1.27.0</commons-compress.version>
   </properties>
 
   <name>Mongo DB Aggregation Query Support</name>

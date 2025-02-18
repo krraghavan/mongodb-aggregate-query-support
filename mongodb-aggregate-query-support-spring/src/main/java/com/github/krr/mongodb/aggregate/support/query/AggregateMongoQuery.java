@@ -25,13 +25,14 @@ import com.github.krr.mongodb.aggregate.support.exceptions.InvalidAggregationQue
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.expression.ValueExpressionParser;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.query.*;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
-import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
-import org.springframework.expression.ExpressionParser;
+import org.springframework.data.repository.query.QueryMethodValueEvaluationContextAccessor;
+import org.springframework.data.repository.query.ValueExpressionDelegate;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
@@ -48,11 +49,6 @@ import java.lang.reflect.Method;
 public class AggregateMongoQuery extends AbstractMongoQuery {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AggregateMongoQuery.class);
-
-  private static final QueryMethodEvaluationContextProvider evaluationContextProvider =
-      new ApplicationContextQueryMethodEvaluationContextProvider();
-
-  private static final ExpressionParser expressionParser = new SpelExpressionParser();
 
   private final MongoOperations mongoOperations;
 
@@ -71,7 +67,8 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
                              ProjectionFactory projectionFactory, MongoQueryExecutor queryExecutor) {
     super(new MongoQueryMethod(method, metadata, projectionFactory,
                                mongoOperations.getConverter().getMappingContext()),
-          mongoOperations, expressionParser, evaluationContextProvider);
+          mongoOperations, new ValueExpressionDelegate(
+                  QueryMethodValueEvaluationContextAccessor.create(), ValueExpressionParser.create()));
     this.mongoOperations = mongoOperations;
     this.method = method;
     this.queryExecutor = queryExecutor;
