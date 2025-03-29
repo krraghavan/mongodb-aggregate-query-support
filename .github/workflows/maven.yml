@@ -28,7 +28,7 @@ jobs:
         distribution: 'temurin'
         cache: maven
     - name: Build with Maven
-      run: mvn -B clean package -T4 -Dde.flapdoodle.mongodb.embedded.downloadProxyHost=DIRECT -Dde.flapdoodle.mongodb.embedded.downloadProxyPort=80 -Dde.flapdoodle.mongodb.embedded.downloadTimeout=600000 -X --file pom.xml
+      run: mvn -B clean package -T4 -Dde.flapdoodle.mongodb.embedded.downloadProxyHost=DIRECT -Dde.flapdoodle.mongodb.embedded.downloadProxyPort=80 -Dde.flapdoodle.mongodb.embedded.downloadTimeout=600000 -Dde.flapdoodle.embed.mongo.log.level=DEBUG --file pom.xml
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
