@@ -44,13 +44,13 @@
     <maqs.version>${project.version}</maqs.version>
 
     <!-- Mongo and Spring versions -->
-    <mongodb.driver.version>4.11.1</mongodb.driver.version>
-    <spring-data-version>3.2.3</spring-data-version>
-    <spring-version>6.1.4</spring-version>
-    <spring-data-mongodb-version>4.2.3</spring-data-mongodb-version>
-    <mongo-reactive-java-driver.version>4.11.1</mongo-reactive-java-driver.version>
+    <mongodb.driver.version>5.2.1</mongodb.driver.version>
+    <spring-data-version>3.4.1</spring-data-version>
+    <spring-data-mongodb-version>4.4.0</spring-data-mongodb-version>
+    <spring-version>6.2.2</spring-version>
 
     <!-- Reactive Support -->
+    <mongodb-reactive-driver.version>5.2.1</mongodb-reactive-driver.version>
     <reactive-streams.version>1.0.4</reactive-streams.version>
     <reactor-core.version>3.6.1</reactor-core.version>
 
@@ -114,7 +114,7 @@
       <dependency>
         <groupId>org.mongodb</groupId>
         <artifactId>mongodb-driver-reactivestreams</artifactId>
-        <version>${mongo-reactive-java-driver.version}</version>
+        <version>${mongodb-reactive-driver.version}</version>
       </dependency>
 
       <!-- Core Mongo Libraries -->

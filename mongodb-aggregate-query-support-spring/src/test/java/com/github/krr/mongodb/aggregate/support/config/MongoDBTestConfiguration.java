@@ -19,13 +19,14 @@
 package com.github.krr.mongodb.aggregate.support.config;
 
 import com.github.krr.mongodb.aggregate.support.api.MongoQueryExecutor;
-import com.github.krr.mongodb.aggregate.support.query.ApplicationContextQueryMethodEvaluationContextProvider;
 import com.github.krr.mongodb.aggregate.support.query.MongoNativeJavaDriverQueryExecutor;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.ServerAddress;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,10 +40,6 @@ import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
 import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
 import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
-import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by rkolliva
@@ -74,11 +71,6 @@ public class MongoDBTestConfiguration {
   @Bean
   public DbRefResolver dbRefResolver(MongoDatabaseFactory mongoDbFactory) {
     return new DefaultDbRefResolver(mongoDbFactory);
-  }
-
-  @Bean
-  public QueryMethodEvaluationContextProvider evaluationContextProvider() {
-    return new ApplicationContextQueryMethodEvaluationContextProvider();
   }
 
   @Bean

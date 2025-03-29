@@ -8,6 +8,11 @@ The @Query annotation provided by Spring Data MongoDb allows queries to be execu
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
 
+## New in 0.9.5 version (DO NOT USE IF USING SPRING DATA Mongo < 4.4)
+1. Update to support Spring Data Mongo 4.4 and Mongo Drive 5.2.1. There have been a number of changes made in Spring Data 
+in this version of Spring Data and therefore 0.9.5 will *not* work with earlier versions of Spring Data.
+
+
 ## New in 0.9.4 version
 1. [Bug 50](https://github.com/krraghavan/mongodb-aggregate-query-support/issues/50): Added ```@@``` support for ```@Project``` and ```@Group``` stages
 1. [Bug 51](https://github.com/krraghavan/mongodb-aggregate-query-support/issues/51): Facets with ```@@@``` annotations in ```@Project``` do not parse correctly

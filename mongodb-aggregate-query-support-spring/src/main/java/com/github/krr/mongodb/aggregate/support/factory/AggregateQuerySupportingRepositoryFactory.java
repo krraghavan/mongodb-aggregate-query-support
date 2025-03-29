@@ -23,48 +23,60 @@ package com.github.krr.mongodb.aggregate.support.factory;
 import com.github.krr.mongodb.aggregate.support.annotations.Aggregate;
 import com.github.krr.mongodb.aggregate.support.api.MongoQueryExecutor;
 import com.github.krr.mongodb.aggregate.support.query.AggregateMongoQuery;
+import java.lang.reflect.Method;
+import java.util.Optional;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.MongoRepositoryFactory;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.NamedQueries;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.query.QueryLookupStrategy;
-import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
+import org.springframework.data.repository.query.QueryLookupStrategy.Key;
 import org.springframework.data.repository.query.RepositoryQuery;
-import org.springframework.lang.Nullable;
-
-import java.lang.reflect.Method;
-import java.util.Optional;
+import org.springframework.data.repository.query.ValueExpressionDelegate;
+import org.springframework.lang.NonNull;
+import org.springframework.util.Assert;
 
 /**
- * Created by rkolliva
- * 10/10/2015.
+ * Created by rkolliva 10/10/2015.
  */
 public class AggregateQuerySupportingRepositoryFactory extends MongoRepositoryFactory {
 
   private final MongoOperations mongoOperations;
 
   private final MongoQueryExecutor queryExecutor;
+  private final ApplicationContext applicationContext;
+  private final Environment environment;
 
   /**
    * Creates a new {@link MongoRepositoryFactory} with the given {@link MongoOperations}.
    *
-   * @param mongoOperations must not be {@literal null}
-   * @param queryExecutor - the query executor
+   * @param mongoOperations    must not be {@literal null}
+   * @param queryExecutor      - the query executor
+   * @param applicationContext - the application context
    */
-  public AggregateQuerySupportingRepositoryFactory(MongoOperations mongoOperations, MongoQueryExecutor queryExecutor) {
+  public AggregateQuerySupportingRepositoryFactory(MongoOperations mongoOperations,
+      MongoQueryExecutor queryExecutor,
+      ApplicationContext applicationContext,
+      Environment environment) {
     super(mongoOperations);
     this.mongoOperations = mongoOperations;
     this.queryExecutor = queryExecutor;
+    this.applicationContext = applicationContext;
+    this.environment = environment;
   }
 
   @Override
-  public Optional<QueryLookupStrategy> getQueryLookupStrategy(@Nullable QueryLookupStrategy.Key key,
-                                                              QueryMethodEvaluationContextProvider evaluationContextProvider) {
+  public @NonNull Optional<QueryLookupStrategy> getQueryLookupStrategy(Key key,
+      @NonNull ValueExpressionDelegate valueExpressionDelegate) {
+    Optional<QueryLookupStrategy> parentLookupStrategy = super.getQueryLookupStrategy(key,
+        valueExpressionDelegate);
+    Assert.isTrue(parentLookupStrategy.isPresent(),
+        "Expecting parent query lookup strategy to be present");
 
-    Optional<QueryLookupStrategy> parentQueryLookupStrategy = super.getQueryLookupStrategy(key, evaluationContextProvider);
-    return Optional.of(new AggregateQueryLookupStrategy(parentQueryLookupStrategy
-                       .orElseThrow(() -> new IllegalArgumentException("No parent query lookup strategy"))));
+    return Optional.of(new AggregateQueryLookupStrategy(parentLookupStrategy.get()));
   }
 
   private boolean isAggregateQueryAnnotated(Method method) {
@@ -82,12 +94,13 @@ public class AggregateQuerySupportingRepositoryFactory extends MongoRepositoryFa
 
     @Override
     public RepositoryQuery resolveQuery(Method method, RepositoryMetadata repositoryMetadata,
-                                        ProjectionFactory projectionFactory, NamedQueries namedQueries) {
+        ProjectionFactory projectionFactory, NamedQueries namedQueries) {
       if (!isAggregateQueryAnnotated(method)) {
-        return parentQueryLookupStrategy.resolveQuery(method, repositoryMetadata, projectionFactory, namedQueries);
-      }
-      else {
-        return new AggregateMongoQuery(method, repositoryMetadata, mongoOperations, projectionFactory, queryExecutor);
+        return parentQueryLookupStrategy.resolveQuery(method, repositoryMetadata, projectionFactory,
+            namedQueries);
+      } else {
+        return new AggregateMongoQuery(method, repositoryMetadata, mongoOperations,
+            projectionFactory, queryExecutor, applicationContext, environment);
       }
     }
   }

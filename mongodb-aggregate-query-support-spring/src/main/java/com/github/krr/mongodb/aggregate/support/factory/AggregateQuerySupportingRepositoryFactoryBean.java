@@ -21,36 +21,51 @@ package com.github.krr.mongodb.aggregate.support.factory;
 
 
 import com.github.krr.mongodb.aggregate.support.api.MongoQueryExecutor;
+import java.io.Serializable;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.MongoRepositoryFactoryBean;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.io.Serializable;
-
 /**
- * Created by rkolliva
- * 9/7/16.
+ * Created by rkolliva 9/7/16.
  */
 @Component
-public class AggregateQuerySupportingRepositoryFactoryBean<T extends Repository<S, ID>, S, ID extends Serializable>
-    extends MongoRepositoryFactoryBean<T, S, ID> {
+public class AggregateQuerySupportingRepositoryFactoryBean<T extends Repository<S, ID>, S,
+    ID extends Serializable>
+    extends MongoRepositoryFactoryBean<T, S, ID> implements ApplicationContextAware {
 
   private final MongoQueryExecutor queryExecutor;
+  private final Environment environment;
+  private ApplicationContext applicationContext;
 
   @Autowired
   public AggregateQuerySupportingRepositoryFactoryBean(Class<? extends T> repositoryInterface,
-                                                       MongoQueryExecutor queryExecutor) {
+      MongoQueryExecutor queryExecutor,
+      Environment environment) {
     super(repositoryInterface);
     this.queryExecutor = queryExecutor;
+    this.environment = environment;
   }
 
   @Override
-  protected RepositoryFactorySupport getFactoryInstance(MongoOperations operations) {
+  protected @NonNull RepositoryFactorySupport getFactoryInstance(
+      @NonNull MongoOperations operations) {
     Assert.notNull(queryExecutor, "Expecting queryExecutor to not be null");
-    return new AggregateQuerySupportingRepositoryFactory(operations, queryExecutor);
+    return new AggregateQuerySupportingRepositoryFactory(operations, queryExecutor,
+        applicationContext, environment);
+  }
+
+  @Override
+  public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
+    this.applicationContext = applicationContext;
   }
 }

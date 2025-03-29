@@ -22,37 +22,38 @@ import com.github.krr.mongodb.aggregate.support.annotations.Aggregate;
 import com.github.krr.mongodb.aggregate.support.api.MongoQueryExecutor;
 import com.github.krr.mongodb.aggregate.support.api.QueryProvider;
 import com.github.krr.mongodb.aggregate.support.exceptions.InvalidAggregationQueryException;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
+import org.springframework.data.expression.ValueExpressionParser;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.repository.query.*;
+import org.springframework.data.mongodb.repository.query.AbstractMongoQuery;
+import org.springframework.data.mongodb.repository.query.ConvertingParameterAccessor;
+import org.springframework.data.mongodb.repository.query.MongoParameterAccessor;
+import org.springframework.data.mongodb.repository.query.MongoParametersParameterAccessor;
+import org.springframework.data.mongodb.repository.query.MongoQueryMethod;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
-import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.data.repository.query.QueryMethodValueEvaluationContextAccessor;
+import org.springframework.data.repository.query.ValueExpressionDelegate;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-
 /**
- * Created by rkolliva
- * 10/10/2015.
+ * Created by rkolliva 10/10/2015.
  */
 @Component
 public class AggregateMongoQuery extends AbstractMongoQuery {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(AggregateMongoQuery.class);
 
-  private static final QueryMethodEvaluationContextProvider evaluationContextProvider =
-      new ApplicationContextQueryMethodEvaluationContextProvider();
-
-  private static final ExpressionParser expressionParser = new SpelExpressionParser();
+  private static final ValueExpressionParser expressionParser = ValueExpressionParser.create();
 
   private final MongoOperations mongoOperations;
 
@@ -61,32 +62,44 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
   private final MongoQueryExecutor queryExecutor;
 
   /**
-   * Creates a new {@link AbstractMongoQuery} from the given {@link MongoQueryMethod} and {@link MongoOperations}.
+   * Creates a new {@link AbstractMongoQuery} from the given {@link MongoQueryMethod} and
+   * {@link MongoOperations}.
    *
-   * @param method must not be {@literal null}.
-   * @param projectionFactory - the projection factory
+   * @param method             must not be {@literal null}.
+   * @param projectionFactory  - the projection factory
+   * @param applicationContext - the Spring application context
    */
   @Autowired
-  public AggregateMongoQuery(Method method, RepositoryMetadata metadata, MongoOperations mongoOperations,
-                             ProjectionFactory projectionFactory, MongoQueryExecutor queryExecutor) {
+  public AggregateMongoQuery(Method method,
+      RepositoryMetadata metadata,
+      MongoOperations mongoOperations,
+      ProjectionFactory projectionFactory,
+      MongoQueryExecutor queryExecutor,
+      ApplicationContext applicationContext,
+      Environment environment) {
     super(new MongoQueryMethod(method, metadata, projectionFactory,
-                               mongoOperations.getConverter().getMappingContext()),
-          mongoOperations, expressionParser, evaluationContextProvider);
+            mongoOperations.getConverter().getMappingContext()),
+        mongoOperations,
+        new ValueExpressionDelegate(
+            new QueryMethodValueEvaluationContextAccessor(environment,
+                applicationContext), expressionParser));
     this.mongoOperations = mongoOperations;
     this.method = method;
     this.queryExecutor = queryExecutor;
   }
 
   @Override
-  public Object execute(@NonNull Object[] parameters) {
-    MongoParameterAccessor mongoParameterAccessor = new MongoParametersParameterAccessor(getQueryMethod(), parameters);
-    ConvertingParameterAccessor parameterAccessor = new ConvertingParameterAccessor(mongoOperations.getConverter(),
-                                                                                    mongoParameterAccessor);
+  public @NonNull Object execute(@NonNull Object[] parameters) {
+    MongoParameterAccessor mongoParameterAccessor = new MongoParametersParameterAccessor(
+        getQueryMethod(), parameters);
+    ConvertingParameterAccessor parameterAccessor = new ConvertingParameterAccessor(
+        mongoOperations.getConverter(),
+        mongoParameterAccessor);
     try {
-      QueryProvider aggregateQueryProvider = createAggregateQueryProvider(mongoParameterAccessor, parameterAccessor);
+      QueryProvider aggregateQueryProvider = createAggregateQueryProvider(mongoParameterAccessor,
+          parameterAccessor);
       return queryExecutor.executeQuery(aggregateQueryProvider);
-    }
-    catch (InvalidAggregationQueryException e) {
+    } catch (InvalidAggregationQueryException e) {
       LOGGER.error("Invalid aggregation query", e);
       throw new IllegalArgumentException(e);
     }
@@ -100,8 +113,9 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
    * @return - the query provider
    * @throws InvalidAggregationQueryException - if there was an error creating the query provider
    */
-  private AbstractAggregateQueryProvider createAggregateQueryProvider(MongoParameterAccessor mongoParameterAccessor,
-                                                                      ConvertingParameterAccessor parameterAccessor)
+  private AbstractAggregateQueryProvider createAggregateQueryProvider(
+      MongoParameterAccessor mongoParameterAccessor,
+      ConvertingParameterAccessor parameterAccessor)
       throws InvalidAggregationQueryException {
 
     Annotation annotation = method.getAnnotation(Aggregate.class);
@@ -110,7 +124,8 @@ public class AggregateMongoQuery extends AbstractMongoQuery {
   }
 
   @Override
-  @NonNull protected Query createQuery(@NonNull ConvertingParameterAccessor accessor) {
+  @NonNull
+  protected Query createQuery(@NonNull ConvertingParameterAccessor accessor) {
     throw new UnsupportedOperationException("AggregateMongoQuery does not support createQuery");
   }
 
