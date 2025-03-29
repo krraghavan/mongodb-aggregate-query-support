@@ -23,6 +23,10 @@ package com.github.krr.mongodb.aggregate.support.factory;
 import com.github.krr.mongodb.aggregate.support.annotations.Aggregate;
 import com.github.krr.mongodb.aggregate.support.api.ReactiveMongoQueryExecutor;
 import com.github.krr.mongodb.aggregate.support.query.ReactiveAggregateMongoQuery;
+import java.lang.reflect.Method;
+import java.util.Optional;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.repository.support.MongoRepositoryFactory;
@@ -31,43 +35,49 @@ import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.repository.core.NamedQueries;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.query.QueryLookupStrategy;
-import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
 import org.springframework.data.repository.query.RepositoryQuery;
+import org.springframework.data.repository.query.ValueExpressionDelegate;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 
-import java.lang.reflect.Method;
-import java.util.Optional;
-
 /**
- * Created by rkolliva
- * 10/10/2015.
+ * Created by rkolliva 10/10/2015.
  */
 @SuppressWarnings("NullableProblems")
-public class ReactiveAggregateQuerySupportingRepositoryFactory extends ReactiveMongoRepositoryFactory {
+public class ReactiveAggregateQuerySupportingRepositoryFactory extends
+    ReactiveMongoRepositoryFactory {
 
   private final ReactiveMongoOperations mongoOperations;
 
   private final ReactiveMongoQueryExecutor queryExecutor;
+  private final ApplicationContext applicationContext;
+  private final Environment environment;
 
   /**
    * Creates a new {@link MongoRepositoryFactory} with the given {@link MongoOperations}.
    *
    * @param mongoOperations must not be {@literal null}
-   * @param queryExecutor - the query executor
+   * @param queryExecutor   - the query executor
    */
   public ReactiveAggregateQuerySupportingRepositoryFactory(ReactiveMongoOperations mongoOperations,
-                                                           ReactiveMongoQueryExecutor queryExecutor) {
+      ReactiveMongoQueryExecutor queryExecutor,
+      ApplicationContext applicationContext,
+      Environment environment) {
     super(mongoOperations);
     this.mongoOperations = mongoOperations;
     this.queryExecutor = queryExecutor;
+    this.applicationContext = applicationContext;
+    this.environment = environment;
   }
 
   @Override
   public Optional<QueryLookupStrategy> getQueryLookupStrategy(QueryLookupStrategy.Key key,
-                                                              QueryMethodEvaluationContextProvider evaluationContextProvider) {
+      @NonNull ValueExpressionDelegate valueExpressionDelegate) {
 
-    Optional<QueryLookupStrategy> parentQueryLookupStrategy = super.getQueryLookupStrategy(key, evaluationContextProvider);
-    Assert.isTrue(parentQueryLookupStrategy.isPresent(), "Expecting parent query lookup strategy to be present");
+    Optional<QueryLookupStrategy> parentQueryLookupStrategy = super.getQueryLookupStrategy(key,
+        valueExpressionDelegate);
+    Assert.isTrue(parentQueryLookupStrategy.isPresent(),
+        "Expecting parent query lookup strategy to be present");
     return Optional.of(new AggregateQueryLookupStrategy(parentQueryLookupStrategy.get()));
   }
 
@@ -86,12 +96,13 @@ public class ReactiveAggregateQuerySupportingRepositoryFactory extends ReactiveM
 
     @Override
     public RepositoryQuery resolveQuery(Method method, RepositoryMetadata repositoryMetadata,
-                                        ProjectionFactory projectionFactory, NamedQueries namedQueries) {
+        ProjectionFactory projectionFactory, NamedQueries namedQueries) {
       if (!isAggregateQueryAnnotated(method)) {
-        return parentQueryLookupStrategy.resolveQuery(method, repositoryMetadata, projectionFactory, namedQueries);
-      }
-      else {
-        return new ReactiveAggregateMongoQuery(method, repositoryMetadata, mongoOperations, projectionFactory, queryExecutor);
+        return parentQueryLookupStrategy.resolveQuery(method, repositoryMetadata, projectionFactory,
+            namedQueries);
+      } else {
+        return new ReactiveAggregateMongoQuery(method, repositoryMetadata, mongoOperations,
+            projectionFactory, queryExecutor, applicationContext, environment);
       }
     }
   }

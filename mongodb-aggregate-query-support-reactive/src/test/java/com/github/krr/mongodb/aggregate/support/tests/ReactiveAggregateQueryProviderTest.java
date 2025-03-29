@@ -28,37 +28,40 @@ import com.github.krr.mongodb.aggregate.support.fixtures.DocumentAnnotationFixtu
 import com.github.krr.mongodb.aggregate.support.repository.ReactiveTestAggregateRepository22;
 import com.github.krr.mongodb.aggregate.support.repository.ReactiveTestNoDocumentAnnotationRepository;
 import com.github.krr.mongodb.aggregate.support.repository.ReactiveTestValidDocumentAnnotationRepository;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Optional;
 import org.bson.json.JsonParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.env.Environment;
+import org.springframework.data.expression.ValueExpressionParser;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.projection.ProjectionFactory;
 import org.springframework.data.projection.SpelAwareProxyProjectionFactory;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.DefaultRepositoryMetadata;
 import org.springframework.data.repository.query.QueryLookupStrategy;
-import org.springframework.data.repository.query.ReactiveQueryMethodEvaluationContextProvider;
+import static org.springframework.data.repository.query.QueryLookupStrategy.Key.CREATE_IF_NOT_FOUND;
+import org.springframework.data.repository.query.QueryMethodValueEvaluationContextAccessor;
 import org.springframework.data.repository.query.RepositoryQuery;
+import org.springframework.data.repository.query.ValueExpressionDelegate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.testng.AbstractTestNGSpringContextTests;
 import org.springframework.util.Assert;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import reactor.core.publisher.Mono;
 
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Optional;
-
-import static org.springframework.data.repository.query.QueryLookupStrategy.Key.CREATE_IF_NOT_FOUND;
-import static org.testng.Assert.*;
-
 /**
- * Created by rkolliva
- * 4/2/17.
+ * Created by rkolliva 4/2/17.
  */
 @SuppressWarnings({"ConstantConditions"})
 @ContextConfiguration(classes = ReactiveAggregateTestConfiguration.class)
-public class ReactiveReactiveAggregateQueryProviderTest extends AbstractTestNGSpringContextTests {
+public class ReactiveAggregateQueryProviderTest extends AbstractTestNGSpringContextTests {
 
   @Autowired
   private ReactiveMongoOperations mongoOperations;
@@ -67,7 +70,10 @@ public class ReactiveReactiveAggregateQueryProviderTest extends AbstractTestNGSp
   private ReactiveMongoQueryExecutor queryExecutor;
 
   @Autowired
-  private ReactiveQueryMethodEvaluationContextProvider evaluationContextProvider;
+  private Environment environment;
+
+  @Autowired
+  private ApplicationContext applicationContext;
 
   @Autowired
   private ReactiveTestValidDocumentAnnotationRepository testValidDocumentAnnotationRepository;
@@ -77,26 +83,36 @@ public class ReactiveReactiveAggregateQueryProviderTest extends AbstractTestNGSp
 
   @DataProvider
   private Object[][] queryMethods() {
-    return new Object[][] {
+    return new Object[][]{
         new Object[]{"aggregateQueryWithMatchOnly"},
         new Object[]{"aggregateQueryWithMultipleMatchQueries"},
         new Object[]{"aggregateQueryWithMultipleMatchQueriesInNonContiguousOrder"},
-        new Object[]{"aggregateQueryWithMultipleMatchQueriesInNonContiguousOrderWithNonAggAnnotations"}
+        new Object[]{
+            "aggregateQueryWithMultipleMatchQueriesInNonContiguousOrderWithNonAggAnnotations"}
     };
   }
 
   // this test throws a NPE because we dont expect these queries to execute.
   @Test(dataProvider = "queryMethods", expectedExceptions = {JsonParseException.class})
   public void testCreateAggregateQuery(String methodName) throws Exception {
-    ReactiveAggregateQuerySupportingRepositoryFactory factory = new ReactiveAggregateQuerySupportingRepositoryFactory(mongoOperations,
-                                                                                                                      queryExecutor);
-    Optional<QueryLookupStrategy> lookupStrategy = factory.getQueryLookupStrategy(CREATE_IF_NOT_FOUND, evaluationContextProvider);
+    ReactiveAggregateQuerySupportingRepositoryFactory factory =
+        new ReactiveAggregateQuerySupportingRepositoryFactory(
+        mongoOperations,
+        queryExecutor, applicationContext, environment);
+    ValueExpressionDelegate valueExpressionDelegate = new ValueExpressionDelegate(
+        new QueryMethodValueEvaluationContextAccessor(environment,
+            applicationContext), ValueExpressionParser.create());
+
+    Optional<QueryLookupStrategy> lookupStrategy = factory.getQueryLookupStrategy(
+        CREATE_IF_NOT_FOUND, valueExpressionDelegate);
 
     Assert.isTrue(lookupStrategy.isPresent(), "Lookup strategy must not be null");
     Method method = ReactiveTestAggregateRepository22.class.getMethod(methodName);
-    RepositoryMetadata repositoryMetadata = new DefaultRepositoryMetadata(ReactiveTestAggregateRepository22.class);
+    RepositoryMetadata repositoryMetadata = new DefaultRepositoryMetadata(
+        ReactiveTestAggregateRepository22.class);
     ProjectionFactory projectionFactory = new SpelAwareProxyProjectionFactory();
-    RepositoryQuery query = lookupStrategy.get().resolveQuery(method, repositoryMetadata, projectionFactory, null);
+    RepositoryQuery query = lookupStrategy.get()
+        .resolveQuery(method, repositoryMetadata, projectionFactory, null);
     assertNotNull(query);
     Object object = query.execute(new Object[0]);
     assertNull(object);
@@ -108,7 +124,8 @@ public class ReactiveReactiveAggregateQueryProviderTest extends AbstractTestNGSp
     TestValidDocumentAnnotationBean bean = new TestValidDocumentAnnotationBean();
     mongoOperations.insert(bean).block();
     //Valid Spring Expression Document name validation
-    Mono<Boolean> validCollectionName = mongoOperations.collectionExists(DocumentAnnotationFixture.RANDOM_COLLECTION);
+    Mono<Boolean> validCollectionName = mongoOperations.collectionExists(
+        DocumentAnnotationFixture.RANDOM_COLLECTION);
     List<String> collectionNames = mongoOperations.getCollectionNames().collectList().block();
     assertTrue(collectionNames.contains(DocumentAnnotationFixture.RANDOM_COLLECTION));
   }
@@ -119,7 +136,8 @@ public class ReactiveReactiveAggregateQueryProviderTest extends AbstractTestNGSp
     mongoOperations.insert(bean).block();
     //No Spring Expression Document annotation specified
     //Since the expression is invalid it should pick up the class name as collection name
-    boolean noAnnotationCollectionNameExists = mongoOperations.collectionExists(TestNoDocumentAnnotationBean.class).block();
+    boolean noAnnotationCollectionNameExists = mongoOperations.collectionExists(
+        TestNoDocumentAnnotationBean.class).block();
     assertTrue(noAnnotationCollectionNameExists);
     List<String> collectionNames = mongoOperations.getCollectionNames().collectList().block();
     assertTrue(collectionNames.contains("testNoDocumentAnnotationBean"));

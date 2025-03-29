@@ -21,11 +21,8 @@
 
 package com.github.krr.mongodb.aggregate.support.config;
 
-import com.github.krr.mongodb.aggregate.support.query.ApplicationContextQueryMethodEvaluationContextProvider;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.repository.query.QueryMethodEvaluationContextProvider;
 
 /**
  * @author rkolliva.
@@ -41,8 +38,4 @@ import org.springframework.data.repository.query.QueryMethodEvaluationContextPro
 })
 public class AggregateTestConfiguration {
 
-  @Bean
-  public QueryMethodEvaluationContextProvider evaluationContextProvider() {
-    return new ApplicationContextQueryMethodEvaluationContextProvider();
-  }
 }
