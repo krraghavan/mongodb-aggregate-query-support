@@ -47,7 +47,7 @@
     <mongodb.driver.version>5.2.1</mongodb.driver.version>
     <spring-data-version>3.4.1</spring-data-version>
     <spring-data-mongodb-version>4.4.0</spring-data-mongodb-version>
-    <spring-version>6.2.2</spring-version>
+    <spring-version>6.2.11</spring-version>
 
     <!-- Reactive Support -->
     <mongodb-reactive-driver.version>5.2.1</mongodb-reactive-driver.version>
