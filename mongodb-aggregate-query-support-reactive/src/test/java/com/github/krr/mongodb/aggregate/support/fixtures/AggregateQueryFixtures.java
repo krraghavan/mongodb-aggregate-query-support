@@ -21,7 +21,7 @@ package com.github.krr.mongodb.aggregate.support.fixtures;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.github.krr.mongodb.aggregate.support.beans.*;
 
 import java.io.IOException;
@@ -181,7 +181,7 @@ public class AggregateQueryFixtures {
                                                                 "{ \"_id\" : 8, \"title\" : \"Blue Flower\", \"price\" : 118.42, \"artist\" : \"O'Keefe\", \"year\" : 1918, \"tags\" : [ \"abstract\", \"painting\" ] }]";
 
   public static List<TestReplaceRootBean> newReplaceRootFixture() throws IOException {
-    ObjectMapper mapper = new ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategy.SNAKE_CASE);
+    ObjectMapper mapper = new ObjectMapper().setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
     TypeReference<List<TestReplaceRootBean>> typeReference = new TypeReference<List<TestReplaceRootBean>>() {};
     return mapper.readValue(REPLACE_ROOT_DOCS, typeReference);
   }

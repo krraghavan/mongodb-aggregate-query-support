@@ -21,6 +21,7 @@ package com.github.krr.mongodb.aggregate.support.factory;
 
 
 import com.github.krr.mongodb.aggregate.support.api.ReactiveMongoQueryExecutor;
+import com.github.krr.mongodb.aggregate.support.utils.SpringDataCompatibility;
 import java.io.Serializable;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.repository.support.ReactiveMongoRepositoryFactoryBean;
 import org.springframework.data.repository.Repository;
-import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
@@ -52,12 +52,13 @@ public class ReactiveAggregateQuerySupportingRepositoryFactoryBean<T extends Rep
       ReactiveMongoQueryExecutor queryExecutor,
       Environment environment) {
     super(repositoryInterface);
+    SpringDataCompatibility.assertSpringDataMongodb5OrLater();
     this.queryExecutor = queryExecutor;
     this.environment = environment;
   }
 
   @Override
-  protected @NonNull RepositoryFactorySupport getFactoryInstance(
+  protected @NonNull ReactiveAggregateQuerySupportingRepositoryFactory getFactoryInstance(
       @NonNull ReactiveMongoOperations operations) {
     Assert.notNull(queryExecutor, "Query executor cannot be null");
     return new ReactiveAggregateQuerySupportingRepositoryFactory(operations, queryExecutor,

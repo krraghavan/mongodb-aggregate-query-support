@@ -1,0 +1,77 @@
+# Publishes to Maven Central via the Sonatype Central Portal.
+#
+# Invoked by hand, never automatically:
+#
+#   gh workflow run release.yml -f expected_version=0.10.0-SNAPSHOT     # dry run
+#   gh workflow run release.yml -f expected_version=0.10.0 --ref v0.10.0
+#
+# A -SNAPSHOT version goes to the Portal snapshot repository and is disposable -
+# use one first to prove the credentials, the signing key and the whole path.
+#
+# A release version is staged as a deployment in the Portal and does NOT go live:
+# autoPublish is false in the release profile, so the last step is a human pressing
+# publish at https://central.sonatype.com/publishing/deployments.  Once published, a
+# version is permanent and cannot be replaced or withdrawn.
+#
+# Required repository secrets:
+#   CENTRAL_TOKEN_USERNAME / CENTRAL_TOKEN_PASSWORD  - Portal user token, NOT the account password
+#   GPG_PRIVATE_KEY                                  - armoured private key
+#   GPG_PASSPHRASE                                   - its passphrase
+
+name: Release to Maven Central
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_version:
+        description: 'Version to publish - must match the pom exactly (e.g. 0.10.0 or 0.10.0-SNAPSHOT)'
+        required: true
+        type: string
+
+jobs:
+  publish:
+    # pinned deliberately - newer images broke the embedded Mongo download (see ac4fd10)
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v6
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
+          server-id: central
+          # these take the NAMES of environment variables, not the values
+          server-username-env-var: MAVEN_USERNAME
+          server-password-env-var: MAVEN_PASSWORD
+          gpg-passphrase-env-var: GPG_PASSPHRASE
+          # this one takes the value
+          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+
+      - name: Check the pom is at the version being released
+        env:
+          # via env rather than inline ${{ }} so the input cannot be injected into the shell
+          EXPECTED_VERSION: ${{ inputs.expected_version }}
+        run: |
+          POM_VERSION=$(mvn -B -q help:evaluate -Dexpression=project.version -DforceStdout)
+          echo "pom:       $POM_VERSION"
+          echo "requested: $EXPECTED_VERSION"
+          if [ "$POM_VERSION" != "$EXPECTED_VERSION" ]; then
+            echo "::error::pom is at $POM_VERSION but this run was invoked for $EXPECTED_VERSION. Bump the pom, or re-run with the version the pom actually has."
+            exit 1
+          fi
+
+      - name: Build, test, sign and publish
+        # the full test suite runs here on purpose - it is the last gate before an
+        # irreversible publish
+        run: mvn -B -P release deploy
+        env:
+          MAVEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
+          MAVEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Where to go next
+        run: |
+          echo "Staged. Review and publish at https://central.sonatype.com/publishing/deployments"

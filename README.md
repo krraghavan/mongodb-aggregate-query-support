@@ -1,4 +1,4 @@
-[![Java CI with Maven](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml/badge.svg?branch=master)](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml)[![Release Version](https://img.shields.io/badge/version-v0.9.5-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
+[![Java CI with Maven](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml/badge.svg?branch=main)](https://github.com/krraghavan/mongodb-aggregate-query-support/actions/workflows/maven.yml)[![Release Version](https://img.shields.io/badge/version-v0.9.5-red.svg)](https://github.com/krraghavan/mongodb-aggregate-query-support) [![License](https://img.shields.io/hexpm/l/plug.svg)](https://img.shields.io/hexpm/l/plug.svg)
 
 # MONGO DB AGGREGATE QUERY SUPPORT
 This module provides annotated support for MongoDB aggregate queries much like the @Query annotation provided by the 
@@ -7,6 +7,103 @@ Spring Data module.
 The @Query annotation provided by Spring Data MongoDb allows queries to be executed with minimum code being written.  
 It is highly desirable to have a similar mechanism for MongoDB aggregate queries which allow us to execute sophisticated
 queries with practically no code being written.
+
+## Getting started
+
+Add the module that matches how you talk to Mongo.  Check the
+[Compatibility](#compatibility) table below first - the release train has to match your Spring
+generation.
+
+Non-reactive (synchronous):
+```
+<dependency>
+  <groupId>com.github.krraghavan</groupId>
+  <artifactId>mongodb-aggregate-query-support-spring</artifactId>
+  <version>0.10.0</version>
+</dependency>
+```
+
+Reactive:
+```
+<dependency>
+  <groupId>com.github.krraghavan</groupId>
+  <artifactId>mongodb-aggregate-query-support-reactive</artifactId>
+  <version>0.10.0</version>
+</dependency>
+```
+
+Aggregate query support is switched on by pointing Spring Data at this library's repository factory
+bean, and by publishing a query executor bean.  For the non-reactive module:
+
+```
+@Configuration
+@EnableMongoRepositories(basePackageClasses = MyRepositoryMarker.class,
+                         repositoryFactoryBeanClass = AggregateQuerySupportingRepositoryFactoryBean.class)
+public class MongoRepositoryConfiguration {
+
+  @Bean
+  public MongoQueryExecutor mongoQueryExecutor(MongoOperations mongoTemplate) {
+    return new MongoNativeJavaDriverQueryExecutor(mongoTemplate);
+  }
+}
+```
+
+and for the reactive module:
+
+```
+@Configuration
+@EnableReactiveMongoRepositories(basePackageClasses = MyReactiveRepositoryMarker.class,
+                                 repositoryFactoryBeanClass = ReactiveAggregateQuerySupportingRepositoryFactoryBean.class,
+                                 reactiveMongoTemplateRef = "reactiveMongoOperations")
+public class ReactiveMongoRepositoryConfiguration {
+
+  @Bean
+  public ReactiveMongoQueryExecutor reactiveMongoQueryExecutor(ReactiveMongoOperations mongoOperations) {
+    return new ReactiveMongoNativeJavaDriverQueryExecutor(mongoOperations);
+  }
+}
+```
+
+The reactive module can serve both reactive and non-reactive queries by picking the matching factory
+bean and executor.  The unit tests are the best source of worked examples.
+
+## Compatibility
+
+The release train tells you which Spring generation an artifact targets.  Pick the row that matches
+your application; the artifact ids and package names are identical across trains, so moving between
+them is a version change and nothing else.
+
+| Release train | Spring Framework | Spring Data MongoDb | Mongo Java driver | Spring Boot | Java |
+|---------------|------------------|---------------------|-------------------|-------------|------|
+| **0.10.x**    | 7.0.x            | 5.0.x               | 5.6.x             | 4.0.x       | 17+  |
+| 0.9.x         | 6.2.x            | 4.4.x               | 5.2.x             | 3.4.x       | 17+  |
+| 0.8.x         | 4.x / 5.x        | 1.x / 2.x           | 3.x               | -           | 8+   |
+
+The Spring and Spring Data dependencies are declared ```optional```, so nothing is imposed on your
+build transitively - your own BOM decides the exact patch version.  Any 5.0.x Spring Data MongoDb
+works with the 0.10.x train.
+
+The 0.10.x train does **not** run on Spring Data MongoDb 4.x.  The incompatibility is a change to a
+method signature in Spring Data that would otherwise disable aggregate query support *silently*, so
+the library checks for it at startup and fails with an explanatory error instead.  If you see that
+error, you want the 0.9.x train.
+
+0.9.x is not under active development.  It is tagged at ```v0.9.5``` and a maintenance branch can be
+cut from that tag if the need arises.
+
+## New in 0.10.0 version (SPRING 7 / SPRING BOOT 4 ONLY - SEE COMPATIBILITY ABOVE)
+1. Moved to Spring Framework 7.0.8, Spring Data Commons 4.0.6, Spring Data MongoDb 5.0.6 and Mongo
+   Java driver 5.6.5.  This train does not support Spring Framework 6 - use 0.9.x for that.
+2. Spring Data MongoDb 5.0 narrowed the return type of ```MongoRepositoryFactoryBean#getFactoryInstance```,
+   so the repository factory beans in this library had to be recompiled against it.  A jar from either
+   train placed on the other train's classpath loses aggregate query support without raising an error,
+   so both factory beans now assert the Spring Data version on construction and fail fast.
+3. Java 17 is now the declared source and target level.  It was previously declared as 1.8, which had
+   not been accurate since 0.9.0 - Spring 6 already required 17 at runtime.
+4. ```javax.annotation``` replaced with ```jakarta.annotation``` in the test support module.  Spring 6.2
+   still honoured the ```javax``` annotations as a fallback; Spring 7 does not.
+5. Upgraded Jackson to 2.21.4, slf4j to 2.0.18 (with the ```log4j-slf4j2-impl``` binding), log4j to
+   2.25.5 and commons-lang3 to 3.18.0.
 
 ## New in 0.9.5 version (DO NOT USE IF USING SPRING DATA Mongo < 4.4)
 1. Update to support Spring Data Mongo 4.4 and Mongo Drive 5.2.1. There have been a number of changes made in Spring Data 
@@ -81,6 +178,9 @@ Spring Cairo.RELEASE release train for Spring 5.x and Spring Data MongoDb 2.x su
 1. Mongo Java driver 3.6.3 for non-reactive and 1.7.1 reactive streams Java driver are supported/tested
 
 ### Reactive and Non-Reactive Usage
+*(Historical note - the coordinates in this section are the 0.8.5-era ones, and the ```spring4```
+module no longer exists.  See [Getting started](#getting-started) for current coordinates.)*
+
 When the reactive module is used, both reactive and non-reactive queries can be performed by using the appropriate
 Factory and query executor classes.  For Reactive Aggregation queries use the 
 ```ReactiveAggregateQuerySupportingRepositoryFactoryBean``` and the ```ReactiveMongoNativeJavaDriverExecutor```.  The 
@@ -394,7 +494,7 @@ public interface PossessionsRepository extends MongoRepository<Possessions, Inte
 ```
 
 ## Java version
-Minimum Java version supported is 1.8 
+Minimum Java version supported is 17 on the 0.10.x and 0.9.x trains.
 
 ## Usage
 See the unit test classes and test repository definitions for examples of how to use the Aggregate query annotations.
