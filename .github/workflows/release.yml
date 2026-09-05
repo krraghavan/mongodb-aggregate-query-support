@@ -11,10 +11,11 @@
 # Portal -> Namespaces -> com.github.krraghavan -> Enable SNAPSHOTs.  Without it the
 # upload fails with 403 Forbidden.
 #
-# A release version is staged as a deployment in the Portal and does NOT go live:
-# autoPublish is false in the release profile, so the last step is a human pressing
-# publish at https://central.sonatype.com/publishing/deployments.  Once published, a
-# version is permanent and cannot be replaced or withdrawn.
+# A release version publishes automatically once Central finishes validating it -
+# autoPublish is true in the release profile, and the build waits for the deployment
+# to reach PUBLISHED, so a publish failure fails the run rather than reporting green.
+# A published version is permanent and cannot be replaced or withdrawn, so the
+# expected_version input below is the guard: the run aborts unless the pom matches.
 #
 # Required repository secrets:
 #   CENTRAL_TOKEN_USERNAME / CENTRAL_TOKEN_PASSWORD  - Portal user token, NOT the account password

@@ -374,10 +374,13 @@
             <extensions>true</extensions>
             <configuration>
               <publishingServerId>central</publishingServerId>
-              <!-- A Central publish is permanent - a version cannot be replaced or
-                   withdrawn.  Stage the bundle and release it from the Portal after
-                   looking at it. -->
-              <autoPublish>false</autoPublish>
+              <!-- Publishes as soon as Central finishes validating.  A published
+                   version is permanent - it cannot be replaced or withdrawn - so the
+                   guard against releasing the wrong thing is the expected_version
+                   check in release.yml, which refuses to run unless the pom matches
+                   the version the release was invoked for. -->
+              <autoPublish>true</autoPublish>
+              <waitUntil>PUBLISHED</waitUntil>
             </configuration>
           </plugin>
           <plugin>
